@@ -44,7 +44,8 @@ const formSchema = z.object({
 function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>>}) {
     const textarea = useWatch({
         control,
-        name: 'targetText'
+        name: 'targetText',
+        defaultValue:''
     })
 
     return <p>{textarea.length} / {tokenLimit}</p>
