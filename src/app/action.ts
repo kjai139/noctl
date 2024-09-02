@@ -11,10 +11,16 @@ const client = new Anthropic({
 export async function translateTxt (text:string, language:string) {
     try {
         const message = await client.messages.create({
-            max_tokens:2048,
+            max_tokens:4096,
             messages: [{
                 role: 'user',
-                content: `Can you translate the following text to ${language ? language : 'English'} and provide me a list of special terms that you translated from the text (in json format,containing the t field for the original text and the m field for what you translated to) after the translated text in your response, with the array after the label "Glossary:", cutting out everyhing else? - ${text}`,
+                content: `Please translate the following text to ${language ? language : 'English'} and provide me a list of special terms that you translated in the following json format, cutting out everyhing else. If there are lines you are unsure of, it's okay to be unsure but please include them in the "unsure" field of the json response with the line in its original language in the line field and a certainty rating of either "unsure" or "very unsure" so I can check on them. Do not include anything else in your response other than the json object.
+
+                JSON format - 
+                {"content":"", "glossary":[{"term": "", "translation":""}], "unsure":[{"line":"", "translation":"", "certainty":""}]}
+                
+                
+                Text to be translated- ${text}`,
             }],
             model: 'claude-3-5-sonnet-20240620'
         })

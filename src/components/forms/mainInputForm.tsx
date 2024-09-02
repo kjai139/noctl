@@ -7,7 +7,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "../ui/select";
 import { Button } from "../ui/button";
 import { translateTxt } from "@/app/action";
-import { useState } from "react";
+import { useWorkState } from "@/app/_contexts/workStateContext";
+import GlossaryTable from "../tables/glossaryTable";
 
 
 const tokenLimit = 1024
@@ -52,7 +53,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
-
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure} = useWorkState()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
     })
@@ -62,6 +63,17 @@ export default function MainInputForm () {
         try {
             const result = await translateTxt(values.targetText, values.language)
             console.log(result)
+
+            if (result && result.length > 0) {
+                if (result[0].type === 'text') {
+                    const jsonResult = JSON.parse(result[0].text)
+                    console.log('JSON format of api response: ', jsonResult)
+                    setGlossary(jsonResult.glossary)
+                    setCurResult(jsonResult.content)
+                    setUnsure(jsonResult.unsure)
+                }
+                
+            }
         } catch (err) {
             console.error(err)
         }
@@ -69,11 +81,15 @@ export default function MainInputForm () {
 
     
 
+    
+
    
 
     return (
+        <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4">
+                <div>
                 <FormField
                 control={form.control}
                 name="language"
@@ -106,6 +122,8 @@ export default function MainInputForm () {
                 >
 
                 </FormField>
+    
+                </div>
                 <div className="flex flex-col gap-4">
                 <FormField control={form.control}
                 name="targetText"
@@ -137,5 +155,7 @@ export default function MainInputForm () {
                 </div>
             </form>
         </Form>
+        <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
+        </>
     )
 }
