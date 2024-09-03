@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { translateTxt } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
+import { useEffect, useRef, useState } from "react";
 
 
 const tokenLimit = 1024
@@ -58,6 +59,8 @@ export default function MainInputForm () {
         resolver:zodResolver(formSchema),
     })
 
+    const textareaRef = useRef(null)
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log('submitted', values)
         try {
@@ -79,7 +82,15 @@ export default function MainInputForm () {
         }
     }
 
-    
+    useEffect(() => {
+        console.log('main re-rendered')
+    })
+
+    const handleTextareaInputchange = () => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+        }
+    }
 
     
 
@@ -124,33 +135,38 @@ export default function MainInputForm () {
                 </FormField>
     
                 </div>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
                 <FormField control={form.control}
                 name="targetText"
                 render={({field}) => (
                     <FormItem>
-                        <FormLabel className="p-4">
+                        {/* <FormLabel className="p-4">
                             What would you like to translate?
-                        </FormLabel>
+                        </FormLabel> */}
                             <FormControl>
-                                <Textarea placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] resize-none sm:min-h-[300px]">
+                                <Textarea onInput={(e) => {
+                                    const target = e.target as HTMLTextAreaElement
+                                    target.style.height = 'auto';
+                                    target.style.height = `${target.scrollHeight}px`;
+                                }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] border-none shadow-none resize-none main-ta focus-visible:ring-0">
 
                                 </Textarea>
                                 
                             </FormControl>
-                            <div className="text-destructive p-2 flex gap-2">
-                                {form.formState.errors.targetText ? form.formState.errors.targetText.message : null }
-                                {form.formState.errors.language ? form.formState.errors.language.message : null }
-                                <TextAreaWatched control={form.control}></TextAreaWatched>
-                            </div>
+                            
                         
                     </FormItem>
                 )}
                 >
 
                 </FormField>
-                <div className="justify-end flex">
-                <Button type="submit">Translate</Button>
+                <div className="justify-end flex gap-2 items-center p-2">
+                <div className="text-destructive p-0 flex gap-2">
+                    {form.formState.errors.targetText ? form.formState.errors.targetText.message : null }
+                    {form.formState.errors.language ? form.formState.errors.language.message : null }
+                    <TextAreaWatched control={form.control}></TextAreaWatched>
+                </div>
+                <Button className="rounded-lg py-0" variant={'ghost'} type="submit">Translate</Button>
                 </div>
                 </div>
             </form>

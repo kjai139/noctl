@@ -7,11 +7,14 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-  } from "@/components/ui/table"
-
-  import { Input } from "../ui/input"
+  } from "@/components/ui/table";
+import { Input } from "../ui/input"
+import { FaFileUpload } from "react-icons/fa";
 import { useState } from "react"
 import { Button } from "../ui/button"
+import { IoAlertCircleOutline } from "react-icons/io5";
+import { GrDocumentDownload } from "react-icons/gr";
+import { RiDeleteBin2Line } from "react-icons/ri";
 
 export default function GlossaryTable ({glossary, setGlossary}) {
 
@@ -34,10 +37,24 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         }
     ]
 
-    const [testGloss, setTestGloss] = useState(glossary1)
+    const notifications = [
+      {
+        text:'The glossary file must be in JSON format'
+      },
+      {
+        text:'Make sure the glossary is cleared out if not needed'
+      },
+      {
+        text: 'It is highly recommended to use a glossary for the same project to ensure consistency'
+      }
+    ]
+
+    const [testGloss, setTestGloss] = useState()
+    const [upLoadedFile, setUpLoadedFile] = useState()
+    const [errorMsg, setErrorMsg] = useState('')
 
     const handleInputchange = (newDef, id) => {
-        const updatedData = testGloss.map((node, idx) => {
+        const updatedData = glossary.map((node, idx) => {
             if (id === idx) {
                 return (
                     {...node, definition: newDef}
@@ -47,16 +64,46 @@ export default function GlossaryTable ({glossary, setGlossary}) {
             }
         })
 
-        setTestGloss(updatedData)
+        /* setTestGloss(updatedData) */
+        setGlossary(updatedData)
     }
 
     const checkGlossary = () => {
         console.log(testGloss)
+        console.log('glossary:', glossary)
+    }
+
+    const handleUploadChange = (e) => {
+      const selectedFile = e.target.files[0]
+      if (selectedFile && selectedFile.type === 'application/json') {
+        console.log('Uploaded File: ', selectedFile)
+        const reader = new FileReader()
+        //onload is triggered once reading is complete
+        reader.onload = (e) => {
+
+          try {
+            if (!e.target || !e.target.result) {
+              throw new Error('e.target is empty')
+            }
+            const json = JSON.parse(e.target.result as string)
+            console.log('JSON uploaded:', json)
+            setUpLoadedFile(selectedFile)
+            setGlossary(json)
+          } catch (err) {
+            setErrorMsg('Invalid JSON file. Please double-check its content and reupload.')
+          }
+        }
+        reader.readAsText(selectedFile)
+        
+        
+      } else {
+        setErrorMsg('Please upload a JSON file.')
+      }
     }
 
     const downloadGlossary = () => {
         // null is the replacer and 2 is the space param for pretty-print
-        const blob = new Blob([JSON.stringify(testGloss, null, 2)], {type: 'application/json'})
+        const blob = new Blob([JSON.stringify(glossary, null, 2)], {type: 'application/json'})
         const url = URL.createObjectURL(blob)
 
         const link = document.createElement('a')
@@ -69,9 +116,32 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         document.body.removeChild(link)
     }
 
+    const resetGlossary = () => {
+      setGlossary([])
+      console.log('glossary reset.')
+    }
+
     return (
-        <div className="shadow p-4 flex flex-col gap-8">
-        <h1 className="text-xl font-semibold">Glossary</h1>
+        <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
+        
+        <div className="flex gap-2 flex-col text-xs">
+          <div className="flex gap-2 items-start">
+            <div>
+          <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
+          </div>
+          <p>An editable glossary will be auto-generated after each translation. You can then choose to save the glossary file and upload it for future uses.</p>
+          </div>
+          <ul>
+            {notifications && notifications.map((node, idx) => {
+              return (
+                <li key={`noti-${idx}`}>
+                  - {node.text}
+                </li>
+              )
+            })}
+          </ul>
+          <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+        </div>
         <Table>
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
       <TableHeader>
@@ -82,7 +152,7 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {testGloss.map((node, idx) => (
+        {glossary && glossary.map((node, idx) => (
           <TableRow key={`tb-${idx}`}>
             <TableCell className="font-medium">{node.term}</TableCell>
             <TableCell>
@@ -101,9 +171,27 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         
       </TableFooter> */}
     </Table>
-    <div className="flex gap-4">
-    <Button onClick={checkGlossary}>Check Glossary</Button>
-    <Button onClick={downloadGlossary}>Download Glossary</Button>
+    <div className="flex gap-4 ml-auto">
+    {/* <Button onClick={checkGlossary}>Check Glossary</Button> */}
+    {glossary.length > 0 ?
+    <>
+    <Button className="gap-2" onClick={resetGlossary}>
+        <RiDeleteBin2Line></RiDeleteBin2Line>
+        <span>Delete Glossary</span>
+        </Button>
+    <Button onClick={downloadGlossary} className="gap-2">
+      <GrDocumentDownload></GrDocumentDownload>
+      <span>Download Glossary</span></Button>
+    </>
+    : null
+    }
+    <div>
+    <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
+      <FaFileUpload></FaFileUpload><span>Upload</span>
+    </label>
+    <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+    
+    </div>
     </div>
     </div>
     )

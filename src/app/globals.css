@@ -59,11 +59,16 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+.uploadBtn:hover {
+  cursor: pointer;
+}
+
+
+.main-ta {
+  min-height:calc(1.6em + 1.5rem + 2px);
+}
+
+/* paddingbox is inside stopping at border and border is entire including border */
+.main-wrap {
+  background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #f5a623, #f093fb, #36cfc9) border-box;
 }
