@@ -72,3 +72,7 @@
 .main-wrap {
   background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, #f5a623, #f093fb, #36cfc9) border-box;
 }
+
+.mw {
+  max-width: 1400px;
+}

@@ -9,7 +9,8 @@ import { Button } from "../ui/button";
 import { translateTxt } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { GlossaryItem, GlossaryType } from "@/app/_types/glossaryType";
 
 
 const tokenLimit = 1024
@@ -59,19 +60,56 @@ export default function MainInputForm () {
         resolver:zodResolver(formSchema),
     })
 
-    const textareaRef = useRef(null)
+    
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log('submitted', values)
         try {
-            const result = await translateTxt(values.targetText, values.language)
+            let normalizedGlossary
+            if (glossary.length > 0) {
+                normalizedGlossary = glossary.map((entry) => {
+                    return (
+                        {
+                            ...entry,
+                            term: entry.term.toLowerCase(),
+                            
+                        }
+                    )
+                })
+            }
+
+            const params = {
+                text:values.targetText,
+                language: values.language,
+                ...(glossary.length > 0 && {glossary:JSON.stringify(normalizedGlossary)})
+            }
+            const result = await translateTxt(params)
             console.log(result)
 
             if (result && result.length > 0) {
                 if (result[0].type === 'text') {
                     const jsonResult = JSON.parse(result[0].text)
                     console.log('JSON format of api response: ', jsonResult)
-                    setGlossary(jsonResult.glossary)
+                    //add new entries if not dupe - backend should only return normalized results
+                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                        jsonResult.glossary.forEach((newentry:GlossaryItem) => {
+                            /* let normalizedterm = newentry.term.toLowerCase() */
+                            if (!termSet.has(newentry.term)){
+                                termSet.add(newentry.term)
+                                normalizedGlossary.unshift(newentry)
+                            } else {
+                                console.log(`Entry ${newentry.term} already exists.`)
+                            }
+                        })
+                        setGlossary(normalizedGlossary)
+                    } else {
+                        setGlossary(jsonResult.glossary)
+                    }
+                    
+                    
+                    
+                    
                     setCurResult(jsonResult.content)
                     setUnsure(jsonResult.unsure)
                 }
@@ -86,26 +124,23 @@ export default function MainInputForm () {
         console.log('main re-rendered')
     })
 
-    const handleTextareaInputchange = () => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-        }
-    }
-
-    
-
+  
    
-
     return (
-        <>
+        <div className="flex gap-8">
+            <div>
+        <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
+        </div>
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4">
-                <div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4 flex-col">
+                <div className="flex">
                 <FormField
                 control={form.control}
                 name="language"
                 render={({field}) => (
+                    
                     <FormItem>
+                        
                         <FormLabel>Output Language</FormLabel>
                         
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
@@ -129,6 +164,7 @@ export default function MainInputForm () {
                             </Select>
                         
                     </FormItem>
+                    
                 )}
                 >
 
@@ -171,7 +207,7 @@ export default function MainInputForm () {
                 </div>
             </form>
         </Form>
-        <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
-        </>
+        
+        </div>
     )
 }
