@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { GlossaryItem, GlossaryType } from "@/app/_types/glossaryType";
 
 
-const tokenLimit = 1024
+const tokenLimit = 5000
 
 const language = [
     {
@@ -55,15 +55,19 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading} = useWorkState()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
+        defaultValues: {
+            language: 'English'
+        }
     })
 
     
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log('submitted', values)
+        setIsLoading(true)
         try {
             let normalizedGlossary
             if (glossary.length > 0) {
@@ -83,19 +87,22 @@ export default function MainInputForm () {
                 language: values.language,
                 ...(glossary.length > 0 && {glossary:JSON.stringify(normalizedGlossary)})
             }
+            console.log('Params used:', params)
             const result = await translateTxt(params)
-            console.log(result)
+            console.log('Api response:', result)
 
-            if (result && result.length > 0) {
-                if (result[0].type === 'text') {
-                    const jsonResult = JSON.parse(result[0].text)
-                    console.log('JSON format of api response: ', jsonResult)
+            if (result && result[0]) {
+                if (result[0].type === 'tool_use') {
+                    const textResult = result[0].input.text
+                    const glossaryResult = result[0].input.glossary
+                   
                     //add new entries if not dupe - backend should only return normalized results
                     if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        console.log('Normalized Glossary used')
                         const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                        jsonResult.glossary.forEach((newentry:GlossaryItem) => {
+                        glossaryResult.forEach((newentry:GlossaryItem) => {
                             /* let normalizedterm = newentry.term.toLowerCase() */
-                            if (!termSet.has(newentry.term)){
+                            if (!termSet.has(newentry.term.toLowerCase())){
                                 termSet.add(newentry.term)
                                 normalizedGlossary.unshift(newentry)
                             } else {
@@ -104,19 +111,23 @@ export default function MainInputForm () {
                         })
                         setGlossary(normalizedGlossary)
                     } else {
-                        setGlossary(jsonResult.glossary)
+                        setGlossary(glossaryResult)
                     }
                     
                     
                     
                     
-                    setCurResult(jsonResult.content)
-                    setUnsure(jsonResult.unsure)
+                    setCurResult(textResult)
+                    
+                
                 }
                 
             }
+            setIsLoading(false)
         } catch (err) {
             console.error(err)
+           
+            setIsLoading(false)
         }
     }
 
@@ -124,11 +135,48 @@ export default function MainInputForm () {
         console.log('main re-rendered')
     })
 
+    const setCurResultHandle = () => {
+        const text = `Cover folding
+
+        Preface.
+
+        The Heavenly Demon has died.
+
+        With that, the long and drawn-out battle between righteousness and evil has also come to an end.
+        The hellish times that persisted for years could finally conclude with the death of the Heavenly Demon.
+
+        Many cheered and rejoiced at the defeat of the demonic sect. They said that peace had finally been restored.
+        However, what remained at the end of the war was not just relief and peace.
+
+        Two of the Nine Major Sects that supported the righteous faction of the martial arts world were burned to ashes, and one of the Four Great Clans collapsed.
+        Even the three masters known as the 'Three Venerables' among the countless warriors of the Central Plains were all killed by the Heavenly Demon's hand.
+
+        Although they succeeded in killing the Heavenly Demon and erasing the demonic sect from this land, it remained a war full of losses.
+
+        Too much had been lost.
+        No one knew how long it would take to recover and restore what had been scattered and destroyed.
+
+        Nevertheless.
+
+        Even though much had burned to ashes, what remained was not just despair.
+        Somewhere, hope would bloom, and heroes who would overcome the crisis and continue the alliance would gradually appear.
+
+        However.
+
+        It was a story that didn't concern me.
+
+        "Where is it?"
+
+        The woman murmured in a small voice.`
+        setCurResult(text)
+    }
+
   
    
     return (
-        <div className="flex gap-8">
+        <div className="flex gap-8 justify-center">
             <div>
+                <Button onClick={setCurResultHandle}>Test output</Button>
         <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
         </div>
         <Form {...form}>
@@ -146,7 +194,8 @@ export default function MainInputForm () {
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select Language"></SelectValue>
+                                    <SelectValue placeholder="Select Language">
+                                    </SelectValue>
                                 </SelectTrigger>
                             </FormControl>
                                 <SelectContent>
@@ -184,7 +233,7 @@ export default function MainInputForm () {
                                     const target = e.target as HTMLTextAreaElement
                                     target.style.height = 'auto';
                                     target.style.height = `${target.scrollHeight}px`;
-                                }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] border-none shadow-none resize-none main-ta focus-visible:ring-0">
+                                }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] max-h-[650px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                 </Textarea>
                                 
@@ -202,7 +251,7 @@ export default function MainInputForm () {
                     {form.formState.errors.language ? form.formState.errors.language.message : null }
                     <TextAreaWatched control={form.control}></TextAreaWatched>
                 </div>
-                <Button className="rounded-lg py-0" variant={'ghost'} type="submit">Translate</Button>
+                <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isLoading}>Translate</Button>
                 </div>
                 </div>
             </form>

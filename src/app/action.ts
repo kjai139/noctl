@@ -18,27 +18,86 @@ interface translateTxtProps {
 
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {
-        const normalizedtext = text.toLowerCase().replace(/[^\w\s]/g, '')
+        const normalizedtext = text.toLowerCase()
+        .replace(/[(){}\[\]<>]/g, ' ')  
+        .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
+        console.log(normalizedtext)
         const words = new Set(normalizedtext.split(/\s+/))
+        console.log('Word set:', words)
         let jsonGlossary
         let filteredGlossary
+        let formattedGlossary
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
-            filteredGlossary = JSON.stringify(jsonGlossary.filter((entry:GlossaryItem) => words.has(entry.term)))
+            console.log('OG GLOSSARY - ',jsonGlossary )
+            filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => words.has(entry.term))
+            console.log('filteredlist', filteredGlossary)
+            formattedGlossary = `
+            Glossary -
+            ${filteredGlossary.map(term => `
+                Term:${term.term},
+                Translation:${term.definition}
+                `).join('')}
+            `
+            console.log('formattedGLoss', formattedGlossary)
+        }
+        
+
+        let prompt
+        if (glossary) {
+            prompt = `You are a very precise translator. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
+            console.log('prompt 1 used', prompt)
+        } else {
+            prompt = `Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of special terms. Here's the text to be translated - ${text}`
+            console.log('prompt 2 used')
         }
 
 
+
+
         const message = await client.messages.create({
-            max_tokens:4096,
+            max_tokens:8192,
+            tool_choice:{
+                type:"tool",
+                name:"translate_with_glossary"
+            },
+            tools: [
+                {
+                    name:"translate_with_glossary",
+                    description: "Translates text from one language into another with the user's glossary",
+                    input_schema: {
+                        type:"object",
+                        properties: {
+                            "text": {
+                                type: "string",
+                                description: "The translated text that is NOT the original text"
+                            },
+                            "glossary": {
+                                type:"array",
+                                items: {
+                                    type:"object",
+                                    properties: {
+                                        "term": {
+                                            type:"string",
+                                            description:"The untranslated original term. The term MUST be whole and not break words apart, especially in asian languages"
+                                        },
+                                        "definition": {
+                                            type:"string",
+                                            description:"The translation that was used for the term"
+                                        }
+                                    },
+                                    required:["term", "definition"]
+                                },
+                                description:"A glossary list of special, uncommon terms taken from the text, each with a term and a definition"
+                            }
+                        },
+                        required:["text", "glossary"]
+                    }
+                }
+            ],
             messages: [{
                 role: 'user',
-                content: `Please translate the following text to ${language ? language : 'English'} ${glossary ? "while making sure that the terms matches the glossary I provide" : ","} and provide me a list of special terms you translated ${glossary ? "that aren't already included in the glossary" : ""} in the following json format. If there are lines you are unsure of, it's okay to be unsure but please include them in the "unsure" field of the json response with the line in its original language in the line field and a certainty rating of either "unsure" or "very unsure" so I can check on them. Do not include anything else in your response other than the json object.
-
-                JSON format - 
-                {"content":"", "glossary":[{"term": "(lower case the terms if applicable)", "translation":""}], "unsure":[{"line":"", "translation":"", "certainty":""}]}
-                
-                
-                Text to be translated- ${text} ${glossary ? `The glossary - ${filteredGlossary}` : "."}`,
+                content: prompt
             }],
             model: 'claude-3-5-sonnet-20240620'
         })

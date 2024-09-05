@@ -30,6 +30,8 @@ interface workStateContextType {
     setCurResult: React.Dispatch<React.SetStateAction<string>>;
     unsure: UnsureItem[];
     setUnsure: React.Dispatch<React.SetStateAction<UnsureItem[]>>;
+    isLoading: boolean,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
@@ -44,10 +46,11 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
     const [user, setUser] = useState<UserState | null>(null)
     const [curResult, setCurResult] = useState('')
     const [unsure, setUnsure] = useState<UnsureItem[]>([])
+    const [isLoading, setIsLoading] = useState(false)
 
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading}}>
             {children}
         </workStateContext.Provider>
     )
