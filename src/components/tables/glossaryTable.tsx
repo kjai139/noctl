@@ -15,8 +15,15 @@ import { Button } from "../ui/button"
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
+import { GlossaryItem } from "@/app/_types/glossaryType";
+import { TiDeleteOutline } from "react-icons/ti";
 
-export default function GlossaryTable ({glossary, setGlossary}) {
+interface GlossaryTableTypes {
+  glossary: GlossaryItem[],
+  setGlossary: React.Dispatch<React.SetStateAction<GlossaryItem[]>>;
+}
+
+export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableTypes) {
 
     /* if (glossary.length === 0) {
         return (
@@ -45,15 +52,15 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         text:'Make sure the glossary is cleared out if not needed'
       },
       {
-        text: 'It is highly recommended to use a glossary for the same project to ensure consistency'
+        text: 'It is highly recommended to double check any uncommon terms to ensure the highest quality'
       }
     ]
 
-    const [testGloss, setTestGloss] = useState()
-    const [upLoadedFile, setUpLoadedFile] = useState()
+    const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
+    const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
     const [errorMsg, setErrorMsg] = useState('')
 
-    const handleInputchange = (newDef, id) => {
+    const handleInputchange = (newDef:string, id) => {
         const updatedData = glossary.map((node, idx) => {
             if (id === idx) {
                 return (
@@ -68,14 +75,14 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         setGlossary(updatedData)
     }
 
-    const checkGlossary = () => {
-        console.log(testGloss)
+    const testGlossary = () => {
+        setGlossary(glossary1)
         console.log('glossary:', glossary)
     }
 
-    const handleUploadChange = (e) => {
-      const selectedFile = e.target.files[0]
-      if (selectedFile && selectedFile.type === 'application/json') {
+    const handleUploadChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0].type === 'application/json') {
+        const selectedFile = e.target.files[0]
         console.log('Uploaded File: ', selectedFile)
         const reader = new FileReader()
         //onload is triggered once reading is complete
@@ -121,10 +128,15 @@ export default function GlossaryTable ({glossary, setGlossary}) {
       console.log('glossary reset.')
     }
 
+    const deleteTerm = (term:string) => {
+      setGlossary((prev) => prev!.filter((entry:GlossaryItem) => entry.term !== term))
+    }
+
     return (
         <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
         
         <div className="flex gap-2 flex-col text-xs">
+        <Button onClick={testGlossary}>Test Glossary</Button>
           <div className="flex gap-2 items-start">
             <div>
           <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
@@ -152,12 +164,18 @@ export default function GlossaryTable ({glossary, setGlossary}) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {glossary && glossary.map((node, idx) => (
+        {glossary && glossary.map((node:GlossaryItem, idx:number) => (
           <TableRow key={`tb-${idx}`}>
             <TableCell className="font-medium">{node.term}</TableCell>
-            <TableCell>
-                <Input type="text" maxLength={25} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
+            <TableCell className="flex gap-4">
+                <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
                 </Input>
+                <div>
+                <Button variant={'ghost'} onClick={() => deleteTerm(node.term)}>
+                  <TiDeleteOutline size={20}></TiDeleteOutline>
+
+                </Button>
+                </div>
             </TableCell>
             
           </TableRow>

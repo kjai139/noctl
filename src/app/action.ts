@@ -30,7 +30,8 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
             console.log('OG GLOSSARY - ',jsonGlossary )
-            filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => words.has(entry.term))
+            filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term))
+            //set with words.has doesnt check partial
             console.log('filteredlist', filteredGlossary)
             formattedGlossary = `
             Glossary -
@@ -45,10 +46,10 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 
         let prompt
         if (glossary) {
-            prompt = `You are a very precise translator. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
+            prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
             console.log('prompt 1 used', prompt)
         } else {
-            prompt = `Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of special terms. Here's the text to be translated - ${text}`
+            prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
             console.log('prompt 2 used')
         }
 
@@ -79,11 +80,15 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                                     properties: {
                                         "term": {
                                             type:"string",
-                                            description:"The untranslated original term. The term MUST be whole and not break words apart, especially in asian languages"
+                                            description:"The untranslated original term. The term MUST be whole phrase and not break words apart, especially in asian languages"
                                         },
                                         "definition": {
                                             type:"string",
                                             description:"The translation that was used for the term"
+                                        },
+                                        "confident_level": {
+                                            type:"number",
+                                            description:"The confident level of the definition's accuracy on a scale of 1-10"
                                         }
                                     },
                                     required:["term", "definition"]
