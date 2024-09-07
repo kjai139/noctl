@@ -8,6 +8,12 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table";
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 import { Input } from "../ui/input"
 import { FaFileUpload } from "react-icons/fa";
 import { useState } from "react"
@@ -17,6 +23,8 @@ import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { GlossaryItem } from "@/app/_types/glossaryType";
 import { TiDeleteOutline } from "react-icons/ti";
+import { TbReportSearch } from "react-icons/tb";
+import SearchTermBtn from "../buttons/searchTermBtn";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -132,6 +140,10 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
       setGlossary((prev) => prev!.filter((entry:GlossaryItem) => entry.term !== term))
     }
 
+    const termLookup = (term:string) => {
+      console.log('Looking up', term)
+    }
+
     return (
         <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
         
@@ -166,11 +178,19 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
       <TableBody>
         {glossary && glossary.map((node:GlossaryItem, idx:number) => (
           <TableRow key={`tb-${idx}`}>
-            <TableCell className="font-medium">{node.term}</TableCell>
+            <TableCell className="font-medium">
+              <span>
+              {node.term}
+              </span>
+            </TableCell>
             <TableCell className="flex gap-4">
                 <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
                 </Input>
-                <div>
+                <div className="flex items-center">
+                  
+              
+                <SearchTermBtn term={node.term}></SearchTermBtn>
+          
                 <Button variant={'ghost'} onClick={() => deleteTerm(node.term)}>
                   <TiDeleteOutline size={20}></TiDeleteOutline>
 

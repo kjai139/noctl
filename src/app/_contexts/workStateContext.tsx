@@ -1,12 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState } from "react"
-
-
-interface GlossaryItem {
-    term:string,
-    translation:string
-}
+import { GlossaryItem } from "../_types/glossaryType"
 
 interface UnsureItem {
     line: string,

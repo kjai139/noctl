@@ -12,6 +12,7 @@ export default function ResultRender () {
 
     useEffect(() => {
         if (isLoading) {
+            setSeconds(0)
             intervalRef.current = setInterval(() => {
                 setSeconds(prev => prev + 1)
             }, 1000)

@@ -70,6 +70,11 @@ export default function MainInputForm () {
         setIsLoading(true)
         try {
             let normalizedGlossary
+            let filteredGlossary
+            const normalizedtext = values.targetText.toLowerCase()
+            .replace(/[(){}\[\]<>]/g, ' ')  
+            .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
+            
             if (glossary.length > 0) {
                 normalizedGlossary = glossary.map((entry) => {
                     return (
@@ -80,12 +85,22 @@ export default function MainInputForm () {
                         }
                     )
                 })
+
+                if (normalizedGlossary) {
+                    filteredGlossary = normalizedGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term))
+                }
+
+                
             }
+
+            
+            console.log('Non filtered Glossary:', glossary)
+            console.log('Filtered Glossary:', filteredGlossary)
 
             const params = {
                 text:values.targetText,
                 language: values.language,
-                ...(glossary.length > 0 && {glossary:JSON.stringify(normalizedGlossary)})
+                ...(glossary.length > 0 && {glossary:JSON.stringify(filteredGlossary)})
             }
             console.log('Params used:', params)
             const result = await translateTxt(params)

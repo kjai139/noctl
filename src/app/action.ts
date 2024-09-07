@@ -2,6 +2,7 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai"
 
 
 const client = new Anthropic({
@@ -18,19 +19,20 @@ interface translateTxtProps {
 
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {
-        const normalizedtext = text.toLowerCase()
+        /* const normalizedtext = text.toLowerCase()
         .replace(/[(){}\[\]<>]/g, ' ')  
         .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
-        console.log(normalizedtext)
-        const words = new Set(normalizedtext.split(/\s+/))
-        console.log('Word set:', words)
+        console.log(normalizedtext) */
+        /* const words = new Set(normalizedtext.split(/\s+/))
+        console.log('Word set:', words) */
         let jsonGlossary
-        let filteredGlossary
+        let filteredGlossary:GlossaryItem[]
         let formattedGlossary
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
             console.log('OG GLOSSARY - ',jsonGlossary )
-            filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term))
+            filteredGlossary = jsonGlossary
+            /* filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term)) */
             //set with words.has doesnt check partial
             console.log('filteredlist', filteredGlossary)
             formattedGlossary = `
@@ -114,4 +116,40 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         throw err
     }
     
+}
+
+interface TermLookupProps {
+    term: string
+}
+
+export async function TermLookup ({term}:TermLookupProps) {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: SchemaType.ARRAY,
+                    items: {
+                        type:SchemaType.OBJECT,
+                        properties: {
+                            definition: {
+                                type: SchemaType.STRING,
+                                description: 'The meaning of the term user is prompting for'
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        const prompt = `What does ${term} mean?`
+
+        const result = await model.generateContent(prompt)
+        return result
+    } catch (err) {
+        console.error(err)
+        throw new Error('Encountered a server error.')
+    }
 }
