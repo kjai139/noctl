@@ -25,6 +25,7 @@ import { GlossaryItem } from "@/app/_types/glossaryType";
 import { TiDeleteOutline } from "react-icons/ti";
 import { TbReportSearch } from "react-icons/tb";
 import SearchTermBtn from "../buttons/searchTermBtn";
+import GlossaryLanguageSelect from "../select/languageSelect";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -67,6 +68,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
     const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
     const [errorMsg, setErrorMsg] = useState('')
+    const [lang, setLang] = useState('English')
 
     const handleInputchange = (newDef:string, id) => {
         const updatedData = glossary.map((node, idx) => {
@@ -165,6 +167,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
             })}
           </ul>
           <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+          <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
         </div>
         <Table>
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}

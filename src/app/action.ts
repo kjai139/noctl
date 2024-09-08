@@ -27,7 +27,8 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         console.log('Word set:', words) */
         let jsonGlossary
         let filteredGlossary:GlossaryItem[]
-        let formattedGlossary
+        let formattedGlossary 
+        let prompt
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
             console.log('OG GLOSSARY - ',jsonGlossary )
@@ -43,13 +44,14 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                 `).join('')}
             `
             console.log('formattedGLoss', formattedGlossary)
-        }
-        
-
-        let prompt
-        if (glossary) {
-            prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
-            console.log('prompt 1 used', prompt)
+            if (filteredGlossary.length > 0) {
+                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
+                console.log('prompt 1 used', prompt)
+            } else {
+                prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
+                console.log('prompt 2 used')
+            }
+            
         } else {
             prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
             console.log('prompt 2 used')
@@ -120,34 +122,44 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 
 interface TermLookupProps {
     term: string
+    context?:string,
 }
 
-export async function TermLookup ({term}:TermLookupProps) {
+export async function TermLookup ({term, context}:TermLookupProps) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
             generationConfig: {
+                temperature: 1,
                 responseMimeType: 'application/json',
                 responseSchema: {
                     type: SchemaType.ARRAY,
                     items: {
                         type:SchemaType.OBJECT,
                         properties: {
-                            definition: {
+                            response: {
                                 type: SchemaType.STRING,
-                                description: 'The meaning of the term user is prompting for'
+                                description:'The meaning of the word the user prompted for'
+                            },
+                            translation: {
+                                type:SchemaType.STRING,
+                                description:'The direct translation of the word. Do not include anything else'
                             }
+                           
                         }
                     }
                 }
-            }
+            },
+            
         })
 
-        const prompt = `What does ${term} mean?`
+        const prompt = `What does ${term} mean${context ? `in this context? ${context}` : ''}?`
 
         const result = await model.generateContent(prompt)
-        return result
+        console.log('gem result:', result)
+
+        return result.response.text()
     } catch (err) {
         console.error(err)
         throw new Error('Encountered a server error.')
