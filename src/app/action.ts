@@ -123,9 +123,10 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 interface TermLookupProps {
     term: string
     context?:string,
+    language: string,
 }
 
-export async function TermLookup ({term, context}:TermLookupProps) {
+export async function TermLookup ({term, context, language}:TermLookupProps) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
@@ -144,7 +145,7 @@ export async function TermLookup ({term, context}:TermLookupProps) {
                             },
                             translation: {
                                 type:SchemaType.STRING,
-                                description:'The direct translation of the word. Do not include anything else'
+                                description:'The direct translation of the word. Do not include anything else. Return null if not applicable'
                             }
                            
                         }
@@ -154,7 +155,7 @@ export async function TermLookup ({term, context}:TermLookupProps) {
             
         })
 
-        const prompt = `What does ${term} mean${context ? `in this context? ${context}` : ''}?`
+        const prompt = `What does ${term} mean${context ? `in this context? ${context}` : ''}\n Please answer in ${language}`
 
         const result = await model.generateContent(prompt)
         console.log('gem result:', result)

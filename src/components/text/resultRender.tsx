@@ -36,7 +36,10 @@ export default function ResultRender () {
 
     
     return (
-        <div className="flex items-center justify-center flex-col relative min-h-screen">
+        <>
+        {
+            isLoading || curResult ? 
+            <div className="flex items-center justify-center flex-col relative min-h-screen">
             
             {isLoading ?
             <>
@@ -48,16 +51,23 @@ export default function ResultRender () {
             </div>
             </div>
             </>
-            :
+            : null
+            }
+
+            {curResult && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
             <div className="whitespace-pre-line p-10">
                 {curResult}
             </div>
-            </>
+            </> : null
             }
             
 
-        </div>
+        </div> : null
+
+        }
+        </>
+        
     )
 }

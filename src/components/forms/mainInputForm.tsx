@@ -11,6 +11,7 @@ import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect } from "react";
 import { GlossaryItem, GlossaryType } from "@/app/_types/glossaryType";
+import ChunkCarousel from "../carousels/chunkCarousel";
 
 
 const tokenLimit = 5000
@@ -55,7 +56,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks} = useWorkState()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
         defaultValues: {
@@ -63,7 +64,9 @@ export default function MainInputForm () {
         }
     })
 
-    
+    const onSubmitTest = async (values: z.infer<typeof formSchema>) => {
+        splitTextIntoChunks(values.targetText, 2000)
+    }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log('submitted', values)
@@ -146,6 +149,30 @@ export default function MainInputForm () {
         }
     }
 
+    const splitTextIntoChunks = (text:string, chunkSize:number) => {
+        const sentences = text.match(/[^.!?]+[.!?]?(\s|$)*/g) || [];
+        let currentChunk = ''
+        let chunks:string[] = []
+
+        console.log('Sentences:', sentences)
+        for (const sentence of sentences) {
+            if ((currentChunk + sentence).length > chunkSize) {
+                chunks.push(currentChunk)
+                currentChunk = sentence
+            } else {
+                currentChunk += sentence
+            }
+        }
+
+        if (currentChunk) {
+            chunks.push(currentChunk)
+        }
+
+        setChunks(chunks)
+        console.log(chunks)
+
+    }
+
     useEffect(() => {
         console.log('main re-rendered')
     })
@@ -195,8 +222,8 @@ export default function MainInputForm () {
         <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
         </div>
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4 flex-col">
-                <div className="flex">
+            <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
+                <div className="flex gap-4">
                 <FormField
                 control={form.control}
                 name="language"
@@ -233,6 +260,9 @@ export default function MainInputForm () {
                 >
 
                 </FormField>
+
+                {/* cara */}
+                <ChunkCarousel></ChunkCarousel>
     
                 </div>
                 <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">

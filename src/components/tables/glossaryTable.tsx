@@ -16,16 +16,17 @@ import {
   } from "@/components/ui/tooltip"
 import { Input } from "../ui/input"
 import { FaFileUpload } from "react-icons/fa";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { IoAlertCircleOutline } from "react-icons/io5";
 import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
-import { GlossaryItem } from "@/app/_types/glossaryType";
+import { GlossaryItem, LanguagesType } from "@/app/_types/glossaryType";
 import { TiDeleteOutline } from "react-icons/ti";
 import { TbReportSearch } from "react-icons/tb";
 import SearchTermBtn from "../buttons/searchTermBtn";
 import GlossaryLanguageSelect from "../select/languageSelect";
+import DeleteTermBtn from "../buttons/deleteTermBtn";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -68,7 +69,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
     const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
     const [errorMsg, setErrorMsg] = useState('')
-    const [lang, setLang] = useState('English')
+    const [lang, setLang] = useState<LanguagesType>('English')
 
     const handleInputchange = (newDef:string, id) => {
         const updatedData = glossary.map((node, idx) => {
@@ -146,6 +147,10 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
       console.log('Looking up', term)
     }
 
+    useEffect(() => {
+      console.log('gloss lang set to :', lang)
+    },[lang])
+
     return (
         <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
         
@@ -166,8 +171,15 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
               )
             })}
           </ul>
-          <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+          <div className="flex justify-end">
+          
+        
           <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
+        
+          </div>
+          <div>
+          <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+          </div>
         </div>
         <Table>
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
@@ -192,12 +204,8 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
                 <div className="flex items-center">
                   
               
-                <SearchTermBtn term={node.term}></SearchTermBtn>
-          
-                <Button variant={'ghost'} onClick={() => deleteTerm(node.term)}>
-                  <TiDeleteOutline size={20}></TiDeleteOutline>
-
-                </Button>
+                <SearchTermBtn term={node.term} language={lang}></SearchTermBtn>
+                <DeleteTermBtn onClick={() => deleteTerm(node.term)}></DeleteTermBtn>
                 </div>
             </TableCell>
             

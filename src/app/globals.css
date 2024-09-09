@@ -77,6 +77,11 @@
   max-width: 1400px;
 }
 
+.c-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+}
+
 
 .loader {
   --w:10ch;

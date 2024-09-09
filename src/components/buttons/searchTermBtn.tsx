@@ -20,14 +20,20 @@ import { useWorkState } from "@/app/_contexts/workStateContext"
 import { TermLookup } from "@/app/action"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
+import { LanguagesType } from "@/app/_types/glossaryType"
   
 
 interface searchTermBtnProps {
     term:string,
+    language:string
+}
+
+interface termLookupProps {
+    word:string,
 }
 
 
-export default function SearchTermBtn ({term}:searchTermBtnProps) {
+export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [ isLoading, setIsLoading ] = useState(false)
@@ -38,7 +44,7 @@ export default function SearchTermBtn ({term}:searchTermBtnProps) {
     const [curInterp,setCurInterp] = useState('')
     const contextLimit = 240
 
-    const termLookup = async (term:string) => {
+    const termLookup = async () => {
         setCurTerm(term)
         setCurInterp('')
         setCurContext('')
@@ -49,15 +55,18 @@ export default function SearchTermBtn ({term}:searchTermBtnProps) {
         console.log('Looking up', term)
         try {
             const response = await TermLookup({
-                term: term
+                term: term,
+                language: language
             })
             const json = JSON.parse(response)
             console.log(json)
             setIsLoading(false)
             const definition = json[0].response
             const interp = json[0].translation
+            if (interp && interp !== 'null') {
+                setCurInterp(interp)
+            }
             setResult(definition)
-            setCurInterp(interp)
     
 
         } catch (err) {
@@ -76,7 +85,8 @@ export default function SearchTermBtn ({term}:searchTermBtnProps) {
             try {
                 const response = await TermLookup({
                     term: curTerm,
-                    context: context
+                    context: context,
+                    language: language
                 })
 
                 const json = JSON.parse(response)
@@ -107,7 +117,7 @@ export default function SearchTermBtn ({term}:searchTermBtnProps) {
         <Tooltip>
             <TooltipTrigger asChild>
                 
-                        <Button size={'sm'} variant={'ghost'} onClick={() => termLookup(term)}>
+                        <Button size={'sm'} variant={'ghost'} onClick={() => termLookup()}>
                         <TbReportSearch size={20}></TbReportSearch>
                         </Button>
                 
@@ -120,7 +130,7 @@ export default function SearchTermBtn ({term}:searchTermBtnProps) {
         
         <DialogContent>
             <DialogHeader>
-            <DialogTitle>{curTerm} - {curInterp}</DialogTitle>
+            <DialogTitle>{curTerm} {curInterp ? `- ${curInterp}` : ''}</DialogTitle>
             <DialogDescription>
                 Definition lookup
             </DialogDescription>
