@@ -9,12 +9,13 @@ import { Button } from "../ui/button";
 import { translateTxt } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GlossaryItem, GlossaryType } from "@/app/_types/glossaryType";
 import ChunkCarousel from "../carousels/chunkCarousel";
 
 
-const tokenLimit = 5000
+const tokenLimit = 10000
+const textLimit = 2000
 
 const language = [
     {
@@ -57,6 +58,10 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 
 export default function MainInputForm () {
     const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks} = useWorkState()
+
+    const [selectedChunk, setSelectedChunk] = useState()
+
+    
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
         defaultValues: {
@@ -65,7 +70,11 @@ export default function MainInputForm () {
     })
 
     const onSubmitTest = async (values: z.infer<typeof formSchema>) => {
-        splitTextIntoChunks(values.targetText, 2000)
+        splitTextIntoChunks(values.targetText)
+    }
+
+    const setTxtareaContent = (content:string) => {
+        form.setValue('targetText', content)
     }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -149,14 +158,30 @@ export default function MainInputForm () {
         }
     }
 
-    const splitTextIntoChunks = (text:string, chunkSize:number) => {
-        const sentences = text.match(/[^.!?]+[.!?]?(\s|$)*/g) || [];
+    /* const handlePaste = (e) => {
+        e.preventDefault()
+        const copyData = e.clipboardData.getData('text')
+        splitTextIntoChunks(copyData)
+    } */
+
+    const splitTextIntoChunks = (text:string) => {
+        const splitTxtLimit = textLimit - 100
+        if (text.length <= splitTxtLimit) {
+            console.log(`Text length - ${text.length} / ${splitTxtLimit}`)
+            return
+        }
         let currentChunk = ''
         let chunks:string[] = []
+        const lines = text.split('\n');
+        const sentences = text.split('\n');
+        let currentSentence = ""
+
+    
 
         console.log('Sentences:', sentences)
-        for (const sentence of sentences) {
-            if ((currentChunk + sentence).length > chunkSize) {
+        for (let sentence of sentences) {
+            sentence = sentence + '\n'
+            if ((currentChunk + sentence).length > splitTxtLimit) {
                 chunks.push(currentChunk)
                 currentChunk = sentence
             } else {
@@ -169,6 +194,7 @@ export default function MainInputForm () {
         }
 
         setChunks(chunks)
+        setSelectedChunk(0)
         console.log(chunks)
 
     }
@@ -223,7 +249,7 @@ export default function MainInputForm () {
         </div>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
-                <div className="flex gap-4">
+                <div className="flex gap-4 mx-2">
                 <FormField
                 control={form.control}
                 name="language"
@@ -231,7 +257,7 @@ export default function MainInputForm () {
                     
                     <FormItem>
                         
-                        <FormLabel>Output Language</FormLabel>
+                        <FormLabel className="whitespace-nowrap">Output Language</FormLabel>
                         
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
@@ -262,7 +288,7 @@ export default function MainInputForm () {
                 </FormField>
 
                 {/* cara */}
-                <ChunkCarousel></ChunkCarousel>
+                <ChunkCarousel setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
     
                 </div>
                 <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
@@ -270,11 +296,8 @@ export default function MainInputForm () {
                 name="targetText"
                 render={({field}) => (
                     <FormItem>
-                        {/* <FormLabel className="p-4">
-                            What would you like to translate?
-                        </FormLabel> */}
                             <FormControl>
-                                <Textarea onInput={(e) => {
+                                <Textarea maxLength={13000} onInput={(e) => {
                                     const target = e.target as HTMLTextAreaElement
                                     target.style.height = 'auto';
                                     target.style.height = `${target.scrollHeight}px`;
