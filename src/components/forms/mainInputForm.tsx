@@ -59,7 +59,9 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 export default function MainInputForm () {
     const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks} = useWorkState()
 
-    const [selectedChunk, setSelectedChunk] = useState()
+    const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
+
+    const [isSplitDone, setIsSplitDone] = useState(false)
 
     
     const form = useForm<z.infer<typeof formSchema>>({
@@ -70,17 +72,129 @@ export default function MainInputForm () {
     })
 
     const onSubmitTest = async (values: z.infer<typeof formSchema>) => {
-        splitTextIntoChunks(values.targetText)
+        if (values.targetText.length > textLimit) {
+            console.log(`Text too long. ${values.targetText.length} / ${textLimit} Splitting...`)
+            
+            const firstPage = splitTextIntoChunks(values.targetText)
+            console.log('first page:', firstPage)
+            apiLookUp({
+                text:firstPage,
+                language: values.language
+            })
+
+        } else {
+            apiLookUp({
+                text:values.targetText,
+                language:values.language
+            })
+        }
+        
+        
+        
     }
 
     const setTxtareaContent = (content:string) => {
         form.setValue('targetText', content)
     }
 
+    interface apiLookUpProps {
+        text:string,
+        language:string
+    }
+
+    const apiLookUp = async ({text, language}:apiLookUpProps) => {
+        setIsLoading(true)
+        try {
+            let normalizedGlossary
+            let filteredGlossary
+            const normalizedtext = text.toLowerCase()
+            .replace(/[(){}\[\]<>]/g, ' ')  
+            .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
+            
+            if (glossary.length > 0) {
+                normalizedGlossary = glossary.map((entry) => {
+                    return (
+                        {
+                            ...entry,
+                            term: entry.term.toLowerCase(),
+                            
+                        }
+                    )
+                })
+
+                if (normalizedGlossary) {
+                    filteredGlossary = normalizedGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term))
+                }
+
+                
+            }
+
+            
+            console.log('Non filtered Glossary:', glossary)
+            console.log('Filtered Glossary:', filteredGlossary)
+
+            const params = {
+                text:text,
+                language: language,
+                ...(glossary.length > 0 && {glossary:JSON.stringify(filteredGlossary)})
+            }
+            console.log('Params used:', params)
+            const result = await translateTxt(params)
+            console.log('Api response:', result)
+
+            if (result && result[0]) {
+                if (result[0].type === 'tool_use') {
+                    const textResult = result[0].input.text
+                    const glossaryResult = result[0].input.glossary
+                   
+                    //add new entries if not dupe - backend should only return normalized results
+                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        console.log('Normalized Glossary used')
+                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                        glossaryResult.forEach((newentry:GlossaryItem) => {
+                            /* let normalizedterm = newentry.term.toLowerCase() */
+                            if (!termSet.has(newentry.term.toLowerCase())){
+                                termSet.add(newentry.term)
+                                normalizedGlossary.unshift(newentry)
+                            } else {
+                                console.log(`Entry ${newentry.term} already exists.`)
+                            }
+                        })
+                        setGlossary(normalizedGlossary)
+                    } else {
+                        setGlossary(glossaryResult)
+                    }
+                    
+                    
+                    
+                    
+                    setCurResult(textResult)
+                    
+                
+                }
+                
+            }
+            setIsLoading(false)
+        } catch (err) {
+            console.error(err)
+           
+            setIsLoading(false)
+        }
+    }
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log('submitted', values)
         setIsLoading(true)
         try {
+            let targetText
+            if (values.targetText.length > textLimit) {
+                console.log(`Text too long. ${values.targetText.length} / ${textLimit} Splitting...`)
+                
+                const firstPage = splitTextIntoChunks(values.targetText)
+                console.log('first page:', firstPage)
+                targetText = firstPage
+    
+            }
             let normalizedGlossary
             let filteredGlossary
             const normalizedtext = values.targetText.toLowerCase()
@@ -159,17 +273,16 @@ export default function MainInputForm () {
     }
 
     /* const handlePaste = (e) => {
-        e.preventDefault()
         const copyData = e.clipboardData.getData('text')
-        splitTextIntoChunks(copyData)
+        console.log('COPYDATA-', copyData)
+        if (copyData && copyData.length > textLimit) {
+            splitTextIntoChunks(copyData)
+        }
     } */
 
     const splitTextIntoChunks = (text:string) => {
+        setChunks([])
         const splitTxtLimit = textLimit - 100
-        if (text.length <= splitTxtLimit) {
-            console.log(`Text length - ${text.length} / ${splitTxtLimit}`)
-            return
-        }
         let currentChunk = ''
         let chunks:string[] = []
         const lines = text.split('\n');
@@ -195,13 +308,18 @@ export default function MainInputForm () {
 
         setChunks(chunks)
         setSelectedChunk(0)
-        console.log(chunks)
+        setTxtareaContent(chunks[0])
+        return chunks[0]
+       
 
     }
 
     useEffect(() => {
         console.log('main re-rendered')
     })
+
+    
+
 
     const setCurResultHandle = () => {
         const text = `Cover folding

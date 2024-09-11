@@ -16,6 +16,11 @@ interface translateTxtProps {
 }
 
 
+export async function translateGemini({text, language, glossary}:translateTxtProps) {
+
+}
+
+
 
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {
@@ -39,13 +44,13 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             formattedGlossary = `
             Glossary -
             ${filteredGlossary.map(term => `
-                Term:${term.term},
-                Translation:${term.definition}
+                Term: ${term.term},
+                Translation: ${term.definition}
                 `).join('')}
             `
             console.log('formattedGLoss', formattedGlossary)
             if (filteredGlossary.length > 0) {
-                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}.`
+                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}. Please make sure the sentences are grammatically correct.`
                 console.log('prompt 1 used', prompt)
             } else {
                 prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
@@ -62,6 +67,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 
         const message = await client.messages.create({
             max_tokens:8192,
+            temperature: 0,
             tool_choice:{
                 type:"tool",
                 name:"translate_with_glossary"
@@ -75,7 +81,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                         properties: {
                             "text": {
                                 type: "string",
-                                description: "The translated text that is NOT the original text"
+                                description: "The translated text in the language the user requested for. It has to be grammatically correct"
                             },
                             "glossary": {
                                 type:"array",
@@ -97,7 +103,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                                     },
                                     required:["term", "definition"]
                                 },
-                                description:"A glossary list of special, uncommon terms taken from the text, each with a term and a definition"
+                                description:"A glossary list of special, uncommon terms, and names taken from the text that wasn't already in the user's glossary"
                             }
                         },
                         required:["text", "glossary"]

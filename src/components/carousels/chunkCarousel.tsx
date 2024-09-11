@@ -8,8 +8,8 @@ import { Button } from "../ui/button";
 
 interface ChunkCarouselProps {
     setTextArea: (content:string) => void,
-    setSelectedChunk: React.Dispatch<SetStateAction<number>>,
-    selectedChunk: number
+    setSelectedChunk: React.Dispatch<SetStateAction<number | null>>,
+    selectedChunk: number | null
 }
 
 export default function ChunkCarousel ({setTextArea, setSelectedChunk, selectedChunk}:ChunkCarouselProps) {
@@ -17,18 +17,27 @@ export default function ChunkCarousel ({setTextArea, setSelectedChunk, selectedC
     const { chunks } = useWorkState()
 
     useEffect(() => {
-        if (chunks && chunks.length > 0) {
+        if (chunks.length > 0) {
+            setSelectedChunk(0)
+            console.log('chunks ue ran -', chunks)
+        }
+    }, [chunks])
+
+    useEffect(() => {
+        if (chunks && chunks.length > 0 && selectedChunk !== null) {
             console.log('Page changed to', selectedChunk)
             setTextArea(chunks[selectedChunk])
+            console.log('setting to', chunks[selectedChunk])
         }
     }, [selectedChunk])
+
 
     return (
        <div className="c-grid w-full gap-4 items-end">
             {chunks.length > 0 && chunks.map((chunk, idx) => {
                 return (
                     <div key={`caro-${idx}`}>
-                        <Button type="button" className="w-full" variant={'outline'} onClick={() => setSelectedChunk(idx)}>
+                        <Button disabled={selectedChunk === idx} type="button" className={`w-full ${selectedChunk === idx ? 'selected' : null}`} variant={'outline'} onClick={() => setSelectedChunk(idx)}>
                             {idx + 1}
                         </Button>
                     </div>

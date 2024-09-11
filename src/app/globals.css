@@ -63,6 +63,11 @@
   cursor: pointer;
 }
 
+.selected {
+  background-color: hsl(var(--accent));
+  border: 2px solid #d3d3d3;
+}
+
 
 .main-ta {
   min-height:calc(1.6em + 1.5rem + 2px);
