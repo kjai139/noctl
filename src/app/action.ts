@@ -17,6 +17,76 @@ interface translateTxtProps {
 
 
 export async function translateGemini({text, language, glossary}:translateTxtProps) {
+    try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            generationConfig: {
+                temperature: 1,
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: SchemaType.ARRAY,
+                    items: {
+                        type:SchemaType.OBJECT,
+                        properties: {
+                            translation: {
+                                type: SchemaType.STRING,
+                                description:'The translation of the text which the user prompted for'
+                            },
+                            glossary: {
+                                type:SchemaType.ARRAY,
+                                description:'A glossary list containing special or uncommon terms and names from the text that was translated',
+                                items: {
+                                    type:SchemaType.OBJECT,
+                                    properties: {
+                                        term: {
+                                            type:SchemaType.STRING,
+                                            description: "The untranslated original term. The term MUST be whole phrase and not break words apart, especially in asian languages"
+                                        },
+                                        definition: {
+                                            type:SchemaType.STRING,
+                                            description:"The direct translation that was used for the term"
+                                        },
+                                        confident_level: {
+                                            type:SchemaType.STRING,
+                                            description:"The confident level of the definition's accuracy on a scale of 1-10"
+                                        }
+
+                                    }
+                                }
+                            }
+                           
+                        }
+                    }
+                }
+            },
+            
+        })
+
+        let prompt
+
+        if (glossary) {
+            const filteredGlossary:GlossaryItem[] = JSON.parse(glossary)
+            const formattedGlossary = `
+            Glossary -
+            ${filteredGlossary.map(term => `
+                Term: ${term.term},
+                Translation: ${term.definition}
+                `).join('')}
+            `
+            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} and return me a glossary list of special terms and names from the text.`
+        } else {
+             prompt = `Please translate this text to ${language} - \n ${text} and return me a glossary list of special terms and names from the text`
+        }
+
+        const result = await model.generateContent(prompt)
+        console.log('gem result:', result)
+
+        return result.response.text()
+    } catch (err) {
+        console.error(err)
+        throw new Error('Encountered a server error.')
+    }
 
 }
 
@@ -50,7 +120,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             `
             console.log('formattedGLoss', formattedGlossary)
             if (filteredGlossary.length > 0) {
-                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}. Please make sure the sentences are grammatically correct.`
+                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}. Please also return me a list of glossary of uncommon terms and names from the text you translated.`
                 console.log('prompt 1 used', prompt)
             } else {
                 prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`

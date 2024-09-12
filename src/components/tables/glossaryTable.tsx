@@ -181,7 +181,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
           </div>
         </div>
-        <Table>
+        <Table className="max-h-[600px]">
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
       <TableHeader>
         <TableRow>

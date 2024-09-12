@@ -6,12 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "../ui/select";
 import { Button } from "../ui/button";
-import { translateTxt } from "@/app/action";
+import { translateGemini, translateTxt } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
-import { GlossaryItem, GlossaryType } from "@/app/_types/glossaryType";
+import { GlossaryItem, GlossaryType, ModelsType } from "@/app/_types/glossaryType";
 import ChunkCarousel from "../carousels/chunkCarousel";
+import AiModelSelect from "../select/aiModelSelect";
 
 
 const tokenLimit = 10000
@@ -62,6 +63,7 @@ export default function MainInputForm () {
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
     const [isSplitDone, setIsSplitDone] = useState(false)
+    const [aiModel, setAiModel] = useState<ModelsType>('Standard')
 
     
     const form = useForm<z.infer<typeof formSchema>>({
@@ -78,14 +80,17 @@ export default function MainInputForm () {
             const firstPage = splitTextIntoChunks(values.targetText)
             console.log('first page:', firstPage)
             apiLookUp({
-                text:firstPage,
-                language: values.language
+                text: firstPage,
+                language: values.language,
+                model: aiModel
             })
+            
 
         } else {
             apiLookUp({
                 text:values.targetText,
-                language:values.language
+                language:values.language,
+                model:aiModel
             })
         }
         
@@ -99,10 +104,13 @@ export default function MainInputForm () {
 
     interface apiLookUpProps {
         text:string,
-        language:string
+        language:string,
+        model: ModelsType
     }
 
-    const apiLookUp = async ({text, language}:apiLookUpProps) => {
+    
+
+    const apiLookUp = async ({text, language, model}:apiLookUpProps) => {
         setIsLoading(true)
         try {
             let normalizedGlossary
@@ -139,41 +147,70 @@ export default function MainInputForm () {
                 ...(glossary.length > 0 && {glossary:JSON.stringify(filteredGlossary)})
             }
             console.log('Params used:', params)
-            const result = await translateTxt(params)
-            console.log('Api response:', result)
 
-            if (result && result[0]) {
-                if (result[0].type === 'tool_use') {
-                    const textResult = result[0].input.text
-                    const glossaryResult = result[0].input.glossary
-                   
-                    //add new entries if not dupe - backend should only return normalized results
-                    if (normalizedGlossary && normalizedGlossary.length > 0) {
-                        console.log('Normalized Glossary used')
-                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                        glossaryResult.forEach((newentry:GlossaryItem) => {
-                            /* let normalizedterm = newentry.term.toLowerCase() */
-                            if (!termSet.has(newentry.term.toLowerCase())){
-                                termSet.add(newentry.term)
-                                normalizedGlossary.unshift(newentry)
-                            } else {
-                                console.log(`Entry ${newentry.term} already exists.`)
-                            }
-                        })
-                        setGlossary(normalizedGlossary)
-                    } else {
-                        setGlossary(glossaryResult)
+            if (model === 'Standard') {
+                const result = await translateGemini(params)
+                console.log(result)
+                const jsonResult = JSON.parse(result)
+                console.log(jsonResult)
+                const glossaryResult = jsonResult[0].glossary
+
+                if (normalizedGlossary && normalizedGlossary.length > 0) {
+                    console.log('Normalized Glossary used')
+                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                    glossaryResult.forEach((newentry:GlossaryItem) => {
+                        if (!termSet.has(newentry.term.toLowerCase())){
+                            termSet.add(newentry.term)
+                            normalizedGlossary.unshift(newentry)
+                        } else {
+                            console.log(`Entry ${newentry.term} already exists.`)
+                        }
+                    })
+                    setGlossary(normalizedGlossary)
+                } else {
+                    setGlossary(glossaryResult)
+                }
+
+                setCurResult(jsonResult[0].translation)
+
+            } else if (model === 'Alt-1') {
+                const result = await translateTxt(params)
+                console.log('Api response:', result)
+
+                if (result && result[0]) {
+                    if (result[0].type === 'tool_use') {
+                        const textResult = result[0].input.text
+                        const glossaryResult = result[0].input.glossary
+                    
+                        //add new entries if not dupe - backend should only return normalized results
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry:GlossaryItem) => {
+                                /* let normalizedterm = newentry.term.toLowerCase() */
+                                if (!termSet.has(newentry.term.toLowerCase())){
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
+                        
+                        
+                        
+                        
+                        setCurResult(textResult)
+                        
+                    
                     }
                     
-                    
-                    
-                    
-                    setCurResult(textResult)
-                    
-                
                 }
-                
             }
+            
             setIsLoading(false)
         } catch (err) {
             console.error(err)
@@ -431,7 +468,8 @@ export default function MainInputForm () {
                 >
 
                 </FormField>
-                <div className="justify-end flex gap-2 items-center p-2">
+                <div className="justify-end flex gap-2 items-center p-2 pb-1">
+                    <AiModelSelect setModel={setAiModel}></AiModelSelect>
                 <div className="text-destructive p-0 flex gap-2">
                     {form.formState.errors.targetText ? form.formState.errors.targetText.message : null }
                     {form.formState.errors.language ? form.formState.errors.language.message : null }
