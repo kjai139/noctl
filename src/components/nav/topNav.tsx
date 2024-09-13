@@ -4,14 +4,17 @@ export default function TopNav() {
 
 
     return (
-        <nav className="flex w-full shadow p-4 justify-between">
-            <div>
-                LOGO
+        <nav className="flex w-full shadow p-4 justify-center">
+            <div className="mw w-full">
+            <div className="font-semibold">
+                MMTL
             </div>
             <div className="flex">
-                <span>
-                    LOGIN
-                </span>
+                
+            </div>
+            <div>
+
+            </div>
             </div>
         </nav>
     )

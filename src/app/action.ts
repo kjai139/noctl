@@ -22,7 +22,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
             generationConfig: {
-                temperature: 1,
+                temperature: 0,
                 responseMimeType: 'application/json',
                 responseSchema: {
                     type: SchemaType.ARRAY,
@@ -35,7 +35,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                             },
                             glossary: {
                                 type:SchemaType.ARRAY,
-                                description:'A glossary list containing special or uncommon terms and names from the text that was translated',
+                                description:'A glossary list containing any special, uncommon terms, and character names from the text that was translated',
                                 items: {
                                     type:SchemaType.OBJECT,
                                     properties: {
@@ -45,7 +45,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                                         },
                                         definition: {
                                             type:SchemaType.STRING,
-                                            description:"The direct translation that was used for the term"
+                                            description:"The direct translation that was used"
                                         },
                                         confident_level: {
                                             type:SchemaType.STRING,

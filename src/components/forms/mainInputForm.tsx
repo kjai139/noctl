@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { GlossaryItem, GlossaryType, ModelsType } from "@/app/_types/glossaryType";
 import ChunkCarousel from "../carousels/chunkCarousel";
 import AiModelSelect from "../select/aiModelSelect";
+import { FaArrowRightArrowLeft } from "react-icons/fa6";
 
 
 const tokenLimit = 10000
@@ -399,8 +400,11 @@ export default function MainInputForm () {
     return (
         <div className="flex gap-8 justify-center">
             <div>
-                <Button onClick={setCurResultHandle}>Test output</Button>
+                {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
         <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
+        </div>
+        <div className="justify-center items-center flex">
+            <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
         </div>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">

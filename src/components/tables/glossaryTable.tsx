@@ -62,7 +62,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         text:'Make sure the glossary is cleared out if not needed'
       },
       {
-        text: 'It is highly recommended to double check any uncommon terms to ensure the highest quality'
+        text: 'Editing is still required'
       }
     ]
 
@@ -155,12 +155,12 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
         
         <div className="flex gap-2 flex-col text-xs">
-        <Button onClick={testGlossary}>Test Glossary</Button>
+        {/* <Button onClick={testGlossary}>Test Glossary</Button> */}
           <div className="flex gap-2 items-start">
             <div>
           <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
           </div>
-          <p>An editable glossary will be auto-generated after each translation. You can then choose to save the glossary file and upload it for future uses.</p>
+          <p>An editable glossary will be auto-generated after each translation. You can then choose to save the glossary file and upload it if you need it for future use.</p>
           </div>
           <ul>
             {notifications && notifications.map((node, idx) => {
@@ -181,7 +181,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
           </div>
         </div>
-        <Table className="max-h-[600px]">
+        <Table>
       {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
       <TableHeader>
         <TableRow>
