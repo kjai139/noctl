@@ -56,14 +56,14 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
 
     const notifications = [
       {
-        text:'The glossary file must be in JSON format'
+        text:'New terms from subsequent translation request will continue to add onto the current glossary'
+      },
+      {
+        text:'The glossary file you upload must be in JSON format'
       },
       {
         text:'Make sure the glossary is cleared out if not needed'
       },
-      {
-        text: 'Editing is still required'
-      }
     ]
 
     const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
@@ -160,13 +160,13 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
             <div>
           <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
           </div>
-          <p>An editable glossary will be auto-generated after each translation. You can then choose to save the glossary file and upload it if you need it for future use.</p>
+          <p>This is a glossary to keep terms and names consistent when translating novels. An editable glossary will be auto-generated after each translation. You can then edit as needed and you can choose to save the glossary file as well</p>
           </div>
           <ul>
             {notifications && notifications.map((node, idx) => {
               return (
-                <li key={`noti-${idx}`}>
-                  - {node.text}
+                <li key={`noti-${idx}`} className="list-disc ml-4">
+                  {node.text}
                 </li>
               )
             })}

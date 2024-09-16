@@ -14,6 +14,7 @@ import { GlossaryItem, GlossaryType, ModelsType } from "@/app/_types/glossaryTyp
 import ChunkCarousel from "../carousels/chunkCarousel";
 import AiModelSelect from "../select/aiModelSelect";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
+import ErrorResultAlert from "../dialog/errorResult";
 
 
 const tokenLimit = 10000
@@ -65,7 +66,7 @@ export default function MainInputForm () {
 
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('Standard')
-
+    const [errorMsg, setErrorMsg] = useState('')
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
@@ -214,9 +215,12 @@ export default function MainInputForm () {
             
             setIsLoading(false)
         } catch (err) {
-            console.error(err)
+            console.error(err, typeof err)
+            setErrorMsg('Encountered an API error. If problem persists, change the model')
            
             setIsLoading(false)
+            
+            
         }
     }
 
@@ -360,38 +364,7 @@ export default function MainInputForm () {
 
 
     const setCurResultHandle = () => {
-        const text = `Cover folding
-
-        Preface.
-
-        The Heavenly Demon has died.
-
-        With that, the long and drawn-out battle between righteousness and evil has also come to an end.
-        The hellish times that persisted for years could finally conclude with the death of the Heavenly Demon.
-
-        Many cheered and rejoiced at the defeat of the demonic sect. They said that peace had finally been restored.
-        However, what remained at the end of the war was not just relief and peace.
-
-        Two of the Nine Major Sects that supported the righteous faction of the martial arts world were burned to ashes, and one of the Four Great Clans collapsed.
-        Even the three masters known as the 'Three Venerables' among the countless warriors of the Central Plains were all killed by the Heavenly Demon's hand.
-
-        Although they succeeded in killing the Heavenly Demon and erasing the demonic sect from this land, it remained a war full of losses.
-
-        Too much had been lost.
-        No one knew how long it would take to recover and restore what had been scattered and destroyed.
-
-        Nevertheless.
-
-        Even though much had burned to ashes, what remained was not just despair.
-        Somewhere, hope would bloom, and heroes who would overcome the crisis and continue the alliance would gradually appear.
-
-        However.
-
-        It was a story that didn't concern me.
-
-        "Where is it?"
-
-        The woman murmured in a small voice.`
+        const text = `test text`
         setCurResult(text)
     }
 
@@ -399,6 +372,13 @@ export default function MainInputForm () {
    
     return (
         <div className="flex gap-8 justify-center">
+            {
+                errorMsg ?
+                <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
+                : null
+
+            }
+            
             <div>
                 {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
         <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
