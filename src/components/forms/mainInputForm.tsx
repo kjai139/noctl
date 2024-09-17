@@ -155,7 +155,7 @@ export default function MainInputForm () {
                 console.log(result)
                 const jsonResult = JSON.parse(result)
                 console.log(jsonResult)
-                const glossaryResult = jsonResult[0].glossary
+                const glossaryResult = jsonResult[0].glossary.terms
 
                 if (normalizedGlossary && normalizedGlossary.length > 0) {
                     console.log('Normalized Glossary used')

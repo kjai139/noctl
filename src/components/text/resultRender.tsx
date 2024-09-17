@@ -1,6 +1,7 @@
 'use client'
 import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
+import CopyTextBtn from "../buttons/copyTextBtn"
 
 
 export default function ResultRender () {
@@ -57,7 +58,8 @@ export default function ResultRender () {
             {curResult && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="whitespace-pre-line p-10">
+            <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px]">
+                <CopyTextBtn text={curResult}></CopyTextBtn>
                 {curResult}
             </div>
             </> : null

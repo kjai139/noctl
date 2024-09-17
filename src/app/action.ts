@@ -34,26 +34,40 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                                 description:'The translation of the text which the user prompted for'
                             },
                             glossary: {
-                                type:SchemaType.ARRAY,
-                                description:'A glossary list containing any special, uncommon terms, and character names from the text that was translated',
-                                items: {
-                                    type:SchemaType.OBJECT,
-                                    properties: {
-                                        term: {
-                                            type:SchemaType.STRING,
-                                            description: "The untranslated original term. The term MUST be whole phrase and not break words apart, especially in asian languages"
+                                type:SchemaType.OBJECT,
+                                description:'A glossary of term names, skill names, and people names extracted from the text',
+                                properties: {
+                                        terms: {
+                                            type:SchemaType.ARRAY,
+                                            description: "A list of terms, skills, and names",
+                                            items: {
+                                                type:SchemaType.OBJECT,
+                                                properties: {
+                                                    term:{
+                                                        type:SchemaType.STRING,
+                                                        description: "term name or people name or skill name in the original text's language"
+                                                    },
+                                                    definition:{
+                                                        type:SchemaType.STRING,
+                                                        description:"the term or name in the translated language"
+                                                    },
+                                                    term_type : {
+                                                        type:SchemaType.STRING,
+                                                        description:"term | name | skill"
+                                                    }
+                                                    /* confidence_level: {
+                                                        type:SchemaType.STRING,
+                                                        description:"The confidence level of the translation's accuracy on a scale of 1-10"
+                                                    } */
+                                                }
+                                            }
                                         },
-                                        definition: {
-                                            type:SchemaType.STRING,
-                                            description:"The direct translation that was used"
-                                        },
-                                        confident_level: {
-                                            type:SchemaType.STRING,
-                                            description:"The confident level of the definition's accuracy on a scale of 1-10"
-                                        }
+                                        
+                                        
+                                        
 
                                     }
-                                }
+                                
                             }
                            
                         }
@@ -74,9 +88,9 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                 Translation: ${term.definition}
                 `).join('')}
             `
-            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} and return me a glossary list of special terms and names from the text.`
+            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} and return me a list of special terms, skills, and people names extracted from the text.`
         } else {
-             prompt = `Please translate this text to ${language} - \n ${text} and return me a glossary list of special terms and names from the text`
+             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
         }
 
         const result = await model.generateContent(prompt)

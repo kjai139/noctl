@@ -160,7 +160,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                                 </span>
                             </span>
                             <div className="flex gap-4">
-                            <Textarea className="max-h-[650px]shadow-none resize-none focus-visible:ring-0" maxLength={contextLimit} value={curContext} onChange={handleContextChange} placeholder="Enter an example sentence or phrase or include a small passage here..." onInput={(e) => {
+                            <Textarea className="max-h-[650px]shadow-none resize-none focus-visible:ring-0" maxLength={contextLimit} value={curContext} onChange={handleContextChange} placeholder="Enter an example sentence or a small passage with the term included here..." onInput={(e) => {
                                     const target = e.target as HTMLTextAreaElement
                                     target.style.height = 'auto';
                                     target.style.height = `${target.scrollHeight}px`;

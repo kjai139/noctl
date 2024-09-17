@@ -64,6 +64,9 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
       {
         text:'Make sure the glossary is cleared out if not needed'
       },
+      {
+        text:'Type T stands for Terms and N stands for Names'
+      }
     ]
 
     const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
@@ -152,7 +155,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     },[lang])
 
     return (
-        <div className="shadow p-4 flex flex-col gap-4 max-w-[500px]">
+        <div className="shadow p-4 flex flex-col gap-4 max-w-[560px]">
         
         <div className="flex gap-2 flex-col text-xs">
         {/* <Button onClick={testGlossary}>Test Glossary</Button> */}
@@ -182,22 +185,29 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           </div>
         </div>
         <Table>
-      {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+      <TableCaption>Use Ctrl + F to find terms quickly</TableCaption>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-[60px]">Type</TableHead>
           <TableHead className="w-[100px]">Term</TableHead>
           <TableHead>Definition</TableHead>
+          
           
         </TableRow>
       </TableHeader>
       <TableBody>
         {glossary && glossary.map((node:GlossaryItem, idx:number) => (
           <TableRow key={`tb-${idx}`}>
+            <TableCell>
+              {node.term_type === 'name' ? 'N' : null}
+              {node.term_type === 'term' || node.term_type === 'skill' ? 'T' : null}
+            </TableCell>
             <TableCell className="font-medium">
               <span>
               {node.term}
               </span>
             </TableCell>
+            
             <TableCell className="flex gap-4">
                 <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
                 </Input>
@@ -208,6 +218,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
                 <DeleteTermBtn onClick={() => deleteTerm(node.term)}></DeleteTermBtn>
                 </div>
             </TableCell>
+            
             
           </TableRow>
         ))}
