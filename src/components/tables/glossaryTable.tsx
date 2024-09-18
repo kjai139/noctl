@@ -185,7 +185,11 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           </div>
         </div>
         <Table>
-      <TableCaption>Use Ctrl + F to find terms quickly</TableCaption>
+        {
+          glossary && glossary.length > 0 ?
+          <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
+        }
+      
       <TableHeader>
         <TableRow>
           <TableHead className="w-[60px]">Type</TableHead>

@@ -88,7 +88,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                 Translation: ${term.definition}
                 `).join('')}
             `
-            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} and return me a list of special terms, skills, and people names extracted from the text.`
+            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
         } else {
              prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
         }

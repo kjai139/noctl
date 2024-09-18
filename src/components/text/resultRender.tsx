@@ -60,7 +60,9 @@ export default function ResultRender () {
             <div className="border-t-2 my-8 w-full"></div>
             <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px]">
                 <CopyTextBtn text={curResult}></CopyTextBtn>
+                <div className="pt-8">
                 {curResult}
+                </div>
             </div>
             </> : null
             }
