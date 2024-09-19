@@ -27,6 +27,7 @@ import { TbReportSearch } from "react-icons/tb";
 import SearchTermBtn from "../buttons/searchTermBtn";
 import GlossaryLanguageSelect from "../select/languageSelect";
 import DeleteTermBtn from "../buttons/deleteTermBtn";
+import AddGlossEntryBtn from "../buttons/addGlossEntryBtn";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -249,6 +250,9 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     </>
     : null
     }
+    <div>
+      <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
+    </div>
     <div>
     <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
       <FaFileUpload></FaFileUpload><span>Upload</span>

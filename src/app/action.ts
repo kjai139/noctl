@@ -134,15 +134,15 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             `
             console.log('formattedGLoss', formattedGlossary)
             if (filteredGlossary.length > 0) {
-                prompt = `You are a very precise translator for novels. You will always use the glossary's translation for specific term translations over your own.${formattedGlossary}. Please translate the following text into ${language ? language : 'English'} - ${text}. Please also return me a list of glossary of uncommon terms and names from the text you translated.`
+                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
                 console.log('prompt 1 used', prompt)
             } else {
-                prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
+                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
                 console.log('prompt 2 used')
             }
             
         } else {
-            prompt = `You are a very precise translator for novels. Please translate the following text into ${language ? language : 'English'}. And also return me a list of glossary of uncommon terms from the text you translated, but always include the whole word and do not break the terms. Here's the text to be translated - ${text}`
+            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
             console.log('prompt 2 used')
         }
 
@@ -158,8 +158,8 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             },
             tools: [
                 {
-                    name:"translate_with_glossary",
-                    description: "Translates text from one language into another with the user's glossary",
+                    name:"translate_text",
+                    description: "Translate text to the language the user prompts for",
                     input_schema: {
                         type:"object",
                         properties: {
