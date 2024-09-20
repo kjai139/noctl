@@ -15,6 +15,7 @@ import ChunkCarousel from "../carousels/chunkCarousel";
 import AiModelSelect from "../select/aiModelSelect";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import ErrorResultAlert from "../dialog/errorResult";
+import Anthropic from "@anthropic-ai/sdk";
 
 
 const tokenLimit = 10000
@@ -176,7 +177,7 @@ export default function MainInputForm () {
                 setCurResult(jsonResult[0].translation)
 
             } else if (model === 'Alt-1') {
-                const result = await translateTxt(params)
+                const result:any = await translateTxt(params)
                 console.log('Api response:', result)
 
                 if (result && result[0]) {

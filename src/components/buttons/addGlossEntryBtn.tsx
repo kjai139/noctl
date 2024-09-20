@@ -90,7 +90,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-            <Button>
+            <Button variant={'ghost'}>
                 <div className="flex items-center">
                     <IoIosAdd size={30}></IoIosAdd>
                     <span>Add Term</span>

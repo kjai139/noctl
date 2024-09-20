@@ -181,8 +181,11 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
         
           </div>
-          <div>
+          <div className="flex justify-between items-center">
           <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+          <div>
+          <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
+          </div>
           </div>
         </div>
         <Table>
@@ -196,6 +199,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           <TableHead className="w-[60px]">Type</TableHead>
           <TableHead className="w-[100px]">Term</TableHead>
           <TableHead>Definition</TableHead>
+          
           
           
         </TableRow>
@@ -236,23 +240,23 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         
       </TableFooter> */}
     </Table>
+    
     <div className="flex gap-4 ml-auto">
+    
     {/* <Button onClick={checkGlossary}>Check Glossary</Button> */}
     {glossary.length > 0 ?
     <>
     <Button className="gap-2" onClick={resetGlossary}>
         <RiDeleteBin2Line></RiDeleteBin2Line>
-        <span>Delete Glossary</span>
+        <span>Clear</span>
         </Button>
     <Button onClick={downloadGlossary} className="gap-2">
       <GrDocumentDownload></GrDocumentDownload>
-      <span>Download Glossary</span></Button>
+      <span>Download</span></Button>
     </>
     : null
     }
-    <div>
-      <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
-    </div>
+
     <div>
     <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
       <FaFileUpload></FaFileUpload><span>Upload</span>

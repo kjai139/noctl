@@ -154,40 +154,40 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             temperature: 0,
             tool_choice:{
                 type:"tool",
-                name:"translate_with_glossary"
+                name:"translate_text"
             },
             tools: [
                 {
                     name:"translate_text",
-                    description: "Translate text to the language the user prompts for",
+                    description: "Translate text to the language the user wants",
                     input_schema: {
                         type:"object",
                         properties: {
                             "text": {
                                 type: "string",
-                                description: "The translated text in the language the user requested for. It has to be grammatically correct"
+                                description: "The translated text. It has to be in the language the user wants"
                             },
                             "glossary": {
                                 type:"array",
-                                items: {
+                                terms: {
                                     type:"object",
                                     properties: {
                                         "term": {
                                             type:"string",
-                                            description:"The untranslated original term. The term MUST be whole phrase and not break words apart, especially in asian languages"
+                                             description: "term name or people name or skill name in the original text's language"
                                         },
                                         "definition": {
                                             type:"string",
-                                            description:"The translation that was used for the term"
+                                            description:"the term or name in the translated language"
                                         },
-                                        "confident_level": {
-                                            type:"number",
-                                            description:"The confident level of the definition's accuracy on a scale of 1-10"
+                                        "term_type": {
+                                            type:"string",
+                                            description:"term | name | skill"
                                         }
                                     },
                                     required:["term", "definition"]
                                 },
-                                description:"A glossary list of special, uncommon terms, and names taken from the text that wasn't already in the user's glossary"
+                                description:"Extract a list of special terms, skills, and people names from the text"
                             }
                         },
                         required:["text", "glossary"]
@@ -196,7 +196,12 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             ],
             messages: [{
                 role: 'user',
-                content: prompt
+                content: [
+                    {
+                        type: 'text',
+                        text: prompt
+                    },
+                ]
             }],
             model: 'claude-3-5-sonnet-20240620'
         })
@@ -205,7 +210,27 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         return message.content
     } catch (err) {
         console.error(err)
-        throw err
+        if (err instanceof Anthropic.APIError) {
+            switch (err.status) {
+                case 400:
+                    throw new Error('Bad request, possibly due to NSFW')
+                case 401:
+                    throw new Error('Authentication Error')
+                case 429:
+                    throw new Error('Rate limit Error')
+                case 403:
+                    throw new Error('Permission denied')
+                case 422:
+                    throw new Error('Unprocessable Entity Error')
+                case 500:
+                    throw new Error('Internal server error')
+                default:
+                    throw new Error('Unknnown API error has occured')
+            }
+        } else {
+            throw err
+        }
+        
     }
     
 }
