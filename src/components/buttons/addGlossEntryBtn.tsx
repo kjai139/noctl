@@ -65,6 +65,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
     
                     console.log(newTerm)
                     setGlossary((prev) => [...prev, newTerm])
+                    setIsOpen(false)
                 } else {
                     setTermTypeError('Choose a valid type')
                 }

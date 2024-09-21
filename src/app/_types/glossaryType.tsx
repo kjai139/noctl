@@ -13,4 +13,4 @@ export type GlossaryType = GlossaryItem[]
 export type LanguagesType = 'English' | 'Chinese' | 'Korean' | 'Japanese'
 
 
-export type ModelsType = 'Standard' | 'Alt-1'
+export type ModelsType = 'Standard' | 'Alt-1' | 'Test-1' | 'Duo'

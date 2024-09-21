@@ -6,7 +6,7 @@ import CopyTextBtn from "../buttons/copyTextBtn"
 
 export default function ResultRender () {
 
-    const { curResult, isLoading } = useWorkState()
+    const { curResult, isLoading, altResult1 } = useWorkState()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -39,7 +39,7 @@ export default function ResultRender () {
     return (
         <>
         {
-            isLoading || curResult ? 
+            isLoading || curResult || altResult1 ? 
             <div className="flex items-center justify-center flex-col relative min-h-screen">
             
             {isLoading ?
@@ -55,14 +55,29 @@ export default function ResultRender () {
             : null
             }
 
-            {curResult && !isLoading ?
+            {curResult && !isLoading || altResult1 && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px]">
+            <div className="flex">
+            {
+                curResult ?
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1">
+                <h2 className="text-center underline font-semibold">STANDARD MODEL</h2>
                 <CopyTextBtn text={curResult}></CopyTextBtn>
                 <div className="pt-8">
                 {curResult}
                 </div>
+            </div> : null}
+            {
+                altResult1 && !isLoading ? 
+                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px]">
+                    <h2 className="text-center underline font-semibold">{`MODEL Alt-1`}</h2>
+                    <CopyTextBtn text={altResult1}></CopyTextBtn>
+                <div className="pt-8">
+                {altResult1}
+                </div>
+                </div> : null
+            }
             </div>
             </> : null
             }

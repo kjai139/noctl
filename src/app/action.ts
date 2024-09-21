@@ -105,6 +105,59 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
 }
 
 
+export async function translateTxtNoTool ({text, language, glossary}:translateTxtProps) {
+    try {
+        let jsonGlossary
+        let filteredGlossary:GlossaryItem[]
+        let formattedGlossary 
+        let prompt
+        if (glossary) {
+            jsonGlossary = JSON.parse(glossary)
+            console.log('OG GLOSSARY - ',jsonGlossary )
+            filteredGlossary = jsonGlossary
+            console.log('filteredlist', filteredGlossary)
+            formattedGlossary = `
+            Glossary -
+            ${filteredGlossary.map(term => `
+                Term: ${term.term},
+                Translation: ${term.definition}
+                `).join('')}
+            `
+            console.log('formattedGLoss', formattedGlossary)
+            if (filteredGlossary.length > 0) {
+                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
+                console.log('prompt 1 used', prompt)
+            } else {
+                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
+                console.log('prompt 2 used')
+            }
+            
+        } else {
+            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
+            console.log('prompt 2 used')
+        }
+
+        const message = await client.messages.create({
+            max_tokens:8192,
+            temperature: 0,
+            messages: [{
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: prompt
+                    },
+                ]
+            }],
+            model: 'claude-3-5-sonnet-20240620'
+        })
+
+        return message.content
+    } catch (err) {
+        console.error(err)
+    }
+}
+
 
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {

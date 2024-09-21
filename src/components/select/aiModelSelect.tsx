@@ -18,6 +18,12 @@ export default function AiModelSelect({setModel}:AiModelSelectProps) {
         {
             name:'Alt-1'
         },
+        {
+            name:'Duo'
+        },
+        {
+            name:'Test-1'
+        }
     
     ]
 

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "../ui/select";
 import { Button } from "../ui/button";
-import { translateGemini, translateTxt } from "@/app/action";
+import { translateGemini, translateTxt, translateTxtNoTool } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -46,7 +46,7 @@ const formSchema = z.object({
         message: 'Please choose a language'
     }),
     targetText: z.string().max(tokenLimit, {
-        message: `Cannot exceed ${tokenLimit} tokens per request.`
+        message: `Cannot exceed limit of ${tokenLimit} chars.`
     })
 })
 
@@ -61,7 +61,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1} = useWorkState()
 
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -114,6 +114,8 @@ export default function MainInputForm () {
     
 
     const apiLookUp = async ({text, language, model}:apiLookUpProps) => {
+        setCurResult('')
+        setAltResult1('')
         setIsLoading(true)
         try {
             let normalizedGlossary
@@ -206,12 +208,51 @@ export default function MainInputForm () {
                         
                         
                         
-                        setCurResult(textResult)
+                        setAltResult1(textResult)
                         
                     
                     }
                     
                 }
+            } else if (model === 'Duo') {
+                const [result1, result2] = await Promise.all([
+                    translateTxt(params),
+                    translateGemini(params)
+                ])
+
+                if (result1 && result2 && result1[0]) {
+                    if (result1[0].type === 'tool_use') {
+                        const textResult = result1[0].input.text
+                        const glossaryResult = result1[0].input.glossary
+                    
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry:GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())){
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
+                        
+                        
+                        const jsonResult2 = JSON.parse(result2)
+                        console.log(jsonResult2)
+                        
+                        setCurResult(jsonResult2[0].translation)
+                        setAltResult1(textResult)
+                        
+                    }    
+                }
+            } else if (model === 'Test-1') {
+                const result = await translateTxtNoTool(params)
+                console.log('NO TOOLS RESULT:', result)
             }
             
             setIsLoading(false)
@@ -455,8 +496,8 @@ export default function MainInputForm () {
                 </FormField>
                 <div className="justify-end flex gap-2 items-center p-2 pb-1">
                     <AiModelSelect setModel={setAiModel}></AiModelSelect>
-                <div className="text-destructive p-0 flex gap-2">
-                    {form.formState.errors.targetText ? form.formState.errors.targetText.message : null }
+                <div className="text-destructive p-0 flex gap-2 items-center">
+                    {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null }
                     {form.formState.errors.language ? form.formState.errors.language.message : null }
                     <TextAreaWatched control={form.control}></TextAreaWatched>
                 </div>
