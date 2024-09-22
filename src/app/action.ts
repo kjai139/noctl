@@ -2,7 +2,7 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai"
+import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
 
 
 const client = new Anthropic({
@@ -21,6 +21,21 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
+            safetySettings: [
+                {
+                    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    threshold:HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                {
+                    category:HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+                },
+                
+            ],
             generationConfig: {
                 temperature: 0,
                 responseMimeType: 'application/json',
