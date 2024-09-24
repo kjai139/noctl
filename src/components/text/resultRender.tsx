@@ -2,11 +2,12 @@
 import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
 import CopyTextBtn from "../buttons/copyTextBtn"
+import DisplayRawBtn from "../buttons/displayRawBtn"
 
 
 export default function ResultRender () {
 
-    const { curResult, isLoading, altResult1 } = useWorkState()
+    const { curResult, ogCurResult, setOgCurResult, ogAltResult, setOgAltResult, isLoading, altResult1, setCurResult, setCurRaw, curRaw, setAltResult1 } = useWorkState()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -63,7 +64,10 @@ export default function ResultRender () {
                 curResult ?
                 <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1">
                 <h2 className="text-center underline font-semibold">STANDARD MODEL</h2>
+                <div className="absolute right-10 top-0 flex gap-2">
+                <DisplayRawBtn setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw}></DisplayRawBtn>
                 <CopyTextBtn text={curResult}></CopyTextBtn>
+                </div>
                 <div className="pt-8">
                 {curResult}
                 </div>
@@ -72,7 +76,10 @@ export default function ResultRender () {
                 altResult1 && !isLoading ? 
                 <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px]">
                     <h2 className="text-center underline font-semibold">{`MODEL Alt-1`}</h2>
+                    <div className="absolute right-10 top-0 flex gap-2">
+                    <DisplayRawBtn curOgTxt={ogAltResult} setCurDisplay={setAltResult1} curRaw={curRaw} setCurRaw={setCurRaw}></DisplayRawBtn>
                     <CopyTextBtn text={altResult1}></CopyTextBtn>
+                    </div>
                 <div className="pt-8">
                 {altResult1}
                 </div>

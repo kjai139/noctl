@@ -61,7 +61,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult} = useWorkState()
 
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -114,6 +114,7 @@ export default function MainInputForm () {
     
 
     const apiLookUp = async ({text, language, model}:apiLookUpProps) => {
+        setCurRaw(text)
         setCurResult('')
         setAltResult1('')
         setIsLoading(true)
@@ -177,6 +178,8 @@ export default function MainInputForm () {
                 }
 
                 setCurResult(jsonResult[0].translation)
+                setOgCurResult(jsonResult[0].translation)
+                
 
             } else if (model === 'Alt-1') {
                 const result:any = await translateTxt(params)
@@ -209,6 +212,7 @@ export default function MainInputForm () {
                         
                         
                         setAltResult1(textResult)
+                        setOgAltResult(textResult)
                         
                     
                     }
@@ -247,6 +251,9 @@ export default function MainInputForm () {
                         
                         setCurResult(jsonResult2[0].translation)
                         setAltResult1(textResult)
+
+                        setOgAltResult(textResult)
+                        setOgCurResult(jsonResult2[0].translation)
                         
                     }    
                 }

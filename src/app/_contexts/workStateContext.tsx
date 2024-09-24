@@ -31,6 +31,12 @@ interface workStateContextType {
     setChunks:React.Dispatch<React.SetStateAction<string[]>>;
     altResult1: string,
     setAltResult1: React.Dispatch<React.SetStateAction<string>>;
+    curRaw:string,
+    setCurRaw: React.Dispatch<React.SetStateAction<string>>;
+    ogAltResult:string,
+    setOgAltResult:React.Dispatch<React.SetStateAction<string>>;
+    ogCurResult: string,
+    setOgCurResult:React.Dispatch<React.SetStateAction<string>>;
 }
 
 
@@ -48,10 +54,14 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
     const [isLoading, setIsLoading] = useState(false)
     const [chunks, setChunks] = useState<string[]>([])
     const [altResult1, setAltResult1] = useState('')
+    const [curRaw, setCurRaw] = useState('')
+
+    const [ogAltResult, setOgAltResult] = useState('')
+    const [ogCurResult, setOgCurResult] = useState('')
 
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, altResult1, setAltResult1}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, altResult1, setAltResult1, curRaw, setCurRaw, ogAltResult, setOgAltResult, setOgCurResult, ogCurResult}}>
             {children}
         </workStateContext.Provider>
     )
