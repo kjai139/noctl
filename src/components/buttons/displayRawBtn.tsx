@@ -17,7 +17,7 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setCurRaw, curOgT
     const toggleRaw = () => {
         if (!isRawOn) {
             const normalizedRaw = curRaw.replace(/\n+/g, '\n').trim()
-            const rawlines = normalizedRaw.split('\n')
+            const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
             const normalizedTxt = curOgTxt.replace(/\n+/g, '\n').trim()
             const resultLines = normalizedTxt.split('\n')
 
@@ -32,6 +32,9 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setCurRaw, curOgT
                 mergedLines.push(line2)
 
             }
+
+            console.log('RAW ARRAY NORMALIZED:', normalizedRaw)
+            console.log('RAW TEXT NORMALIZED', normalizedTxt)
 
             const result = mergedLines.join('\n')
             setCurDisplay(result)
