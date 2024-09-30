@@ -1,8 +1,11 @@
+import { auth } from "../../../auth";
 import SignInBtn from "../buttons/signInBtn";
+import CurrencyDisplay from "../dropdown/currencyDisplay";
 
 
-export default function TopNav() {
+export default async function TopNav() {
 
+    const session = await auth()
 
     return (
         <nav className="flex w-full shadow p-4 justify-center">
@@ -13,8 +16,9 @@ export default function TopNav() {
                 <div className="flex">
                     
                 </div>
-                <div>
-                    <SignInBtn></SignInBtn>
+                <div className="flex gap-2 items-center">
+                    <CurrencyDisplay session={session}></CurrencyDisplay>
+                    <SignInBtn session={session}></SignInBtn>
 
                 </div>
             </div>

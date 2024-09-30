@@ -6,17 +6,26 @@ import { Button } from "../ui/button";
 import { FaUserCircle } from "react-icons/fa";
 import GoogleSignInBtn from "./googleSignInBtn";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { MdOutlineLogout } from "react-icons/md";
 import GoogleSignOutBtn from "./googleSignOutBtn";
-export default async function SignInBtn () {
+import { type Session } from 'next-auth'
 
-    const session = await auth()
+interface SignInBtnProps {
+    session: Session | null
+}
+
+
+export default async function SignInBtn ({session}:SignInBtnProps) {
+
+    
+    console.log('session', session)
 
     if (!session?.user || !session) {
        return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <FaUserCircle size={30}></FaUserCircle>
+                    <div className="cursor-pointer" aria-label="Open Sign in menu">
+                    <FaUserCircle size={40}></FaUserCircle>
+                    </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuGroup>
@@ -34,10 +43,10 @@ export default async function SignInBtn () {
     return (
         <div>
             <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                 <Avatar>
                 <AvatarImage alt="User avatar" src={session?.user.image || ''}></AvatarImage>
-                <AvatarFallback><FaUserCircle></FaUserCircle></AvatarFallback>
+                <AvatarFallback><FaUserCircle size={40}></FaUserCircle></AvatarFallback>
                 </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

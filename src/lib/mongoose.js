@@ -20,6 +20,7 @@ if (!cached) {
 
 async function connectToMongoose() {
     if (cached.conn) {
+        console.log('mongoose connection in cache')
         return cached.conn
     }
 
@@ -32,3 +33,5 @@ async function connectToMongoose() {
     cached.conn = await cached.promise
     return cached.conn
 }
+
+export default connectToMongoose
