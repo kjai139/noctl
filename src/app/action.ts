@@ -112,9 +112,23 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
         console.log('gem result:', result)
 
         return result.response.text()
-    } catch (err) {
-        console.error(err)
-        throw new Error('Encountered a server error.')
+    } catch (err:any) {
+        console.error(err.message)
+        let errMsg
+        if (err.message) {
+            errMsg = err.message.toLowerCase()
+            if (errMsg.includes('safety')) {
+                throw new Error('No NSFW / dangerous / offensive content.')
+            } else if (errMsg.includes('rate limit')) {
+                throw new Error('Encountered a rate limit error. Please try again later.')
+            } else if (err.Msg.includes('unauthorized') || errMsg.includes('invalid api key') || errMsg.includes('missing token')) {
+                throw new Error('Encountered an authorization error. Please try again later.')
+            }
+        } else {
+            throw new Error('An unknown server error has occured. Please try again later.')
+        }
+        
+        
     }
 
 }
@@ -213,6 +227,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
             console.log('prompt 2 used')
         }
+        
 
 
 
@@ -272,7 +287,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                 ]
             }],
             model: 'claude-3-5-sonnet-20240620'
-        })
+        }) as Anthropic.Message
     
         console.log(message)
         return message.content
@@ -293,7 +308,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                 case 500:
                     throw new Error('Internal server error')
                 default:
-                    throw new Error('Unknnown API error has occured')
+                    throw new Error('An unknown server error has occured.')
             }
         } else {
             throw err

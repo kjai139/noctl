@@ -61,6 +61,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 }
 
 export default function MainInputForm () {
+    // curResult = Standard
     const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult} = useWorkState()
 
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
@@ -68,6 +69,8 @@ export default function MainInputForm () {
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('Standard')
     const [errorMsg, setErrorMsg] = useState('')
+    const [standardResultError, setStandardResultError] = useState('')
+    const [better1Error, setBetter1Error] = useState('')
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
@@ -117,6 +120,8 @@ export default function MainInputForm () {
         setCurRaw(text)
         setCurResult('')
         setAltResult1('')
+        setOgAltResult('')
+        setOgCurResult('')
         setIsLoading(true)
         try {
             let normalizedGlossary
@@ -155,33 +160,45 @@ export default function MainInputForm () {
             console.log('Params used:', params)
 
             if (model === 'Standard') {
-                const result = await translateGemini(params)
-                console.log(result)
-                const jsonResult = JSON.parse(result)
-                console.log(jsonResult)
-                const glossaryResult = jsonResult[0].glossary.terms
+                try {
+                    const result = await translateGemini(params)
+                    console.log(result)
+                    const jsonResult = JSON.parse(result)
+                    console.log(jsonResult)
+                    const glossaryResult = jsonResult[0].glossary.terms
 
-                if (normalizedGlossary && normalizedGlossary.length > 0) {
-                    console.log('Normalized Glossary used')
-                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                    glossaryResult.forEach((newentry:GlossaryItem) => {
-                        if (!termSet.has(newentry.term.toLowerCase())){
-                            termSet.add(newentry.term)
-                            normalizedGlossary.unshift(newentry)
-                        } else {
-                            console.log(`Entry ${newentry.term} already exists.`)
-                        }
-                    })
-                    setGlossary(normalizedGlossary)
-                } else {
-                    setGlossary(glossaryResult)
+                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        console.log('Normalized Glossary used')
+                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                        glossaryResult.forEach((newentry:GlossaryItem) => {
+                            if (!termSet.has(newentry.term.toLowerCase())){
+                                termSet.add(newentry.term)
+                                normalizedGlossary.unshift(newentry)
+                            } else {
+                                console.log(`Entry ${newentry.term} already exists.`)
+                            }
+                        })
+                        setGlossary(normalizedGlossary)
+                    } else {
+                        setGlossary(glossaryResult)
+                    }
+
+                    setCurResult(jsonResult[0].translation)
+                    setOgCurResult(jsonResult[0].translation)
+                } catch (err:any) {
+                    console.log('Error in Standard API')
+                    console.error(err, typeof err)
+                    if (err.message) {
+                        setStandardResultError(`Standard Model: ${err.message}`)
+                        throw new Error(err.message)
+                    } else {
+                        throw new Error('Standard Model: Encountered an unknown server error. If problem persists, change the model')
+                    }
                 }
-
-                setCurResult(jsonResult[0].translation)
-                setOgCurResult(jsonResult[0].translation)
+                
                 
 
-            } else if (model === 'Alt-1') {
+            } else if (model === 'Better-1') {
                 const result:any = await translateTxt(params)
                 console.log('Api response:', result)
 
@@ -219,15 +236,16 @@ export default function MainInputForm () {
                     
                 }
             } else if (model === 'Duo') {
-                const [result1, result2] = await Promise.all([
+                const [result1, result2]:[any, any] = await Promise.allSettled([
                     translateTxt(params),
                     translateGemini(params)
                 ])
 
-                if (result1 && result2 && result1[0]) {
-                    if (result1[0].type === 'tool_use') {
-                        const textResult = result1[0].input.text
-                        const glossaryResult = result1[0].input.glossary
+                if (result1.status === 'fulfilled') {
+                    const result1Response = result1.value[0]
+                    if (result1Response.type === 'tool_use') {
+                        const textResult = result1Response.input.text
+                        const glossaryResult = result1Response.input.glossary
                     
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
                             console.log('Normalized Glossary used')
@@ -246,16 +264,29 @@ export default function MainInputForm () {
                         }
                         
                         
-                        const jsonResult2 = JSON.parse(result2)
-                        console.log(jsonResult2)
                         
-                        setCurResult(jsonResult2[0].translation)
+                        
+                        
                         setAltResult1(textResult)
 
                         setOgAltResult(textResult)
-                        setOgCurResult(jsonResult2[0].translation)
+                        
                         
                     }    
+                } else {
+                    console.log('Result1', result1)
+                    setAltResult1(result1.reason.message)
+                }
+
+                if (result2.status === 'fulfilled') {
+                    console.log('result2', result2)
+                    const jsonResult2 = JSON.parse(result2.value)
+                    console.log(jsonResult2)
+                    setCurResult(jsonResult2[0].translation)
+                    setOgCurResult(jsonResult2[0].translation)
+                } else {
+                    console.log('Result2', result2)
+                    setCurResult(result2.reason.message)
                 }
             } else if (model === 'Test-1') {
                 const result = await translateTxtNoTool(params)
@@ -263,9 +294,13 @@ export default function MainInputForm () {
             }
             
             setIsLoading(false)
-        } catch (err) {
+        } catch (err:any) {
             console.error(err, typeof err)
-            setErrorMsg('Encountered an API error. If problem persists, change the model')
+            if (err.message) {
+               setErrorMsg(err.message)
+            } else {
+                setErrorMsg('Encountered an unknown server error. If problem persists, change the model')
+            }
            
             setIsLoading(false)
             
@@ -273,95 +308,7 @@ export default function MainInputForm () {
         }
     }
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log('submitted', values)
-        setIsLoading(true)
-        try {
-            let targetText
-            if (values.targetText.length > textLimit) {
-                console.log(`Text too long. ${values.targetText.length} / ${textLimit} Splitting...`)
-                
-                const firstPage = splitTextIntoChunks(values.targetText)
-                console.log('first page:', firstPage)
-                targetText = firstPage
     
-            }
-            let normalizedGlossary
-            let filteredGlossary
-            const normalizedtext = values.targetText.toLowerCase()
-            .replace(/[(){}\[\]<>]/g, ' ')  
-            .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
-            
-            if (glossary.length > 0) {
-                normalizedGlossary = glossary.map((entry) => {
-                    return (
-                        {
-                            ...entry,
-                            term: entry.term.toLowerCase(),
-                            
-                        }
-                    )
-                })
-
-                if (normalizedGlossary) {
-                    filteredGlossary = normalizedGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term))
-                }
-
-                
-            }
-
-            
-            console.log('Non filtered Glossary:', glossary)
-            console.log('Filtered Glossary:', filteredGlossary)
-
-            const params = {
-                text:values.targetText,
-                language: values.language,
-                ...(glossary.length > 0 && {glossary:JSON.stringify(filteredGlossary)})
-            }
-            console.log('Params used:', params)
-            const result = await translateTxt(params)
-            console.log('Api response:', result)
-
-            if (result && result[0]) {
-                if (result[0].type === 'tool_use') {
-                    const textResult = result[0].input.text
-                    const glossaryResult = result[0].input.glossary
-                   
-                    //add new entries if not dupe - backend should only return normalized results
-                    if (normalizedGlossary && normalizedGlossary.length > 0) {
-                        console.log('Normalized Glossary used')
-                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                        glossaryResult.forEach((newentry:GlossaryItem) => {
-                            /* let normalizedterm = newentry.term.toLowerCase() */
-                            if (!termSet.has(newentry.term.toLowerCase())){
-                                termSet.add(newentry.term)
-                                normalizedGlossary.unshift(newentry)
-                            } else {
-                                console.log(`Entry ${newentry.term} already exists.`)
-                            }
-                        })
-                        setGlossary(normalizedGlossary)
-                    } else {
-                        setGlossary(glossaryResult)
-                    }
-                    
-                    
-                    
-                    
-                    setCurResult(textResult)
-                    
-                
-                }
-                
-            }
-            setIsLoading(false)
-        } catch (err) {
-            console.error(err)
-           
-            setIsLoading(false)
-        }
-    }
 
     /* const handlePaste = (e) => {
         const copyData = e.clipboardData.getData('text')

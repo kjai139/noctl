@@ -10,13 +10,13 @@ export default async function TopNav() {
     return (
         <nav className="flex w-full shadow p-4 justify-center">
             <div className="mw w-full flex gap-8 justify-between items-center">
-                <div className="font-semibold">
+                <div className="font-semibold text-lg">
                     MMTL
                 </div>
                 <div className="flex">
                     
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-8 items-center">
                     <CurrencyDisplay session={session}></CurrencyDisplay>
                     <SignInBtn session={session}></SignInBtn>
 

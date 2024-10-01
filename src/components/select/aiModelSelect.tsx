@@ -16,7 +16,7 @@ export default function AiModelSelect({setModel}:AiModelSelectProps) {
             name:'Standard'
         },
         {
-            name:'Alt-1'
+            name:'Better-1'
         },
         {
             name:'Duo'
