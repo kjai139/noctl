@@ -27,7 +27,7 @@ export default function CopyTextBtn ({text}: CopyTextBtnProps) {
 
     return (
         <div>
-            <Button onClick={handleCopy} disabled={isCopied} className="disabled:opacity-100" variant={'default'}>
+            <Button onClick={handleCopy} disabled={isCopied} className="disabled:opacity-100" variant={'secondary'}>
                 {
                     isCopied ?
                     <div className="flex items-center gap-2">

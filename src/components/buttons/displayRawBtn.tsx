@@ -49,7 +49,7 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setCurRaw, curOgT
 
     return (
         <div>
-            <Button onClick={toggleRaw}>
+            <Button onClick={toggleRaw} variant={'secondary'}>
                 <div className="flex gap-2 items-center">
                     <TbListDetails></TbListDetails>
                     <span>Raw</span>
