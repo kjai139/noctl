@@ -7,10 +7,11 @@ import { Button } from '../ui/button';
 import AddCurrencyDialog from '../dialog/addCurrencyDialog';
 import { useState } from 'react';
 interface CurrencyDisplayProps {
-    session: Session | null
+    session: Session | null,
+    products: any
 }
 
-export default function CurrencyDisplay ({session}:CurrencyDisplayProps) {
+export default function CurrencyDisplay ({session, products}:CurrencyDisplayProps) {
 
     if (!session || !session.user) {
         return null
@@ -50,7 +51,7 @@ export default function CurrencyDisplay ({session}:CurrencyDisplayProps) {
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
-        <AddCurrencyDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
+        <AddCurrencyDialog products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
         </>
     )
 }

@@ -1,17 +1,18 @@
 import { SetStateAction } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { Separator } from "../ui/separator";
+import { Button } from "../ui/button";
 
 interface addCurrencyDialogProps {
     isDialogOpen: boolean,
-    setIsDialogOpen: React.Dispatch<SetStateAction<boolean>>
+    setIsDialogOpen: React.Dispatch<SetStateAction<boolean>>,
+    products: any
 }
 
-export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen}:addCurrencyDialogProps) {
+export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, products}:addCurrencyDialogProps) {
 
-    const handleDialogOpen = (isOpen) => {
-        setIsDialogOpen(isOpen)
-    }
+
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -24,8 +25,36 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen}:addCu
                     Buy currency to use the paid models
                     </DialogDescription>
                 </DialogHeader>
+                <Separator></Separator>
                 <div>
-                    Content here
+                    {
+                        products && products.length > 0 ?
+                        <div className="flex flex-col gap-4">
+                            {products.map((node) => {
+
+                                let price = (node.defaultPrice.unit_amount / 100).toFixed(2)
+                                return (
+                                    <Button variant={'outline'} key={`pdl-${node.id}`} className="flex justify-between h-auto">
+                                        <span className="flex flex-col">
+                                            <span className="text-lg font-semibold">
+                                            {node.name}
+                                            </span>
+                                            <span className="text-muted-foreground text-sm">
+                                                {node.description}
+                                            </span>
+                                        </span>
+                                        <span className="min-w-[100px]">
+                                            {`${price} ${node.defaultPrice.currency.toUpperCase()}`}
+                                        </span>
+                                    </Button>
+                                )
+                            })}
+
+                        </div> :
+                        <div>
+                            ERROR, NO PRODUCTS
+                        </div>
+                    }
                 </div>
                 
             </DialogContent>
