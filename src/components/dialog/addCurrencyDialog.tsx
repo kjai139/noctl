@@ -1,4 +1,5 @@
-import { SetStateAction } from "react";
+'use client'
+import { SetStateAction, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { Separator } from "../ui/separator";
@@ -10,9 +11,35 @@ interface addCurrencyDialogProps {
     products: any
 }
 
+
+
 export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, products}:addCurrencyDialogProps) {
 
+    const [clientSecret, setClientSecret] = useState('')
+    const [dpmCheckerLink, setDpmCheckerLink] = useState("")
+    const [confirmed, setConfirmed] = useState(false)
 
+
+    const getPaymentInt = async (itemId:string) => {
+        console.log('GETTING PAYMENT INT FOR ID', itemId)
+        const item = {
+            id:itemId
+        }
+        try {
+            const response = await fetch('/api/create-paymentIntent/', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(item)
+            })
+            console.log(response)
+
+        } catch (err) {
+            console.error(err)
+        }
+        
+    }
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -30,11 +57,11 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                     {
                         products && products.length > 0 ?
                         <div className="flex flex-col gap-4">
-                            {products.map((node) => {
+                            {products.map((node:any) => {
 
                                 let price = (node.defaultPrice.unit_amount / 100).toFixed(2)
                                 return (
-                                    <Button variant={'outline'} key={`pdl-${node.id}`} className="flex justify-between h-auto">
+                                    <Button onClick={() => getPaymentInt(node.id)} variant={'outline'} key={`pdl-${node.id}`} className="flex justify-between h-auto">
                                         <span className="flex flex-col">
                                             <span className="text-lg font-semibold">
                                             {node.name}
