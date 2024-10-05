@@ -39,6 +39,11 @@ export async function POST(request:NextRequest) {
    console.log('PRODUCT*******', product)
 
    return NextResponse.json({
+        amount: unitPrice,
+        currency:currency,
+        productName: product.name,
+        productDesc: product.description,
+        pId: paymentInt.id,
         clientSecret:  paymentInt.client_secret,
         dpmCheckerLink: `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentInt.id}`,
    })
