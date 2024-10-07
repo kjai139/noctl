@@ -4,12 +4,13 @@ import {
     useStripe,
     useElements
   } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import StripePowered from '../../../public/stripePowered.svg'
 import { IoIosLock } from "react-icons/io";
 import { Separator } from "../ui/separator";
+import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
 
 export type CheckoutProduct = {
     name:string,
@@ -20,16 +21,26 @@ export type CheckoutProduct = {
 
 interface CheckoutFormProps {
     dpmCheckerLink: string,
-    product: CheckoutProduct | null
+    product: CheckoutProduct | null,
+    setIsDialogOpen?: React.Dispatch<SetStateAction<boolean>>,
+    closeModal: () => void
+    
 }
 
-export default function CheckoutForm ({dpmCheckerLink, product}:CheckoutFormProps) {
+export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen, closeModal}:CheckoutFormProps) {
 
     const stripe = useStripe()
     const elements = useElements()
 
     const [message, setMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+
+    const [paymentSuccess, setPaymentSuccess] = useState(false)
+    const [paymentFailed, setPaymentFailed] = useState(false)
+
+    const handleCloseModal = () => {
+
+    }
     
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -40,16 +51,21 @@ export default function CheckoutForm ({dpmCheckerLink, product}:CheckoutFormProp
         }
         setIsLoading(true)
         try {
-            const { error } = await stripe.confirmPayment({
+            const response = await stripe.confirmPayment({
                 elements: elements,
                 confirmParams: {
                     return_url: "http://localhost:3000"
                 },
+                redirect:'if_required'
                 
-              });
-
-            if (error.type === "card_error" || error.type === "validation_error") {
-            setMessage(error.message || 'An unexpected error has occured');
+            });
+            console.log('response confirm payment', response)
+            if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
+                console.log('Payment successful.')
+                setPaymentSuccess(true)
+            }
+            if (response.error?.type === "card_error" || response.error?.type === "validation_error") {
+            setMessage(response.error.message || 'An unexpected error has occured');
             } else {
             setMessage("An unexpected error occurred.");
             }
@@ -76,7 +92,30 @@ export default function CheckoutForm ({dpmCheckerLink, product}:CheckoutFormProp
                 </div>
             </div>
             <Separator className="mt-4"></Separator>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
+            {
+                isLoading && !paymentFailed && !paymentSuccess ?
+                <div className="flex justify-center items-center min-h-[400px]">
+                <div className="spinner">
+
+                </div>
+                </div> : null
+            }
+            {
+                paymentSuccess && !isLoading ? 
+                <div className="flex flex-col gap-8 items-center p-10">
+                    <SuccessAnimatedIcon></SuccessAnimatedIcon>
+                    <div className="flex flex-col gap-4">
+                    <span>
+                        Payment Successful
+                    </span>
+                    <Button variant={'pmt'} onClick={() => closeModal()}>Close</Button>
+                    </div>
+                </div>
+                : null
+
+            }
+            {!paymentFailed && !paymentSuccess && !isLoading ? 
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 min-height-[240px]">
                 <div className="flex flex-col items-center gap-4">
                     
                     <span className="flex gap-2 items-center">
@@ -99,13 +138,13 @@ export default function CheckoutForm ({dpmCheckerLink, product}:CheckoutFormProp
                 {message && 
                 <div id="payment-message">{message}
                 </div>}
-            </form>
-            <div id="dpm-annotation">
+            </form> : null}
+            {/* <div id="dpm-annotation">
         <p className="mt-4">
           Payment methods are dynamically displayed based on customer location, order amount, and currency.&nbsp;
           <a href={dpmCheckerLink} target="_blank" rel="noopener noreferrer" id="dpm-integration-checker" className='color-red'>Preview payment methods by transaction</a>
         </p>
-      </div>
+      </div> */}
         </>
     )
 }

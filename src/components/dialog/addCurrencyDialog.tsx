@@ -79,10 +79,17 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
         if (!open) {
             setTimeout(() => {
                 setClientSecret('')
-            }, 3000)
+            }, 500)
         }
         setIsDialogOpen(open)
     
+    }
+
+    const closeModal = () => {
+        setTimeout(() => {
+            setClientSecret('')
+        }, 500)
+        setIsDialogOpen(false)
     }
 
     return (
@@ -140,7 +147,10 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                         : 
                         (
                             <Elements stripe={stripePromise} options={options}>
-                                {confirmed && curProduct ? <CompletedPage></CompletedPage> : <CheckoutForm product={curProduct} dpmCheckerLink={dpmCheckerLink}></CheckoutForm>}
+                                {curProduct ? <CheckoutForm product={curProduct} dpmCheckerLink={dpmCheckerLink}
+                                setIsDialogOpen={setIsDialogOpen}
+                                closeModal={closeModal}
+                                ></CheckoutForm> : null}
                             </Elements>
                         )
                     }
