@@ -63,15 +63,19 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 console.log('Payment successful.')
                 setPaymentSuccess(true)
+                setIsLoading(false)
             }
             if (response.error?.type === "card_error" || response.error?.type === "validation_error") {
             setMessage(response.error.message || 'An unexpected error has occured');
+            setIsLoading(false)
             } else {
             setMessage("An unexpected error occurred.");
-            }
             setIsLoading(false)
+            }
+            
         } catch (err) {
             console.error(err)
+            setIsLoading(false)
         }
     }
 
@@ -92,14 +96,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                 </div>
             </div>
             <Separator className="mt-4"></Separator>
-            {
-                isLoading && !paymentFailed && !paymentSuccess ?
-                <div className="flex justify-center items-center min-h-[400px]">
-                <div className="spinner">
-
-                </div>
-                </div> : null
-            }
+            
             {
                 paymentSuccess && !isLoading ? 
                 <div className="flex flex-col gap-8 items-center p-10">
@@ -114,7 +111,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                 : null
 
             }
-            {!paymentFailed && !paymentSuccess && !isLoading ? 
+            {!paymentFailed && !paymentSuccess? 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 min-height-[240px]">
                 <div className="flex flex-col items-center gap-4">
                     
@@ -128,16 +125,27 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                     <Image src={StripePowered} alt="Powered by Stripe Logo" unoptimized></Image>
                     </span>
                 </div>
+                <div className="min-h-[230px] relative">
+                {
+                isLoading && !paymentFailed && !paymentSuccess ?
+                <div className="flex justify-center items-center min-h-[230px] absolute w-full z-10 spin-bd">
+                <div className="spinner">
+
+                </div>
+                </div> : null
+                }
                 <PaymentElement options={{
                     layout: 'tabs'
                 }}></PaymentElement>
-                <div className="justify-end flex">
-                <Button>Pay now</Button>
+                </div>
+                <div className="justify-between flex">
+                {message && 
+                <div id="payment-message" className="text-destructive font-semibold">{message}
+                </div>}
+                <Button disabled={isLoading} className="ml-auto">Pay now</Button>
                 </div>
            
-                {message && 
-                <div id="payment-message">{message}
-                </div>}
+                
             </form> : null}
             {/* <div id="dpm-annotation">
         <p className="mt-4">

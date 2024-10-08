@@ -55,7 +55,8 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                     name:data.productName,
                     description:data.productDesc,
                     amount:data.amount,
-                    currency:data.currency
+                    currency:data.currency,
+                    pId:data.pId
                 }
                 setCurProduct(product)
             }

@@ -197,6 +197,10 @@
       background-color: #5bb543;
 }
 
+.spin-bd {
+      backdrop-filter: blur(1px);
+      background-color: rgba(255, 255, 255, 0.7);
+}
 
 @supports (animation: grow .5s cubic-bezier(.25, .25, .25, 1) forwards) {
       .tick {
