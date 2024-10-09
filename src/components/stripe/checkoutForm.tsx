@@ -65,7 +65,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                 setPaymentSuccess(true)
                 setIsLoading(false)
             }
-            if (response.error?.type === "card_error" || response.error?.type === "validation_error") {
+            if (response.error?.type === "card_error" || response.error?.type === "validation_error" || response.error?.type === 'invalid_request_error') {
             setMessage(response.error.message || 'An unexpected error has occured');
             setIsLoading(false)
             } else {
