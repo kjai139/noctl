@@ -5,7 +5,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { Button } from '../ui/button';
 import AddCurrencyDialog from '../dialog/addCurrencyDialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getStripe } from '@/lib/loadStripeClient';
 interface CurrencyDisplayProps {
     session: Session | null,
     products: any
@@ -19,6 +20,8 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
 
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [redirectMsg, setRedirectMsg] = useState('')
+    const [isResultOpen, setIsResultOpen] = useState(false)
 
     const handleItemClick = (e:any) => {
         e.preventDefault()
@@ -28,6 +31,32 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         }, 100)
       
     }
+
+    useEffect(() => {
+        const handleRedirect = async () => {
+            try {
+                const stripe = await getStripe()
+                const searchParams = new URLSearchParams(window.location.search)
+                const clientSecret = searchParams.get('payment_intent_client_secret')
+                console.log('PI CS :', clientSecret)
+                if (clientSecret) {
+                    const response = await stripe.retrievePaymentIntent(clientSecret)
+
+                    console.log(response)
+                    if (response.status === 'succeeded') {
+                        setRedirectMsg('Your payment was successful.')
+                    } else {
+                        setRedirectMsg('Your payment was unsuccessful.')
+                    }
+                }   
+            } catch (err) {
+                console.error(err)
+                setRedirectMsg('Error getting payment status')
+            }
+        }
+
+        handleRedirect()
+    }, [])
 
     return (
         <>
