@@ -7,6 +7,8 @@ import { Button } from '../ui/button';
 import AddCurrencyDialog from '../dialog/addCurrencyDialog';
 import { useEffect, useState } from 'react';
 import { getStripe } from '@/lib/loadStripeClient';
+import RedirectResultModal from '../dialog/redirectResult';
+import { usePathname, useRouter } from 'next/navigation';
 interface CurrencyDisplayProps {
     session: Session | null,
     products: any
@@ -22,6 +24,11 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [redirectMsg, setRedirectMsg] = useState('')
     const [isResultOpen, setIsResultOpen] = useState(false)
+    const [isRedirectSuccess, setIsRedirectSuccess] = useState(false)
+    const [isInitiated, setIsInitiated] = useState(false)
+    const [isResultLoading, setIsResultLoading] = useState(false)
+    const router = useRouter()
+    const pathname = usePathname()
 
     const handleItemClick = (e:any) => {
         e.preventDefault()
@@ -33,25 +40,40 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     }
 
     useEffect(() => {
+        if (!isResultOpen && isInitiated) {
+            router.replace(pathname)
+            console.log('pathname replaced.')
+        }
+    }, [isResultOpen])
+
+    useEffect(() => {
         const handleRedirect = async () => {
             try {
+                
                 const stripe = await getStripe()
                 const searchParams = new URLSearchParams(window.location.search)
                 const clientSecret = searchParams.get('payment_intent_client_secret')
                 console.log('PI CS :', clientSecret)
                 if (clientSecret) {
+                    setIsResultLoading(true)
+                    setIsResultOpen(true)
+                    setIsInitiated(true)
                     const response = await stripe.retrievePaymentIntent(clientSecret)
 
                     console.log(response)
-                    if (response.status === 'succeeded') {
+                    if (response.paymentIntent.status === 'succeeded') {
                         setRedirectMsg('Your payment was successful.')
+                        
+                        setIsRedirectSuccess(true)
                     } else {
                         setRedirectMsg('Your payment was unsuccessful.')
                     }
+                    setIsResultLoading(false)
                 }   
             } catch (err) {
                 console.error(err)
                 setRedirectMsg('Error getting payment status')
+                setIsResultLoading(false)
             }
         }
 
@@ -81,6 +103,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
             </DropdownMenuContent>
         </DropdownMenu>
         <AddCurrencyDialog products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
+        <RedirectResultModal isOpen={isResultOpen} setIsOpen={setIsResultOpen} isSuccess={isRedirectSuccess} resultMsg={redirectMsg}></RedirectResultModal>
         </>
     )
 }
