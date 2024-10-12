@@ -56,7 +56,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                 confirmParams: {
                     return_url: "http://localhost:3000"
                 },
-                /* redirect:'if_required' */
+                redirect:'if_required'
                 
             });
             console.log('response confirm payment', response)

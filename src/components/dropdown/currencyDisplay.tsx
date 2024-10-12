@@ -102,7 +102,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
-        <AddCurrencyDialog products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
+        <AddCurrencyDialog session={session} products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
         <RedirectResultModal isOpen={isResultOpen} setIsOpen={setIsResultOpen} isSuccess={isRedirectSuccess} resultMsg={redirectMsg}></RedirectResultModal>
         </>
     )

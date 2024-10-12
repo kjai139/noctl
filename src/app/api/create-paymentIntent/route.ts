@@ -1,3 +1,5 @@
+import userModel from "@/app/_models/userModel";
+import connectToMongoose from "@/lib/mongoose";
 import stripeInstance from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from 'stripe'
@@ -20,6 +22,23 @@ const getProductDetail = async (itemId:string) => {
 
 export async function POST(request:NextRequest) {
     const item  = await request.json()
+    console.log('[Stripe create paymentIntent] user Id:', item.userId)
+    //Database connection issue on signIn
+    
+    if (!item.userId) {
+        /* console.log('User is not logged in, checking database...')
+        await connectToMongoose()
+        const existingUser = await userModel.findOne({
+            email: item.userEmail
+        }) */
+       console.log('[Stripe create pi] User Id from DB missing...')
+        return NextResponse.json({
+            message: 'Account error, please try relogging.'
+        }, {
+            status:503
+        })
+
+    }
     const product = await stripeInstance.products.retrieve(item.id, {
         expand:['default_price']
     })
@@ -29,11 +48,15 @@ export async function POST(request:NextRequest) {
     const priceObj = product.default_price as Stripe.Price
     const unitPrice = priceObj.unit_amount!
     const currency = priceObj.currency
+
     
 
     const paymentInt = await stripeInstance.paymentIntents.create({
         amount: unitPrice,
-        currency: currency
+        currency: currency,
+        metadata: {
+            userId: item.userId
+        }
     })
    console.log('ITEM ******', item)
    console.log('PRODUCT*******', product)
@@ -45,6 +68,7 @@ export async function POST(request:NextRequest) {
         productDesc: product.description,
         pId: paymentInt.id,
         clientSecret:  paymentInt.client_secret,
+        userId: paymentInt.metadata.userId,
         dpmCheckerLink: `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentInt.id}`,
    })
 }

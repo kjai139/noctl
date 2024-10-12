@@ -8,34 +8,40 @@ import { Elements } from '@stripe/react-stripe-js'
 import { getStripe } from '../../lib/loadStripeClient'
 import CompletedPage from "../stripe/completedPage";
 import CheckoutForm, { CheckoutProduct } from "../stripe/checkoutForm";
+import { type Session } from 'next-auth'
 
 const stripePromise = getStripe()
 
 interface addCurrencyDialogProps {
     isDialogOpen: boolean,
     setIsDialogOpen: React.Dispatch<SetStateAction<boolean>>,
-    products: any
+    products: any,
+    session: Session | null
 }
 
 
 
-export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, products}:addCurrencyDialogProps) {
+export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, products, session}:addCurrencyDialogProps) {
 
     const [clientSecret, setClientSecret] = useState('')
     const [dpmCheckerLink, setDpmCheckerLink] = useState("")
     const [confirmed, setConfirmed] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [errorMsg, setErrorMsg] = useState('')
     
     const [curProduct, setCurProduct] = useState<CheckoutProduct | null>(null)
 
     const getPaymentInt = async (itemId:string) => {
         setClientSecret('')
+        setErrorMsg('')
         setDpmCheckerLink('')
         setCurProduct(null)
         setIsLoading(true)
         console.log('GETTING PAYMENT INT FOR ID', itemId)
         const item = {
-            id:itemId
+            id:itemId,
+            userId: session?.user.id || '',
+            userEmail: session?.user.email
         }
         try {
             const response = await fetch('/api/create-paymentIntent/', {
@@ -59,6 +65,10 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                     pId:data.pId
                 }
                 setCurProduct(product)
+            } else {
+                const data = await response.json()
+                console.log('[Create paymentIntent response not ok]', data)
+                setErrorMsg(data.message)
             }
             setIsLoading(false)
 
@@ -139,6 +149,12 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                                         </Button>
                                     )
                                 })}
+                                {
+                                    errorMsg ? 
+                                    <div className="text-destructive">
+                                        {errorMsg}
+                                    </div> : null
+                                }
     
                             </div> :
                             <div>
