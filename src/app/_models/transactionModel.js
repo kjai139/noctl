@@ -15,6 +15,11 @@ const TransactionModel = new Schema({
         type:String,
         enum: ['purchase', 'refund'],
         required:true
+    },
+    paymentId: {
+        type:String,
+        required: true,
+        unique: true,
     }
 }, {
     timestamps: true
