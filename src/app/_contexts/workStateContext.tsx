@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from "react"
+import React, { createContext, useContext, useState } from "react"
 import { GlossaryItem } from "../_types/glossaryType"
 
 interface UnsureItem {
@@ -37,6 +37,8 @@ interface workStateContextType {
     setOgAltResult:React.Dispatch<React.SetStateAction<string>>;
     ogCurResult: string,
     setOgCurResult:React.Dispatch<React.SetStateAction<string>>;
+    userCurrency: number | null,
+    setUserCurrency: React.Dispatch<React.SetStateAction<number | null>>
 }
 
 
@@ -59,9 +61,11 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
     const [ogAltResult, setOgAltResult] = useState('')
     const [ogCurResult, setOgCurResult] = useState('')
 
+    const [userCurrency, setUserCurrency] = useState<number | null>(null)
+
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, altResult1, setAltResult1, curRaw, setCurRaw, ogAltResult, setOgAltResult, setOgCurResult, ogCurResult}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, altResult1, setAltResult1, curRaw, setCurRaw, ogAltResult, setOgAltResult, setOgCurResult, ogCurResult, userCurrency, setUserCurrency}}>
             {children}
         </workStateContext.Provider>
     )

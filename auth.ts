@@ -55,7 +55,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           } else {
             console.log('User already exists : ', existingUser)
             token.id = existingUser._id
-            token.currencyAmt = existingUser.currencyAmt || 0
           }
         }
 

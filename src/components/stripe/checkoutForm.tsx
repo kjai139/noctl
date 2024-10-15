@@ -4,13 +4,16 @@ import {
     useStripe,
     useElements
   } from "@stripe/react-stripe-js";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import StripePowered from '../../../public/stripePowered.svg'
 import { IoIosLock } from "react-icons/io";
 import { Separator } from "../ui/separator";
 import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
+import { useWorkState } from "@/app/_contexts/workStateContext";
+import { type Session } from 'next-auth'
+import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
 
 export type CheckoutProduct = {
     name:string,
@@ -23,11 +26,12 @@ interface CheckoutFormProps {
     dpmCheckerLink: string,
     product: CheckoutProduct | null,
     setIsDialogOpen?: React.Dispatch<SetStateAction<boolean>>,
-    closeModal: () => void
+    closeModal: () => void,
+    session: Session | null
     
 }
 
-export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen, closeModal}:CheckoutFormProps) {
+export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen, closeModal, session}:CheckoutFormProps) {
 
     const stripe = useStripe()
     const elements = useElements()
@@ -38,9 +42,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
     const [paymentSuccess, setPaymentSuccess] = useState(false)
     const [paymentFailed, setPaymentFailed] = useState(false)
 
-    const handleCloseModal = () => {
-
-    }
+    const { setUserCurrency } = useWorkState()
     
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -78,6 +80,35 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             setIsLoading(false)
         }
     }
+
+    useEffect(() => {
+        const updateUserCurrency = async () => {
+            if (!session || !session.user.id) {
+                console.log('[Update user currency] User ID missing.')
+                return
+            }
+            try {
+                const currencyAmt = await UpdateUserCurrency({
+                    userId:session.user.id
+                })
+
+                if (currencyAmt === null) {
+                    throw new Error(`Encountered a server error getting user's currency balance`)
+                } else {
+                    console.log('[Update User Currency]', currencyAmt)
+                    setUserCurrency(currencyAmt)
+                }
+
+
+            } catch (err) {
+                console.error(err)
+            }
+        }
+        if (paymentSuccess) {
+            console.log(`[Payment Success] Updating User's currency...`)
+            updateUserCurrency()
+        }
+    }, [paymentSuccess])
 
     return (
         <>

@@ -9,6 +9,9 @@ import { useEffect, useState } from 'react';
 import { getStripe } from '@/lib/loadStripeClient';
 import RedirectResultModal from '../dialog/redirectResult';
 import { usePathname, useRouter } from 'next/navigation';
+import { UpdateUserCurrency } from '@/app/_utils/updateUserCurrency';
+import { useWorkState } from '@/app/_contexts/workStateContext';
+
 interface CurrencyDisplayProps {
     session: Session | null,
     products: any
@@ -29,6 +32,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     const [isResultLoading, setIsResultLoading] = useState(false)
     const router = useRouter()
     const pathname = usePathname()
+    const { userCurrency, setUserCurrency } = useWorkState()
 
     const handleItemClick = (e:any) => {
         e.preventDefault()
@@ -80,13 +84,40 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         handleRedirect()
     }, [])
 
+    useEffect(() => {
+        const getUserCurrency = async () => {
+            if (!session.user.id) {
+                console.log('[Get user currency] User ID missing.')
+                return
+            }
+            try {
+                const currencyAmt = await UpdateUserCurrency({
+                    userId:session.user.id
+                })
+
+                if (currencyAmt === null) {
+                    throw new Error(`Encountered a server error getting user's currency balance`)
+                } else {
+                    console.log('[Get User Currency]', currencyAmt)
+                    setUserCurrency(currencyAmt)
+                }
+
+
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        getUserCurrency()
+    }, [])
+
     return (
         <>
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
                 <Button variant={'outline'} className='flex gap-2 items-center'>
                     <TbPigMoney color='#AA336A' size={30}></TbPigMoney>
-                    <span>{session.user.currencyAmt}</span>
+                    <span>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'Unavailable'}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>

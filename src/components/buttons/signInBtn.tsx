@@ -45,13 +45,13 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <Avatar>
-                <AvatarImage alt="User avatar" src={session?.user.image || ''}></AvatarImage>
+                <AvatarImage alt="User avatar" src={session.user.image!}></AvatarImage>
                 <AvatarFallback><FaUserCircle size={40}></FaUserCircle></AvatarFallback>
                 </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuLabel>
-                        My Account
+                        {`Logged in as ${session.user.email}`}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator></DropdownMenuSeparator>
                     <DropdownMenuGroup>

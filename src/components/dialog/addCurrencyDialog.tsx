@@ -166,7 +166,7 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                             <Elements stripe={stripePromise} options={options}>
                                 {curProduct ? <CheckoutForm product={curProduct} dpmCheckerLink={dpmCheckerLink}
                                 setIsDialogOpen={setIsDialogOpen}
-                                closeModal={closeModal}
+                                closeModal={closeModal} session={session}
                                 ></CheckoutForm> : null}
                             </Elements>
                         )
