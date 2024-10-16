@@ -18,6 +18,7 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
 
     
     console.log('session', session)
+    
 
     if (!session?.user || !session) {
        return (
@@ -39,15 +40,27 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
             
        ) 
     }
+    /* const cacheBustedUrl = `${session.user.image}?v=${new Date().getTime()}` */
 
     return (
         <div>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Avatar>
-                <AvatarImage alt="User avatar" src={session.user.image!}></AvatarImage>
-                <AvatarFallback><FaUserCircle size={40}></FaUserCircle></AvatarFallback>
-                </Avatar>
+                    {
+                        session.user.image ? 
+                        <Avatar>
+                        <AvatarImage alt="User avatar" src={session.user.image!}></AvatarImage>
+                        
+                        <AvatarFallback>
+                        <FaUserCircle size={40}></FaUserCircle>
+                        </AvatarFallback>
+                        </Avatar>
+                        : 
+                        <AvatarFallback>
+                        <FaUserCircle size={40}></FaUserCircle>
+                        </AvatarFallback>
+                    }
+
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuLabel>

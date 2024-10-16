@@ -62,7 +62,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 
 export default function MainInputForm () {
     // curResult = Standard
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult, setUserCurrency} = useWorkState()
 
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -163,6 +163,9 @@ export default function MainInputForm () {
                 try {
                     const result = await translateGemini(params)
                     console.log(result)
+                    if (!result) {
+                        throw new Error('[Standard Model Response] response blank')
+                    }
                     const jsonResult = JSON.parse(result)
                     console.log(jsonResult)
                     const glossaryResult = jsonResult[0].glossary.terms

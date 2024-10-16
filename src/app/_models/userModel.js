@@ -15,7 +15,7 @@ const UserModel = new Schema({
     },
     currencyAmt: {
         type:Number,
-        default: 0
+        default: 10
     }
 })
 

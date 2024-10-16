@@ -3,6 +3,8 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
 import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
+import { auth } from "../../auth"
+import userModel from "./_models/userModel"
 
 
 const client = new Anthropic({
@@ -190,6 +192,16 @@ export async function translateTxtNoTool ({text, language, glossary}:translateTx
 
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {
+
+        const session = await auth()
+        if (!session || !session.user) {
+            throw new Error('User is not logged in.')
+        }
+
+        const existingUser = await userModel.findById(session.user.id)
+        
+
+
         /* const normalizedtext = text.toLowerCase()
         .replace(/[(){}\[\]<>]/g, ' ')  
         .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
