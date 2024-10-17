@@ -5,6 +5,7 @@ import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
 import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
 import { auth } from "../../auth"
 import userModel from "./_models/userModel"
+import { claudeCost } from "@/lib/modelPrice"
 
 
 const client = new Anthropic({
@@ -199,6 +200,14 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         }
 
         const existingUser = await userModel.findById(session.user.id)
+
+        if (!existingUser) {
+            throw new Error('User Id in Session does not exist in DB')
+        } 
+        if (existingUser.currencyAmt < claudeCost) {
+            throw new Error('You do not have enough currency to use this model.')
+        } 
+    
         
 
 
@@ -302,6 +311,9 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         }) as Anthropic.Message
     
         console.log(message)
+        existingUser.currencyAmt -= claudeCost
+        await existingUser.save()
+        console.log(`[TranslateTxt] user currency updated`)
         return message.content
     } catch (err) {
         console.error(err)

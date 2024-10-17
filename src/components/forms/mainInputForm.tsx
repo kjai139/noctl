@@ -16,6 +16,7 @@ import AiModelSelect from "../select/aiModelSelect";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import ErrorResultAlert from "../dialog/errorResult";
 import Anthropic from "@anthropic-ai/sdk";
+import { claudeCost } from "@/lib/modelPrice";
 
 
 const tokenLimit = 10000
@@ -168,23 +169,26 @@ export default function MainInputForm () {
                     }
                     const jsonResult = JSON.parse(result)
                     console.log(jsonResult)
-                    const glossaryResult = jsonResult[0].glossary.terms
+                    if (jsonResult[0].glossary?.terms) {
+                        const glossaryResult = jsonResult[0].glossary.terms
 
-                    if (normalizedGlossary && normalizedGlossary.length > 0) {
-                        console.log('Normalized Glossary used')
-                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                        glossaryResult.forEach((newentry:GlossaryItem) => {
-                            if (!termSet.has(newentry.term.toLowerCase())){
-                                termSet.add(newentry.term)
-                                normalizedGlossary.unshift(newentry)
-                            } else {
-                                console.log(`Entry ${newentry.term} already exists.`)
-                            }
-                        })
-                        setGlossary(normalizedGlossary)
-                    } else {
-                        setGlossary(glossaryResult)
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry:GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())){
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
                     }
+                    
 
                     setCurResult(jsonResult[0].translation)
                     setOgCurResult(jsonResult[0].translation)
@@ -233,6 +237,12 @@ export default function MainInputForm () {
                         
                         setAltResult1(textResult)
                         setOgAltResult(textResult)
+                        setUserCurrency((prev) =>  {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - claudeCost
+                            }
+                            return prev
+                        })
                         
                     
                     }

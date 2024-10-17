@@ -47,6 +47,19 @@ export async function POST (req:NextRequest) {
             case "payment_intent.succeeded":
                 const session4 = event.data.object
                 console.log('[Stripe webhook payment intent succeeded]', session4)
+
+                console.log(`[Stripe webhook] Checking if event ID ${event.id} exists`)
+
+                const existingTransaction = await TransactiionModel.findOne({
+                    eventId: event.id
+                })
+
+                if (existingTransaction) {
+                    console.log(`Transaction event ${event.id} already processed.`)
+                    return NextResponse.json({
+                        success:true
+                    })
+                }
                 const dbSess = await mongoose.startSession()
                 dbSess.startTransaction()
                 try {

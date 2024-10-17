@@ -7,6 +7,10 @@ const TransactionModel = new Schema({
         type:Schema.ObjectId,
         ref:'User'
     },
+    eventId: {
+        type:String,
+        unique:true,
+    },
     amount: {
         type:Number,
         required:true
@@ -19,7 +23,6 @@ const TransactionModel = new Schema({
     paymentId: {
         type:String,
         required: true,
-        unique: true,
     }
 }, {
     timestamps: true
