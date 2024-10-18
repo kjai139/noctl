@@ -283,7 +283,12 @@ export default function MainInputForm () {
                         setAltResult1(textResult)
 
                         setOgAltResult(textResult)
-                        
+                        setUserCurrency((prev) =>  {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - claudeCost
+                            }
+                            return prev
+                        })
                         
                     }    
                 } else {
@@ -380,6 +385,7 @@ export default function MainInputForm () {
   
    
     return (
+        <div>
         <div className="flex gap-8 justify-center">
             {
                 errorMsg ?
@@ -474,6 +480,7 @@ export default function MainInputForm () {
             </form>
         </Form>
         
+        </div>
         </div>
     )
 }

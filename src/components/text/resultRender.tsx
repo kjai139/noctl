@@ -3,6 +3,7 @@ import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
 import CopyTextBtn from "../buttons/copyTextBtn"
 import DisplayRawBtn from "../buttons/displayRawBtn"
+import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 
 
 export default function ResultRender () {
@@ -59,14 +60,13 @@ export default function ResultRender () {
             {curResult && !isLoading || altResult1 && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="flex w-full justify-center">
+            <div className="flex w-full justify-center gap-8">
             {
                 curResult ?
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1">
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted min-h-[400px]">
+                    <div className="flex justify-between items-center">
                 <h2 className="underline font-semibold">Model: Standard</h2>
-                <div className="absolute right-10 top-0 flex gap-2">
-                <DisplayRawBtn setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw}></DisplayRawBtn>
-                <CopyTextBtn text={curResult}></CopyTextBtn>
+                <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>
                 </div>
                 <div className="pt-8">
                 {curResult}
@@ -74,11 +74,10 @@ export default function ResultRender () {
             </div> : null}
             {
                 altResult1 && !isLoading ? 
-                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px]">
+                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px]">
+                    <div className="flex justify-between items-center">
                     <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
-                    <div className="absolute right-10 top-0 flex gap-2">
-                    <DisplayRawBtn curOgTxt={ogAltResult} setCurDisplay={setAltResult1} curRaw={curRaw} setCurRaw={setCurRaw}></DisplayRawBtn>
-                    <CopyTextBtn text={altResult1}></CopyTextBtn>
+                    <ResultRenderTaskbar curOgTxt={ogAltResult} curRaw={curRaw} setCurDisplay={setAltResult1} setCurRaw={setCurRaw} text={altResult1}></ResultRenderTaskbar>
                     </div>
                 <div className="pt-8">
                 {altResult1}

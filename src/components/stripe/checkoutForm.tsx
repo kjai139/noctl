@@ -14,6 +14,7 @@ import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { type Session } from 'next-auth'
 import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
+import { oneDollarCurAmt, tenDollarsCurAmt } from "@/lib/currencyPrice";
 
 export type CheckoutProduct = {
     name:string,
@@ -65,6 +66,17 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 console.log('Payment successful.')
                 setPaymentSuccess(true)
+                switch (response.paymentIntent.amount) {
+                    case 1000:
+                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + tenDollarsCurAmt : null)
+                        break
+                    case 100:
+                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + oneDollarCurAmt : null)
+                        break
+                    default:
+                        console.log(`[Client Currency Update] Unhandled currency amount after successful transaction: ${response.paymentIntent.amount}`)
+                        break
+                }
                 setIsLoading(false)
             }
             if (response.error?.type === "card_error" || response.error?.type === "validation_error" || response.error?.type === 'invalid_request_error') {
@@ -81,34 +93,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
         }
     }
 
-    useEffect(() => {
-        const updateUserCurrency = async () => {
-            if (!session || !session.user.id) {
-                console.log('[Update user currency] User ID missing.')
-                return
-            }
-            try {
-                const currencyAmt = await UpdateUserCurrency({
-                    userId:session.user.id
-                })
-
-                if (currencyAmt === null) {
-                    throw new Error(`Encountered a server error getting user's currency balance`)
-                } else {
-                    console.log('[Update User Currency]', currencyAmt)
-                    setUserCurrency(currencyAmt)
-                }
-
-
-            } catch (err) {
-                console.error(err)
-            }
-        }
-        if (paymentSuccess) {
-            console.log(`[Payment Success] Updating User's currency...`)
-            updateUserCurrency()
-        }
-    }, [paymentSuccess])
+    
 
     return (
         <>

@@ -8,24 +8,25 @@ interface AiModelSelectProps {
     setModel: React.Dispatch<SetStateAction<ModelsType>>
 }
 
+const models = [
+    {
+        name:'Standard'
+    },
+    {
+        name:'Better-1'
+    },
+    {
+        name:'Duo'
+    },
+    {
+        name:'Test-1'
+    }
+
+]
 
 export default function AiModelSelect({setModel}:AiModelSelectProps) {
 
-    const models = [
-        {
-            name:'Standard'
-        },
-        {
-            name:'Better-1'
-        },
-        {
-            name:'Duo'
-        },
-        {
-            name:'Test-1'
-        }
     
-    ]
 
     const handleValueChange = (value:ModelsType) => {
         setModel(value)
