@@ -48,7 +48,7 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
                 <DropdownMenuTrigger asChild>
                     {
                         session.user.image ? 
-                        <Avatar>
+                        <Avatar className="hover:cursor-pointer">
                         <AvatarImage alt="User avatar" src={session.user.image!}></AvatarImage>
                         
                         <AvatarFallback>

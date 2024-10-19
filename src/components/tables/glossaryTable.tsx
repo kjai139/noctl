@@ -28,11 +28,24 @@ import SearchTermBtn from "../buttons/searchTermBtn";
 import GlossaryLanguageSelect from "../select/languageSelect";
 import DeleteTermBtn from "../buttons/deleteTermBtn";
 import AddGlossEntryBtn from "../buttons/addGlossEntryBtn";
+import GlossaryInfo from "../cards/glossaryInfo";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
   setGlossary: React.Dispatch<React.SetStateAction<GlossaryItem[]>>;
 }
+
+const glossary1 = [
+  {
+      term:'Kappa',
+      definition:'Sarcastic word spammed'
+  },
+  {
+      term:'KEKL',
+      definition:'making fun of something'
+  }
+]
+
 
 export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableTypes) {
 
@@ -44,29 +57,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         )
     } */
 
-    const glossary1 = [
-        {
-            term:'Kappa',
-            definition:'Sarcastic word spammed'
-        },
-        {
-            term:'KEKL',
-            definition:'making fun of something'
-        }
-    ]
-
-    const notifications = [
-      {
-        text:'New terms from subsequent translation request will continue to add onto the current glossary'
-      },
-      {
-        text:'The glossary file you upload must be in JSON format'
-      },
-      {
-        text:'Type "T" stands for Term and "N" stands for Name. *There can be rare mixups*'
-      },
-      
-    ]
+    
 
     const [testGloss, setTestGloss] = useState<GlossaryItem[]>()
     const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
@@ -154,115 +145,104 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     },[lang])
 
     return (
-        <div className="shadow p-4 flex flex-col gap-4 max-w-[560px]">
-        
-        <div className="flex gap-2 flex-col text-xs">
-        {/* <Button onClick={testGlossary}>Test Glossary</Button> */}
-          <div className="flex gap-2 items-start">
-            <div>
-          <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
-          </div>
-          <p>This is a glossary to keep terms and names consistent when translating novels. An editable glossary will be auto-generated after each translation. You can then edit as needed and you can choose to save the glossary file as well</p>
-          </div>
-          <ul>
-            {notifications && notifications.map((node, idx) => {
-              return (
-                <li key={`noti-${idx}`} className="list-disc ml-4">
-                  {node.text}
-                </li>
-              )
-            })}
-          </ul>
-          <div className="flex justify-end">
-          
-        
-          <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
-        
-          </div>
-          <div className="flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
-          <div>
-          <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
-          </div>
+      <div className="p-4 flex flex-col gap-4 max-w-[560px]">
+
+        <GlossaryInfo></GlossaryInfo>
+        <div>
+        <div className="flex justify-end">
+
+
+            <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
+
           </div>
         </div>
-        <Table>
-        {
-          glossary && glossary.length > 0 ?
-          <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
-        }
-      
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[60px]">Type</TableHead>
-          <TableHead className="w-[100px]">Term</TableHead>
-          <TableHead>Definition</TableHead>
+        <div className="gloss-wrap flex flex-col gap-4 border-2 border-muted p-4 rounded">
           
-          
-          
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {glossary && glossary.map((node:GlossaryItem, idx:number) => (
-          <TableRow key={`tb-${idx}`}>
-            <TableCell>
-              {node.term_type === 'name' ? 'N' : null}
-              {node.term_type === 'term' || node.term_type === 'skill' ? 'T' : null}
-            </TableCell>
-            <TableCell className="font-medium">
-              <span>
-              {node.term}
-              </span>
-            </TableCell>
-            
-            <TableCell className="flex gap-4">
-                <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
-                </Input>
-                <div className="flex items-center">
-                  
-              
-                <SearchTermBtn term={node.term} language={lang}></SearchTermBtn>
-                <DeleteTermBtn onClick={() => deleteTerm(node.term)}></DeleteTermBtn>
-                </div>
-            </TableCell>
-            
-            
-          </TableRow>
-        ))}
-      </TableBody>
-      {/* <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
+          <div className="flex justify-between items-center">
+            <h1 className="text-lg font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+            <div>
+              <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
+            </div>
+          </div>
         
-      </TableFooter> */}
-    </Table>
-    
-    <div className="flex gap-4 ml-auto">
-    
-    {/* <Button onClick={checkGlossary}>Check Glossary</Button> */}
-    {glossary.length > 0 ?
-    <>
-    <Button className="gap-2" onClick={resetGlossary}>
-        <RiDeleteBin2Line></RiDeleteBin2Line>
-        <span>Clear</span>
-        </Button>
-    <Button onClick={downloadGlossary} className="gap-2">
-      <GrDocumentDownload></GrDocumentDownload>
-      <span>Download</span></Button>
-    </>
-    : null
-    }
+        <Table>
+          {
+            glossary && glossary.length > 0 ?
+              <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
+          }
 
-    <div>
-    <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
-      <FaFileUpload></FaFileUpload><span>Upload</span>
-    </label>
-    <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
-    
-    </div>
-    </div>
-    </div>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[60px]">Type</TableHead>
+              <TableHead className="w-[100px]">Term</TableHead>
+              <TableHead>Definition</TableHead>
+
+
+
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {glossary && glossary.map((node: GlossaryItem, idx: number) => (
+              <TableRow key={`tb-${idx}`}>
+                <TableCell>
+                  {node.term_type === 'name' ? 'N' : null}
+                  {node.term_type === 'term' || node.term_type === 'skill' ? 'T' : null}
+                </TableCell>
+                <TableCell className="font-medium">
+                  <span>
+                    {node.term}
+                  </span>
+                </TableCell>
+
+                <TableCell className="flex gap-4">
+                  <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
+                  </Input>
+                  <div className="flex items-center">
+
+
+                    <SearchTermBtn term={node.term} language={lang}></SearchTermBtn>
+                    <DeleteTermBtn onClick={() => deleteTerm(node.term)}></DeleteTermBtn>
+                  </div>
+                </TableCell>
+
+
+              </TableRow>
+            ))}
+          </TableBody>
+          {/* <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell className="text-right">$2,500.00</TableCell>
+            </TableRow>
+            
+          </TableFooter> */}
+        </Table>
+
+        <div className="flex gap-4 ml-auto">
+
+          {glossary.length > 0 ?
+            <>
+              <Button className="gap-2" onClick={resetGlossary}>
+                <RiDeleteBin2Line></RiDeleteBin2Line>
+                <span>Clear</span>
+              </Button>
+              <Button onClick={downloadGlossary} className="gap-2">
+                <GrDocumentDownload></GrDocumentDownload>
+                <span>Download</span></Button>
+            </>
+            : null
+          }
+
+          <div>
+            <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
+              <FaFileUpload></FaFileUpload><span>Upload</span>
+            </label>
+            <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+
+          </div>
+        </div>
+        </div>
+
+      </div>
     )
 }

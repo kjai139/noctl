@@ -36,7 +36,7 @@ export default function AiModelSelect({setModel}:AiModelSelectProps) {
         <div className="flex flex-col gap-2">
         <Select onValueChange={handleValueChange} defaultValue={'Standard'}>
         
-            <SelectTrigger id="lang-select" className="border-none shadow-none hover:shadow hover:border">
+            <SelectTrigger id="lang-select" className="border-none shadow-none hover:shadow">
                 <SelectValue placeholder="Select Language">
                 </SelectValue>
             </SelectTrigger>

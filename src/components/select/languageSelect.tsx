@@ -8,24 +8,25 @@ interface GlossaryLangSelectProps {
     setLang: React.Dispatch<SetStateAction<LanguagesType>>
 }
 
+const language = [
+    {
+        name:'Japanese'
+    },
+    {
+        name:'Korean'
+    },
+    {
+        name:'English'
+    },
+    {
+        name:'Chinese'
+    }
+
+]
 
 export default function GlossaryLangSelect({setLang}:GlossaryLangSelectProps) {
 
-    const language = [
-        {
-            name:'Japanese'
-        },
-        {
-            name:'Korean'
-        },
-        {
-            name:'English'
-        },
-        {
-            name:'Chinese'
-        }
     
-    ]
 
     const handleValueChange = (value:LanguagesType) => {
         setLang(value)

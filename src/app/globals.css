@@ -59,6 +59,12 @@
   }
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .uploadBtn:hover {
   cursor: pointer;
 }
@@ -66,6 +72,10 @@
 .selected {
   background-color: hsl(var(--accent));
   border: 2px solid #d3d3d3;
+}
+
+.main-p {
+      flex:1
 }
 
 
