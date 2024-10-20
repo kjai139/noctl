@@ -18,18 +18,23 @@ const notifications = [
 export default function GlossaryInfo () {
 
     return (
-        <div className="flex gap-2 flex-col text-xs">
+        <div className="flex gap-4 flex-col text-sm">
             <div className="flex gap-2 items-start">
                 <div>
                     <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
                 </div>
-                <p>This is a glossary to keep terms and names consistent when translating novels. An editable glossary will be auto-generated after each appropriate translation. You can then edit as needed and also save and upload it for future use.</p>
+                <p>A glossary is used to keep terms and names consistent when translating novels. An editable glossary will be auto-generated after each successful prompt when appropirate. You can then edit as needed and also save and upload it for future use.</p>
             </div>
-            <ul>
+            <ul className="flex flex-col gap-2">
                 {notifications && notifications.map((node, idx) => {
                     return (
-                        <li key={`noti-${idx}`} className="list-disc ml-4">
+                        <li key={`noti-${idx}`} className="grid grid-cols-[25px_1fr] items-start">
+                            <span className="rounded-full bg-primary h-2 w-2 translate-y-1">
+                            
+                            </span>
+                            <span>
                             {node.text}
+                            </span>
                         </li>
                     )
                 })}

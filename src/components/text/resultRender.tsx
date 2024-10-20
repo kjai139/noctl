@@ -1,8 +1,6 @@
 'use client'
 import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
-import CopyTextBtn from "../buttons/copyTextBtn"
-import DisplayRawBtn from "../buttons/displayRawBtn"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 
 
@@ -48,9 +46,15 @@ export default function ResultRender () {
             <>
             <div className="absolute">
                 <div className="flex flex-col gap-2">
+                    <div className="flex gap-2 items-end font-bold text-lg justify-between">
             <div className="loader" ref={loadingRef}>
             </div>
-            <span className="justify-center">{`${seconds > 0 ? seconds : null}s...It might take a second`}</span>
+            <span>
+                {`${seconds > 0 ? seconds : null}s`}
+            </span>
+            </div>
+
+            <span className="justify-center text-muted-foreground">{`...It might take a min, please be patient.`}</span>
             </div>
             </div>
             </>
@@ -60,10 +64,10 @@ export default function ResultRender () {
             {curResult && !isLoading || altResult1 && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="flex w-full justify-center gap-8">
+            <div className="flex w-full justify-center gap-8 min-h-[1000px]">
             {
                 curResult ?
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted min-h-[400px]">
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
                     <div className="flex justify-between items-center">
                 <h2 className="underline font-semibold">Model: Standard</h2>
                 <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>

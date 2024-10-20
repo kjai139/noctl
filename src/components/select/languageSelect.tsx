@@ -34,7 +34,7 @@ export default function GlossaryLangSelect({setLang}:GlossaryLangSelectProps) {
 
     return (
         <div className="flex flex-col gap-2">
-        <Label htmlFor="lang-select">Lookup Language</Label>
+        <Label htmlFor="lang-select">Term Lookup Language</Label>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
             <SelectTrigger id="lang-select">

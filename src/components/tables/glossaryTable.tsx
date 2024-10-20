@@ -18,12 +18,9 @@ import { Input } from "../ui/input"
 import { FaFileUpload } from "react-icons/fa";
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
-import { IoAlertCircleOutline } from "react-icons/io5";
 import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { GlossaryItem, LanguagesType } from "@/app/_types/glossaryType";
-import { TiDeleteOutline } from "react-icons/ti";
-import { TbReportSearch } from "react-icons/tb";
 import SearchTermBtn from "../buttons/searchTermBtn";
 import GlossaryLanguageSelect from "../select/languageSelect";
 import DeleteTermBtn from "../buttons/deleteTermBtn";
@@ -35,27 +32,23 @@ interface GlossaryTableTypes {
   setGlossary: React.Dispatch<React.SetStateAction<GlossaryItem[]>>;
 }
 
-const glossary1 = [
+const glossary1:GlossaryItem[] = [
   {
       term:'Kappa',
-      definition:'Sarcastic word spammed'
+      definition:'Sarcastic word spammed',
+      term_type:'term'
   },
   {
       term:'KEKL',
-      definition:'making fun of something'
+      definition:'making fun of something',
+      term_type: 'term'
   }
 ]
 
 
 export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableTypes) {
 
-    /* if (glossary.length === 0) {
-        return (
-            <div>
-                No glossary in use currently.
-            </div>
-        )
-    } */
+   
 
     
 
@@ -64,7 +57,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     const [errorMsg, setErrorMsg] = useState('')
     const [lang, setLang] = useState<LanguagesType>('English')
 
-    const handleInputchange = (newDef:string, id) => {
+    const handleInputchange = (newDef:string, id:number) => {
         const updatedData = glossary.map((node, idx) => {
             if (id === idx) {
                 return (
@@ -151,8 +144,10 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         <div>
         <div className="flex justify-end">
 
-
-            <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect>
+            {
+              glossary && glossary.length > 0 ?
+              <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect> : null
+            }
 
           </div>
         </div>
