@@ -10,7 +10,7 @@ const notifications = [
       text:'The glossary file you upload must be in JSON format'
     },
     {
-      text:'Type "T" stands for Term and "N" stands for Name. *There can be rare mixups*'
+      text:'For reference, type "T" stands for Term and "N" stands for Name. *Sometimes there can be rare mixups*'
     },
     
     ]

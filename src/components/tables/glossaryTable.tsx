@@ -26,6 +26,7 @@ import GlossaryLanguageSelect from "../select/languageSelect";
 import DeleteTermBtn from "../buttons/deleteTermBtn";
 import AddGlossEntryBtn from "../buttons/addGlossEntryBtn";
 import GlossaryInfo from "../cards/glossaryInfo";
+import GlossaryInfoDialog from "../dialog/glossaryInfoDialog";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -138,9 +139,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     },[lang])
 
     return (
-      <div className="p-4 flex flex-col gap-4 max-w-[560px]">
-
-        <GlossaryInfo></GlossaryInfo>
+      <div className="p-4 flex flex-col gap-4 max-w-[560px] flex-1">
         <div>
         <div className="flex justify-end">
 
@@ -154,11 +153,17 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
         <div className="gloss-wrap flex flex-col gap-4 border-2 border-muted p-4 rounded">
           
           <div className="flex justify-between items-center">
-            <h1 className="text-lg font-semibold">Glossary {upLoadedFile ? `- ${upLoadedFile.name}` : null}</h1>
+            <div className="flex gap-2 items-center">
+            <h1 className="text-lg font-semibold">Glossary </h1>
+            <GlossaryInfoDialog></GlossaryInfoDialog>
+            </div>
             <div>
               <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
             </div>
           </div>
+          <span className="text-sm text-muted-foreground">
+          {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
+          </span>
         
         <Table>
           {
@@ -206,8 +211,8 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           </TableBody>
           {/* <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
+              <TableCell colSpan={3}>"T" stands for term and "N" for name</TableCell>
+
             </TableRow>
             
           </TableFooter> */}

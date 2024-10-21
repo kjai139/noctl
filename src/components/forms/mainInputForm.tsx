@@ -385,102 +385,102 @@ export default function MainInputForm () {
   
    
     return (
-        <div>
-        <div className="flex gap-8 justify-center">
-            {
-                errorMsg ?
-                <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
-                : null
-
-            }
-            
-            <div>
-                {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
-        <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
-        </div>
-        <div className="justify-center items-center flex">
-            <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
-        </div>
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
-                <div className="flex gap-4 mx-2">
-                <FormField
-                control={form.control}
-                name="language"
-                render={({field}) => (
-                    
-                    <FormItem>
-                        
-                        <FormLabel className="whitespace-nowrap">Output Language</FormLabel>
-                        
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Language">
-                                    </SelectValue>
-                                </SelectTrigger>
-                            </FormControl>
-                                <SelectContent>
-                                    {
-                                        language.map((node, idx) => {
-                                            return (
-                                                <SelectItem value={node.name} key={`lg-${idx}`}>
-                                                       {node.name} 
-                                                </SelectItem>
-                                            )
-                                        })
-                                    }
-                                </SelectContent>
-                            
-                            </Select>
-                        
-                    </FormItem>
-                    
-                )}
-                >
-
-                </FormField>
-
-                {/* cara */}
-                <ChunkCarousel setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
     
-                </div>
-                <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
-                <FormField control={form.control}
-                name="targetText"
-                render={({field}) => (
-                    <FormItem>
-                            <FormControl>
-                                <Textarea maxLength={13000} onInput={(e) => {
-                                    const target = e.target as HTMLTextAreaElement
-                                    target.style.height = 'auto';
-                                    target.style.height = `${target.scrollHeight}px`;
-                                }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] max-h-[650px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+            <div className="flex gap-8 justify-center">
+                {
+                    errorMsg ?
+                        <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
+                        : null
 
-                                </Textarea>
-                                
-                            </FormControl>
-                            
-                        
-                    </FormItem>
-                )}
-                >
+                }
 
-                </FormField>
-                <div className="justify-end flex gap-2 items-center p-2 pb-1">
-                    <AiModelSelect setModel={setAiModel}></AiModelSelect>
-                <div className="text-destructive p-0 flex gap-2 items-center">
-                    {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null }
-                    {form.formState.errors.language ? form.formState.errors.language.message : null }
-                    <TextAreaWatched control={form.control}></TextAreaWatched>
+                
+                    {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
+                    <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
+            
+                <div className="justify-center items-center flex">
+                    <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
                 </div>
-                <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isLoading}>Translate</Button>
-                </div>
-                </div>
-            </form>
-        </Form>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
+                        <div className="flex gap-4 mx-2">
+                            <FormField
+                                control={form.control}
+                                name="language"
+                                render={({ field }) => (
+
+                                    <FormItem>
+
+                                        <FormLabel className="whitespace-nowrap">Output Language</FormLabel>
+
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Language">
+                                                    </SelectValue>
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {
+                                                    language.map((node, idx) => {
+                                                        return (
+                                                            <SelectItem value={node.name} key={`lg-${idx}`}>
+                                                                {node.name}
+                                                            </SelectItem>
+                                                        )
+                                                    })
+                                                }
+                                            </SelectContent>
+
+                                        </Select>
+
+                                    </FormItem>
+
+                                )}
+                            >
+
+                            </FormField>
+
+                            {/* cara */}
+                            <ChunkCarousel setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
+
+                        </div>
+                        <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
+                            <FormField control={form.control}
+                                name="targetText"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Textarea maxLength={13000} onInput={(e) => {
+                                                const target = e.target as HTMLTextAreaElement
+                                                target.style.height = 'auto';
+                                                target.style.height = `${target.scrollHeight}px`;
+                                            }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] max-h-[650px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+
+                                            </Textarea>
+
+                                        </FormControl>
+
+
+                                    </FormItem>
+                                )}
+                            >
+
+                            </FormField>
+                            <div className="justify-end flex gap-2 items-center p-2 pb-1">
+                                <AiModelSelect setModel={setAiModel}></AiModelSelect>
+                                <div className="text-destructive p-0 flex gap-2 items-center">
+                                    {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}
+                                    {form.formState.errors.language ? form.formState.errors.language.message : null}
+                                    <TextAreaWatched control={form.control}></TextAreaWatched>
+                                </div>
+                                <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isLoading}>Translate</Button>
+                            </div>
+                        </div>
+                    </form>
+                </Form>
+
+            </div>
         
-        </div>
-        </div>
     )
 }
