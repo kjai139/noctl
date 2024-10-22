@@ -156,7 +156,7 @@ export default function GlossaryTable () {
           
           <div className="flex justify-between items-center">
             <div className="flex gap-1 items-center">
-            <h1 className="text-lg font-semibold px-2">Glossary</h1>
+            <h1 className="text-lg font-semibold pl-2">Glossary</h1>
             <GlossaryInfoDialog></GlossaryInfoDialog>
             </div>
             <div>

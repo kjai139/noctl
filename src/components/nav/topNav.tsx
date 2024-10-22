@@ -45,9 +45,15 @@ export default async function TopNav() {
                 <div className="font-semibold text-lg">
                     MMTL
                 </div>
-                <div className="flex">
-                    
+                <div className="flex gap-4">
+                    <div>
+                    Models
+                    </div>
+                    <div>
+                        Pricing
+                    </div>
                 </div>
+                
                 <div className="flex gap-8 items-center">
                     <CurrencyDisplay products={plainProducts} session={session}></CurrencyDisplay>
                     <SignInBtn session={session}></SignInBtn>
