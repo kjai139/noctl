@@ -2,6 +2,7 @@ import { auth } from "../../../auth";
 import SignInBtn from "../buttons/signInBtn";
 import CurrencyDisplay from "../dropdown/currencyDisplay";
 import stripeInstance from '../../lib/stripe'
+import ModelsDialog from "../dialog/modelsDialog";
 
 async function getProductList () {
     try {
@@ -47,7 +48,7 @@ export default async function TopNav() {
                 </div>
                 <div className="flex gap-4">
                     <div>
-                    Models
+                        <ModelsDialog></ModelsDialog>
                     </div>
                     <div>
                         Pricing
