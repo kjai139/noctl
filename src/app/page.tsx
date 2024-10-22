@@ -6,7 +6,7 @@ import ResultRender from "@/components/text/resultRender";
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col w-full">
     <TopNav></TopNav>
     <TopNavInfo></TopNavInfo>
     <main className="flex main-p flex-col items-center w-full">
@@ -16,6 +16,6 @@ export default function Home() {
         <ResultRender></ResultRender>
       </div>
     </main>
-    </>
+    </div>
   );
 }

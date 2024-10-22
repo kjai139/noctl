@@ -63,15 +63,14 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 
 export default function MainInputForm () {
     // curResult = Standard
-    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult, setUserCurrency} = useWorkState()
+    const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult, setUserCurrency, setStandardResultError, setBetter1Error} = useWorkState()
 
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('Standard')
     const [errorMsg, setErrorMsg] = useState('')
-    const [standardResultError, setStandardResultError] = useState('')
-    const [better1Error, setBetter1Error] = useState('')
+    
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
@@ -123,6 +122,8 @@ export default function MainInputForm () {
         setAltResult1('')
         setOgAltResult('')
         setOgCurResult('')
+        setBetter1Error('')
+        setStandardResultError('')
         setIsLoading(true)
         try {
             let normalizedGlossary
@@ -199,7 +200,7 @@ export default function MainInputForm () {
                         setStandardResultError(`Standard Model: ${err.message}`)
                         throw new Error(err.message)
                     } else {
-                        throw new Error('Standard Model: Encountered an unknown server error. If problem persists, change the model')
+                        throw new Error('Standard Model: Encountered an unknown server error. If problem persists, change the model.')
                     }
                 }
                 
@@ -253,7 +254,7 @@ export default function MainInputForm () {
                     translateTxt(params),
                     translateGemini(params)
                 ])
-
+                //claude
                 if (result1.status === 'fulfilled') {
                     const result1Response = result1.value[0]
                     if (result1Response.type === 'tool_use') {
@@ -293,9 +294,10 @@ export default function MainInputForm () {
                     }    
                 } else {
                     console.log('Result1', result1)
-                    setAltResult1(result1.reason.message)
+                    setBetter1Error(result1.reason.message)
+                    
                 }
-
+                // gemini
                 if (result2.status === 'fulfilled') {
                     console.log('result2', result2)
                     const jsonResult2 = JSON.parse(result2.value)
@@ -304,7 +306,8 @@ export default function MainInputForm () {
                     setOgCurResult(jsonResult2[0].translation)
                 } else {
                     console.log('Result2', result2)
-                    setCurResult(result2.reason.message)
+                    setStandardResultError(result1.reason.message)
+                    
                 }
             } else if (model === 'Test-1') {
                 const result = await translateTxtNoTool(params)
@@ -396,7 +399,7 @@ export default function MainInputForm () {
 
                 
                     {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
-                    <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable>
+                    {/* <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable> */}
             
                 <div className="justify-center items-center flex">
                     <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>

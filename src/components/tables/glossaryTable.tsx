@@ -1,3 +1,4 @@
+'use client'
 import {
     Table,
     TableBody,
@@ -27,6 +28,7 @@ import DeleteTermBtn from "../buttons/deleteTermBtn";
 import AddGlossEntryBtn from "../buttons/addGlossEntryBtn";
 import GlossaryInfo from "../cards/glossaryInfo";
 import GlossaryInfoDialog from "../dialog/glossaryInfoDialog";
+import { useWorkState } from "@/app/_contexts/workStateContext";
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -47,9 +49,9 @@ const glossary1:GlossaryItem[] = [
 ]
 
 
-export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableTypes) {
+export default function GlossaryTable () {
 
-   
+   const { glossary, setGlossary } = useWorkState()
 
     
 
@@ -139,7 +141,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
     },[lang])
 
     return (
-      <div className="p-4 flex flex-col gap-4 max-w-[560px] flex-1">
+      <div className="flex flex-col gap-4 max-w-[560px] flex-1">
         <div>
         <div className="flex justify-end">
 
@@ -150,20 +152,29 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
 
           </div>
         </div>
-        <div className="gloss-wrap flex flex-col gap-4 border-2 border-muted p-4 rounded">
+        <div className="gloss-wrap flex flex-col gap-4">
           
           <div className="flex justify-between items-center">
-            <div className="flex gap-2 items-center">
-            <h1 className="text-lg font-semibold">Glossary </h1>
+            <div className="flex gap-1 items-center">
+            <h1 className="text-lg font-semibold px-2">Glossary</h1>
             <GlossaryInfoDialog></GlossaryInfoDialog>
             </div>
             <div>
               <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
             </div>
           </div>
+          <div className="flex justify-between items-center px-2">
           <span className="text-sm text-muted-foreground">
           {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
           </span>
+          <div>
+            <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
+              <FaFileUpload></FaFileUpload><span>Upload</span>
+            </label>
+            <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+
+          </div>
+          </div>
         
         <Table>
           {
@@ -173,7 +184,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
 
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[60px]">Type</TableHead>
+              {/* <TableHead className="w-[60px]">Type</TableHead> */}
               <TableHead className="w-[100px]">Term</TableHead>
               <TableHead>Definition</TableHead>
 
@@ -184,10 +195,10 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           <TableBody>
             {glossary && glossary.map((node: GlossaryItem, idx: number) => (
               <TableRow key={`tb-${idx}`}>
-                <TableCell>
+                {/* <TableCell>
                   {node.term_type === 'name' ? 'N' : null}
                   {node.term_type === 'term' || node.term_type === 'skill' ? 'T' : null}
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="font-medium">
                   <span>
                     {node.term}
@@ -195,8 +206,17 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
                 </TableCell>
 
                 <TableCell className="flex gap-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
                   <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
                   </Input>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                  <span>{node.definition}</span>
+                  </TooltipContent>
+                  </Tooltip>
+                  </TooltipProvider>
                   <div className="flex items-center">
 
 
@@ -218,7 +238,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
           </TableFooter> */}
         </Table>
 
-        <div className="flex gap-4 ml-auto">
+        <div className="flex gap-4 ml-auto px-2">
 
           {glossary.length > 0 ?
             <>
@@ -233,13 +253,7 @@ export default function GlossaryTable ({glossary, setGlossary}:GlossaryTableType
             : null
           }
 
-          <div>
-            <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
-              <FaFileUpload></FaFileUpload><span>Upload</span>
-            </label>
-            <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
-
-          </div>
+          
         </div>
         </div>
 

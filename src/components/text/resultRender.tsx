@@ -6,7 +6,7 @@ import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 
 export default function ResultRender () {
 
-    const { curResult, ogCurResult, setOgCurResult, ogAltResult, setOgAltResult, isLoading, altResult1, setCurResult, setCurRaw, curRaw, setAltResult1 } = useWorkState()
+    const { curResult, ogCurResult, setOgCurResult, ogAltResult, setOgAltResult, isLoading, altResult1, setCurResult, setCurRaw, curRaw, setAltResult1, standardResultError, better1Error } = useWorkState()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -61,7 +61,7 @@ export default function ResultRender () {
             : null
             }
 
-            {curResult && !isLoading || altResult1 && !isLoading ?
+            {curResult && !isLoading || altResult1 && !isLoading || standardResultError && !isLoading || better1Error && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
             <div className="flex w-full justify-center gap-8 min-h-[1000px]">
@@ -77,7 +77,19 @@ export default function ResultRender () {
                 </div>
             </div> : null}
             {
-                altResult1 && !isLoading ? 
+                standardResultError ? 
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
+                    <div className="flex justify-between items-center">
+                        <h2 className="underline font-semibold">Model: Standard</h2>
+                    </div>
+                    <div className="pt-8">
+                        {standardResultError}
+                    </div>
+                </div> : null
+
+            }
+            {
+                altResult1 ? 
                 <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px]">
                     <div className="flex justify-between items-center">
                     <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
@@ -87,6 +99,18 @@ export default function ResultRender () {
                 {altResult1}
                 </div>
                 </div> : null
+            }
+            {
+                better1Error ? 
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
+                    <div className="flex justify-between items-center">
+                        <h2 className="underline font-semibold">Model: Better-1</h2>
+                    </div>
+                    <div className="pt-8">
+                        {better1Error}
+                    </div>
+                </div> : null
+
             }
             </div>
             </> : null

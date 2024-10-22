@@ -42,6 +42,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
     const [curTerm, setCurTerm] = useState('')
     const [curContext, setCurContext] = useState('')
     const [curInterp,setCurInterp] = useState('')
+    const [aLookupError, setALookupError] = useState('')
     const contextLimit = 240
 
     const termLookup = async () => {
@@ -52,7 +53,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         setIsLoading(true)
         
         setResult('')
-        console.log('Looking up', term)
+        console.log(`Looking up ${term} in ${language}`)
         try {
             const response = await TermLookup({
                 term: term,
@@ -77,7 +78,8 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
     const additionalLookup = async (context:string) => {
         if (!context.includes(curTerm.toLowerCase())) {
-            console.log('CONTEXT SENTENCE DOES NOT CONTAIN THE WORD.')
+            console.log('Please enter a sentence with the term in it.')
+            setALookupError('Please enter a sentence with the term in it.')
         } else {
             setResult('')
             setCurInterp('')
@@ -169,6 +171,9 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                                 Re-search
                             </Button>
                             </div>
+                            <span className="text-destructive font-semibold text-sm">
+                                {aLookupError ? aLookupError : null}
+                            </span>
                         </div>
                     </div>
                     : null
