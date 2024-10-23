@@ -81,8 +81,14 @@ body {
   height: 100vh;
 }
 
-.uploadBtn:hover {
+.cTwoBtn {
+      background-color: hsl(var(--chart-2));
+
+}
+
+.cTwoBtn:hover {
   cursor: pointer;
+  background-color: hsla(173, 58%, 39%, .9);
 }
 
 .selected {

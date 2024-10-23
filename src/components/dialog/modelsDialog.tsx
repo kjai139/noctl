@@ -9,13 +9,13 @@ const models = [
     {
         name:"Standard",
         accuracy: 3,
-        info: "Better than Google Translate & slightly better than DeepL. Occasional pronoun errors.",
+        info: "Much better than Google Translate & slightly better than DeepL. Occasional pronoun errors.",
         pricing: "Free"
     },
     {
         name:"Better-1",
         accuracy: 4.5,
-        info: "More accurate than the 'Standard' model and much better in comprehension than Google Translate and DeepL. Rare pronoun errors.",
+        info: "More accurate than the 'Standard' model and better comprehension with slightly less pronoun errors.",
         pricing: "100 requests @ $5 USD"
     },
 
@@ -30,7 +30,7 @@ export default function ModelsDialog () {
             <DialogTrigger>
                 Models
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-[40rem]">
                 <DialogHeader>
                     <DialogTitle>
                         AI Models

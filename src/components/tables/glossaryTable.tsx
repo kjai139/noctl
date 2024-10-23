@@ -159,8 +159,12 @@ export default function GlossaryTable () {
             <h1 className="text-lg font-semibold pl-2">Glossary</h1>
             <GlossaryInfoDialog></GlossaryInfoDialog>
             </div>
-            <div>
-              <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
+            <div className="px-2">
+              <label htmlFor="file-upload" className="cTwoBtn text-primary-foreground shadow h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
+                <FaFileUpload></FaFileUpload><span>Upload</span>
+              </label>
+              <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+              
             </div>
           </div>
           <div className="flex justify-between items-center px-2">
@@ -168,10 +172,7 @@ export default function GlossaryTable () {
           {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
           </span>
           <div>
-            <label htmlFor="file-upload" className="uploadBtn bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
-              <FaFileUpload></FaFileUpload><span>Upload</span>
-            </label>
-            <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+          <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
           </div>
           </div>
@@ -242,11 +243,11 @@ export default function GlossaryTable () {
 
           {glossary.length > 0 ?
             <>
-              <Button className="gap-2" onClick={resetGlossary}>
+              <Button variant={'glossary'} className="gap-2" onClick={resetGlossary}>
                 <RiDeleteBin2Line></RiDeleteBin2Line>
                 <span>Clear</span>
               </Button>
-              <Button onClick={downloadGlossary} className="gap-2">
+              <Button variant={'glossary'} onClick={downloadGlossary} className="gap-2">
                 <GrDocumentDownload></GrDocumentDownload>
                 <span>Download</span></Button>
             </>

@@ -50,9 +50,6 @@ export default async function TopNav() {
                     <div>
                         <ModelsDialog></ModelsDialog>
                     </div>
-                    <div>
-                        Pricing
-                    </div>
                 </div>
                 
                 <div className="flex gap-8 items-center">
