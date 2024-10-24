@@ -11,7 +11,7 @@ export default function AppSidebar () {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>
-                        MMTL
+                        Glossary tab
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <GlossaryTable>

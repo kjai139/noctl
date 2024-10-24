@@ -42,7 +42,7 @@ interface workStateContextType {
     standardResultError: string,
     setStandardResultError: React.Dispatch<SetStateAction<string>>,
     better1Error: string,
-    setBetter1Error: React.Dispatch<SetStateAction<string>>
+    setBetter1Error: React.Dispatch<SetStateAction<string>>,
 }
 
 

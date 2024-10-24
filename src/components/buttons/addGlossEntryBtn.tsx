@@ -45,7 +45,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                 setTermError('Term name cannot be blank')   
             }
             if (!defInput) {
-                setDefError('Enter the translated definition') 
+                setDefError('Definition cannot be blank') 
             }
             if (!termType) {
                 setTermTypeError('Choose a valid type')
@@ -111,7 +111,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                     <Label htmlFor="term" className="mb-2">
                         Term
                     </Label>
-                    <Input id="term" value={termInput} onChange={handleInputChange} placeholder="カッパ">
+                    <Input autoComplete="off" id="term" value={termInput} onChange={handleInputChange} placeholder="カッパ">
                     </Input>
                     <span className="px-2">
                         {
@@ -124,7 +124,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                     <Label htmlFor="definition" className="mb-2">
                         Definition
                     </Label>
-                    <Input id="definition" value={defInput} onChange={handleDefChange} placeholder="Kappa"></Input>
+                    <Input autoComplete="off" id="definition" value={defInput} onChange={handleDefChange} placeholder="Kappa"></Input>
                     <span className="px-2">
                         {
                             defError ?

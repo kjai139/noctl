@@ -15,6 +15,8 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setCurRaw, curOgT
     const [isRawOn, setIsRawOn] = useState(false)
 
     const toggleRaw = () => {
+        console.log('[Toggle Raw] curRaw : ', curRaw)
+        console.log('[Toggle Raw] curOgTxt: ', curOgTxt)
         if (!isRawOn) {
             const normalizedRaw = curRaw.replace(/\n+/g, '\n').trim()
             const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')

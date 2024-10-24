@@ -17,35 +17,21 @@ import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import ErrorResultAlert from "../dialog/errorResult";
 import Anthropic from "@anthropic-ai/sdk";
 import { claudeCost } from "@/lib/modelPrice";
+import { useOutputContext } from "@/app/_contexts/outputContext";
 
 
 const tokenLimit = 10000
 const textLimit = 2000
 
-const language = [
-    {
-        name:'Japanese'
-    },
-    {
-        name:'Korean'
-    },
-    {
-        name:'English'
-    },
-    {
-        name:'Chinese'
-    }
 
-]
 
-const languageChoices = language.map(item => item.name)
 
 const formSchema = z.object({
-    language: z.string({
+    /* language: z.string({
         message: 'Please choose a language'
     }).refine(value => languageChoices.includes(value), {
         message: 'Please choose a language'
-    }),
+    }), */
     targetText: z.string().max(tokenLimit, {
         message: `Cannot exceed limit of ${tokenLimit} chars.`
     })
@@ -64,7 +50,7 @@ function TextAreaWatched ({control}:{control: Control<z.infer<typeof formSchema>
 export default function MainInputForm () {
     // curResult = Standard
     const {setGlossary, curResult, setCurResult, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setAltResult1, altResult1, curRaw, setCurRaw, setOgCurResult, setOgAltResult, setUserCurrency, setStandardResultError, setBetter1Error} = useWorkState()
-
+    const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
     const [isSplitDone, setIsSplitDone] = useState(false)
@@ -74,9 +60,9 @@ export default function MainInputForm () {
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
-        defaultValues: {
+        /* defaultValues: {
             language: 'English'
-        }
+        } */
     })
 
     const onSubmitTest = async (values: z.infer<typeof formSchema>) => {
@@ -87,7 +73,7 @@ export default function MainInputForm () {
             console.log('first page:', firstPage)
             apiLookUp({
                 text: firstPage,
-                language: values.language,
+                language: outputLang,
                 model: aiModel
             })
             
@@ -95,7 +81,7 @@ export default function MainInputForm () {
         } else {
             apiLookUp({
                 text:values.targetText,
-                language:values.language,
+                language: outputLang,
                 model:aiModel
             })
         }
@@ -189,10 +175,18 @@ export default function MainInputForm () {
                             setGlossary(glossaryResult)
                         }
                     }
+
+                    if (!jsonResult[0].translation && text) {
+                        setCurResult(text)
+                        setOgCurResult(text)
+                    } else {
+                        setCurResult(jsonResult[0].translation)
+                        setOgCurResult(jsonResult[0].translation)
+                    }
                     
 
-                    setCurResult(jsonResult[0].translation)
-                    setOgCurResult(jsonResult[0].translation)
+                    
+                    
                 } catch (err:any) {
                     console.log('Error in Standard API')
                     console.error(err, typeof err)
@@ -388,8 +382,8 @@ export default function MainInputForm () {
   
    
     return (
-    
-            <div className="flex gap-8 justify-center">
+            
+            <div className="flex gap-8 justify-center my-8">
                 {
                     errorMsg ?
                         <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
@@ -407,42 +401,7 @@ export default function MainInputForm () {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
                         <div className="flex gap-4 mx-2">
-                            <FormField
-                                control={form.control}
-                                name="language"
-                                render={({ field }) => (
-
-                                    <FormItem>
-
-                                        <FormLabel className="whitespace-nowrap">Output Language</FormLabel>
-
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select Language">
-                                                    </SelectValue>
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {
-                                                    language.map((node, idx) => {
-                                                        return (
-                                                            <SelectItem value={node.name} key={`lg-${idx}`}>
-                                                                {node.name}
-                                                            </SelectItem>
-                                                        )
-                                                    })
-                                                }
-                                            </SelectContent>
-
-                                        </Select>
-
-                                    </FormItem>
-
-                                )}
-                            >
-
-                            </FormField>
+                            
 
                             {/* cara */}
                             <ChunkCarousel setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
@@ -474,7 +433,7 @@ export default function MainInputForm () {
                                 <AiModelSelect setModel={setAiModel}></AiModelSelect>
                                 <div className="text-destructive p-0 flex gap-2 items-center">
                                     {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}
-                                    {form.formState.errors.language ? form.formState.errors.language.message : null}
+                                    {/* {form.formState.errors.language ? form.formState.errors.language.message : null} */}
                                     <TextAreaWatched control={form.control}></TextAreaWatched>
                                 </div>
                                 <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isLoading}>Translate</Button>

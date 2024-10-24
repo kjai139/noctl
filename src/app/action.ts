@@ -196,13 +196,13 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 
         const session = await auth()
         if (!session || !session.user) {
-            throw new Error('User is not logged in.')
+            throw new Error('Please sign in to use this model.')
         }
 
         const existingUser = await userModel.findById(session.user.id)
 
         if (!existingUser) {
-            throw new Error('User Id in Session does not exist in DB')
+            throw new Error('Encountered a server error. Please try relogging.')
         } 
         if (existingUser.currencyAmt < claudeCost) {
             throw new Error('You do not have enough currency to use this model.')

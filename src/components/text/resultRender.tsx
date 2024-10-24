@@ -64,7 +64,7 @@ export default function ResultRender () {
             {curResult && !isLoading || altResult1 && !isLoading || standardResultError && !isLoading || better1Error && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="flex w-full justify-center gap-8 min-h-[1000px]">
+            <div className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2">
             {
                 curResult ?
                 <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
