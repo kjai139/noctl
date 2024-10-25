@@ -395,9 +395,9 @@ export default function MainInputForm () {
                     {/* <Button onClick={setCurResultHandle}>Test output</Button> */}
                     {/* <GlossaryTable glossary={glossary} setGlossary={setGlossary}></GlossaryTable> */}
             
-                <div className="justify-center items-center flex">
-                    {/* <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft> */}
-                </div>
+                {/* <div className="justify-center items-center flex">
+                    <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
+                </div> */}
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
                         <div className="flex gap-4 mx-2">
@@ -417,7 +417,7 @@ export default function MainInputForm () {
                                                 const target = e.target as HTMLTextAreaElement
                                                 target.style.height = 'auto';
                                                 target.style.height = `${target.scrollHeight}px`;
-                                            }} placeholder="Enter text..." {...field} className="min-w-[300px] sm:min-w-[600px] max-h-[300px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                            }} placeholder="Enter text..." {...field} className="sm:min-w-[600px] max-h-[300px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                             </Textarea>
 

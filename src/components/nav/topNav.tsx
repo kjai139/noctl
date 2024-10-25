@@ -42,7 +42,7 @@ export default async function TopNav() {
 
     return (
         <nav className="flex w-full shadow p-4 justify-center">
-            <div className="mw w-full flex gap-8 justify-between items-center">
+            <div className="mw w-full flex gap-2 sm:gap-8 justify-between items-center">
                 <div className="font-semibold text-lg">
                     MMTL
                 </div>

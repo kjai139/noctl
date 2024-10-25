@@ -68,7 +68,7 @@ export default function ResultRender () {
             {
                 curResult ?
                 <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
-                    <div className="flex justify-between items-center">
+                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                 <h2 className="underline font-semibold">Model: Standard</h2>
                 <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>
                 </div>
@@ -79,7 +79,7 @@ export default function ResultRender () {
             {
                 standardResultError ? 
                 <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
-                    <div className="flex justify-between items-center">
+                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                         <h2 className="underline font-semibold">Model: Standard</h2>
                     </div>
                     <div className="pt-8">
@@ -91,7 +91,7 @@ export default function ResultRender () {
             {
                 altResult1 ? 
                 <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px]">
-                    <div className="flex justify-between items-center">
+                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                     <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
                     <ResultRenderTaskbar curOgTxt={ogAltResult} curRaw={curRaw} setCurDisplay={setAltResult1} setCurRaw={setCurRaw} text={altResult1}></ResultRenderTaskbar>
                     </div>
@@ -103,7 +103,7 @@ export default function ResultRender () {
             {
                 better1Error ? 
                 <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center sm:flex-row flex-col-reverse gap-2 sm:gap-0">
                         <h2 className="underline font-semibold">Model: Better-1</h2>
                     </div>
                     <div className="pt-8">
