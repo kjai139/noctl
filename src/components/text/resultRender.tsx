@@ -64,10 +64,10 @@ export default function ResultRender () {
             {curResult && !isLoading || altResult1 && !isLoading || standardResultError && !isLoading || better1Error && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2">
+            <div className="flex flex-col lg:flex-row w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-center">
             {
                 curResult ?
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                 <h2 className="underline font-semibold">Model: Standard</h2>
                 <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>
@@ -78,7 +78,7 @@ export default function ResultRender () {
             </div> : null}
             {
                 standardResultError ? 
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                         <h2 className="underline font-semibold">Model: Standard</h2>
                     </div>
@@ -90,7 +90,7 @@ export default function ResultRender () {
             }
             {
                 altResult1 ? 
-                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px]">
+                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px] w-full">
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                     <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
                     <ResultRenderTaskbar curOgTxt={ogAltResult} curRaw={curRaw} setCurDisplay={setAltResult1} setCurRaw={setCurRaw} text={altResult1}></ResultRenderTaskbar>
@@ -102,7 +102,7 @@ export default function ResultRender () {
             }
             {
                 better1Error ? 
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted">
+                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
                     <div className="flex justify-between items-center sm:flex-row flex-col-reverse gap-2 sm:gap-0">
                         <h2 className="underline font-semibold">Model: Better-1</h2>
                     </div>

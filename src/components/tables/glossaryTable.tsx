@@ -141,7 +141,7 @@ export default function GlossaryTable () {
     },[lang])
 
     return (
-      <div className="flex flex-col gap-4 max-w-[560px] flex-1">
+      <div className="flex flex-col gap-4 lg:max-w-[560px] max-w-none flex-1">
         {/* <div>
         <div className="flex justify-end">
 
