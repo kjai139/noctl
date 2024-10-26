@@ -6,7 +6,7 @@ export default function TopNavInfo () {
 
     return (
         <div className="flex justify-center p-4 hbg mb-8">
-            <div className="mw w-full flex-col sm:flex-row gap-4">
+            <div className="mw w-full flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
                 <div className="p-8">
                 <h1 className="text-2xl font-semibold">Modern Machine Translator</h1>

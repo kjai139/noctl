@@ -87,6 +87,10 @@ body {
 
 }
 
+.gloss-h {
+      background-color:beige;
+}
+
 .cTwoBtn:hover {
   cursor: pointer;
   background-color: hsla(173, 58%, 39%, .9);

@@ -33,7 +33,7 @@ export default function GlossaryLangSelect({setLang}:GlossaryLangSelectProps) {
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
         <Label htmlFor="lang-select"><span className="text-xs">Term Lookup Language</span></Label>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         

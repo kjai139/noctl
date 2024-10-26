@@ -142,7 +142,7 @@ export default function GlossaryTable () {
 
     return (
       <div className="flex flex-col gap-4 max-w-[560px] flex-1">
-        <div>
+        {/* <div>
         <div className="flex justify-end">
 
             {
@@ -151,13 +151,18 @@ export default function GlossaryTable () {
             }
 
           </div>
-        </div>
+        </div> */}
         <div className="gloss-wrap flex flex-col gap-4">
           
           <div className="flex justify-between items-center">
+            <div>
             <div className="flex gap-1 items-center">
             <h1 className="text-lg font-semibold pl-2">Glossary</h1>
             <GlossaryInfoDialog></GlossaryInfoDialog>
+            </div>
+            <span className="text-sm text-muted-foreground pl-2">
+            {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
+            </span>
             </div>
             <div className="px-2">
               <label htmlFor="file-upload" className="cTwoBtn text-primary-foreground shadow h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
@@ -167,11 +172,17 @@ export default function GlossaryTable () {
               
             </div>
           </div>
+          
           <div className="flex justify-between items-center px-2">
-          <span className="text-sm text-muted-foreground">
-          {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
-          </span>
           <div>
+          
+          {
+              glossary && glossary.length > 0 ?
+              <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect> : null
+            }
+          </div>
+          <div>
+          
           <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
           </div>
@@ -183,11 +194,12 @@ export default function GlossaryTable () {
               <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
           }
 
-          <TableHeader>
+          <TableHeader className="sticky top-0 bg-muted shadow">
             <TableRow>
               {/* <TableHead className="w-[60px]">Type</TableHead> */}
               <TableHead className="w-[100px]">Term</TableHead>
               <TableHead>Definition</TableHead>
+              
 
 
 

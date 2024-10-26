@@ -399,7 +399,7 @@ export default function MainInputForm () {
                     <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
                 </div> */}
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col">
+                    <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col w-full sm:w-auto">
                         <div className="flex gap-4 mx-2">
                             
 

@@ -50,7 +50,7 @@ export default function ResultRender () {
             <div className="loader" ref={loadingRef}>
             </div>
             <span>
-                {`${seconds > 0 ? seconds : null}s`}
+                {`${seconds > 0 ? seconds : '0'}s`}
             </span>
             </div>
 
