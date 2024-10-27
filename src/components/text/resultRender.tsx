@@ -2,6 +2,7 @@
 import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
+import ResultWrap from "../wrapper/resultWrap"
 
 
 export default function ResultRender () {
@@ -64,33 +65,33 @@ export default function ResultRender () {
             {curResult && !isLoading || altResult1 && !isLoading || standardResultError && !isLoading || better1Error && !isLoading ?
             <>
             <div className="border-t-2 my-8 w-full"></div>
-            <div className="flex flex-col lg:flex-row w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-center">
+            <div className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-center r-cont">
             {
                 curResult ?
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
+                <ResultWrap>
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                <h2 className="underline font-semibold">Model: Standard</h2>
-                <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>
-                </div>
-                <div className="pt-8">
-                {curResult}
-                </div>
-            </div> : null}
+                    <h2 className="underline font-semibold">Model: Standard</h2>
+                    <ResultRenderTaskbar setCurDisplay={setCurResult} curRaw={curRaw} curOgTxt={ogCurResult} setCurRaw={setCurRaw} text={curResult}></ResultRenderTaskbar>
+                    </div>
+                    <div className="pt-8">
+                    {curResult}
+                    </div>
+            </ResultWrap> : null}
             {
                 standardResultError ? 
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
+                <ResultWrap>
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                         <h2 className="underline font-semibold">Model: Standard</h2>
                     </div>
                     <div className="pt-8">
                         {standardResultError}
                     </div>
-                </div> : null
+                </ResultWrap> : null
 
             }
             {
                 altResult1 ? 
-                <div className="flex-1 relative whitespace-pre-line p-10 mb-8 max-w-[800px] border-2 border-muted min-h-[400px] w-full">
+                <ResultWrap>
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                     <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
                     <ResultRenderTaskbar curOgTxt={ogAltResult} curRaw={curRaw} setCurDisplay={setAltResult1} setCurRaw={setCurRaw} text={altResult1}></ResultRenderTaskbar>
@@ -98,18 +99,18 @@ export default function ResultRender () {
                 <div className="pt-8">
                 {altResult1}
                 </div>
-                </div> : null
+                </ResultWrap> : null
             }
             {
                 better1Error ? 
-                <div className="whitespace-pre-line p-10 mb-8 relative max-w-[800px] flex-1 border-2 border-muted w-full">
+                <ResultWrap>
                     <div className="flex justify-between items-center sm:flex-row flex-col-reverse gap-2 sm:gap-0">
                         <h2 className="underline font-semibold">Model: Better-1</h2>
                     </div>
                     <div className="pt-8">
                         {better1Error}
                     </div>
-                </div> : null
+                </ResultWrap> : null
 
             }
             </div>

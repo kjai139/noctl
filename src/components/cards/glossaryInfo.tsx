@@ -20,7 +20,7 @@ export default function GlossaryInfo () {
                 <div>
                     <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
                 </div>
-                <p>A glossary is used to keep terms and names consistent when translating novels. An editable glossary will be auto-generated after each successful prompt when appropirate. You can then edit as needed and also save and upload it for future use.</p>
+                <p>A glossary is used to keep terms and names consistent when translating things such as novels. An editable glossary will be auto-generated after each successful prompt when appropirate. You can then edit as needed and also save and upload it for future use.</p>
             </div>
             <ul className="flex flex-col gap-2">
                 {notifications && notifications.map((node, idx) => {

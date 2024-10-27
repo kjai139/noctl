@@ -8,14 +8,14 @@ import StarsIcons from "../icons/stars";
 const models = [
     {
         name:"Standard",
-        accuracy: 3,
-        info: "Much better than Google Translate & slightly better than DeepL. Occasional pronoun errors.",
+        accuracy: 3.5,
+        info: "Much better than Google Translate & DeepL. Occasional POV errors.",
         pricing: "Free"
     },
     {
         name:"Better-1",
         accuracy: 4.5,
-        info: "More accurate than the 'Standard' model and better comprehension with slightly less pronoun errors.",
+        info: "Higher reading comprehension than the 'Standard' model. Slightly less POV errors.",
         pricing: "100 requests @ $5 USD"
     },
 

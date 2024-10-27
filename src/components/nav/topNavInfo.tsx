@@ -12,7 +12,7 @@ export default function TopNavInfo () {
                 <h1 className="text-2xl font-semibold">Modern Machine Translator</h1>
                 <div className="flex flex-col mt-1">
                 <p>
-                    MMTL uses some of the most accurate modern LLMs for translating Asian novels into English and vice versa. 
+                    MMTL uses some of the most accurate modern LLMs for translating Asian literature into English and vice versa. 
                 </p>
                 <p className="text-sm text-muted-foreground mt-4">
                     Start by signing in with gmail to receive a one-time bonus of 10 free credits for the paid models.

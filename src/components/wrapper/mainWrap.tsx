@@ -12,7 +12,7 @@ export default function MainWrapper () {
         <div className="flex flex-col gap-8">
         <h1 className="md:text-4xl text-center">NOCTURNE</h1>
         <MainInputForm></MainInputForm>
-        <GlossaryTable glossary={glossary}></GlossaryTable>
+        <GlossaryTable></GlossaryTable>
       </div>
     )
 }
