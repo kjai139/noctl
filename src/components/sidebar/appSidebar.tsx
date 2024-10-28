@@ -1,5 +1,5 @@
 import GlossaryTable from "../tables/glossaryTable";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from "../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarExpandBtn, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from "../ui/sidebar";
 
 
 
@@ -12,6 +12,7 @@ export default function AppSidebar () {
                 <SidebarGroup>
                     <SidebarGroupLabel>
                         Glossary tab
+                        <SidebarExpandBtn></SidebarExpandBtn>
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <GlossaryTable>

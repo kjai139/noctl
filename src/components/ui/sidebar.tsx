@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, PanelBottomClose } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -33,7 +33,10 @@ type SidebarContext = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
-  toggleSidebar: () => void
+  toggleSidebar: () => void,
+  expandState: "e" | "c",
+  setExpandState: React.Dispatch<React.SetStateAction<'c' | 'e'>>,
+  toggleExpand: () => void
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -69,7 +72,7 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-
+    const [expandState, setExpandState] = React.useState<'c' | 'e'>('e')
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
@@ -96,6 +99,15 @@ const SidebarProvider = React.forwardRef<
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open)
     }, [isMobile, setOpen, setOpenMobile])
+
+    //custom expand
+    const toggleExpand = React.useCallback(() => {
+      if (expandState === 'e') {
+        setExpandState('c')
+      } else if (expandState === 'c') {
+        setExpandState('e')
+      }
+    }, [expandState])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -126,8 +138,11 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        expandState,
+        setExpandState,
+        toggleExpand
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, toggleExpand]
     )
 
     return (
@@ -142,7 +157,7 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper overflow-y-auto flex-col-reverse md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar",
+              "group/sidebar-wrapper overflow-y-auto flex-col md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar",
               className
             )}
             ref={ref}
@@ -176,7 +191,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, expandState } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -216,11 +231,12 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer max-w-[380px] min-w-[300px] md:block md:sticky md:top-0"
+        className="group peer md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        data-gstate={expandState}
       >
         {/* This is what handles the sidebar gap on desktop */}
         {/* EDITING for mobile */}
@@ -367,6 +383,21 @@ const SidebarHeader = React.forwardRef<
 })
 SidebarHeader.displayName = "SidebarHeader"
 
+const SidebarExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps> (({className, onClick, ...props}, ref) => {
+
+  const { toggleExpand } = useSidebar()
+
+  return (
+    <Button ref={ref} className={className} onClick={(event) => {
+      onClick?.(event)
+      toggleExpand()
+    }} {...props}>
+      Expand
+    </Button>
+  )
+})
+
+SidebarExpandBtn.displayName = 'SidebarExpandBtn'
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
@@ -761,5 +792,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarExpandBtn,
   useSidebar,
 }

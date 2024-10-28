@@ -149,17 +149,25 @@ body {
   content:"Loading...";
 }
 
-/* .r-cont {
+.r-cont {
       display: flex;
       container: rcont / inline-size;
       width:100%;
 }
 
-@container rcont (width > 0) {
-      .r-cont {
+[data-gstate="e"] {
+      transform: translateY(0);
+}
+
+[data-gstate="c"] {
+      transform: translateY(100%);
+}
+
+@container rcont (max-width: 780px) {
+      .r-wrap-cont {
             flex-direction: column;
       }
-} */
+}
 
 @keyframes l17 {
    0% {text-shadow: 
