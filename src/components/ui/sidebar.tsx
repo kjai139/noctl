@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft, PanelBottomClose } from "lucide-react"
+import { PanelLeft, PanelBottomClose, PanelBottomOpen } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -157,7 +157,10 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper overflow-y-auto flex-col md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar",
+              `group/sidebar-wrapper flex-col md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar`,
+              {
+                "overflow-hidden": expandState === 'c'
+              },
               className
             )}
             ref={ref}
@@ -193,6 +196,8 @@ const Sidebar = React.forwardRef<
   ) => {
     const { isMobile, state, openMobile, setOpenMobile, expandState } = useSidebar()
 
+    const [isAnimating, setIsAnimating] = React.useState(false)
+
     if (collapsible === "none") {
       return (
         <div
@@ -207,6 +212,19 @@ const Sidebar = React.forwardRef<
         </div>
       )
     }
+
+    React.useEffect(() => {
+      let timeout:ReturnType<typeof setTimeout>
+      if (expandState  === 'c') {
+        setIsAnimating(true)
+        timeout = setTimeout(() => setIsAnimating(false), 300)
+      } else if (expandState === 'e') {
+        
+        timeout = setTimeout(() => setIsAnimating(true), 300)
+      }
+
+      return () => clearTimeout(timeout)
+    }, [expandState])
 
     /* if (isMobile) {
       return (
@@ -231,7 +249,7 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1"
+        className={`transition-transform ease group peer md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1 ${isAnimating && expandState === 'e' ? 'translate-y-0' : null} ${expandState === 'c' && !isAnimating ? 'h-0' : null} ${expandState === 'c' && isAnimating ? 'translate-y-full': null}`}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
@@ -383,21 +401,47 @@ const SidebarHeader = React.forwardRef<
 })
 SidebarHeader.displayName = "SidebarHeader"
 
-const SidebarExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps> (({className, onClick, ...props}, ref) => {
+const SidebarExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
 
   const { toggleExpand } = useSidebar()
 
   return (
-    <Button ref={ref} className={className} onClick={(event) => {
-      onClick?.(event)
-      toggleExpand()
-    }} {...props}>
-      Expand
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button ref={ref} variant={'ghost'} size={'icon'} className={className} onClick={(event) => {
+            onClick?.(event)
+            toggleExpand()
+          }} {...props}>
+            <PanelBottomClose></PanelBottomClose>
+          </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>Hide Glossary</p>
+    </TooltipContent>
+    </Tooltip>
+    </TooltipProvider>
   )
 })
 
 SidebarExpandBtn.displayName = 'SidebarExpandBtn'
+
+const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
+
+  const { toggleExpand } = useSidebar()
+
+  return (
+    <Button ref={ref} variant={'ghost'} size={'icon'} className={className} onClick={(event) => {
+      onClick?.(event)
+      toggleExpand()
+    }} {...props}>
+      <PanelBottomOpen></PanelBottomOpen>
+    </Button>
+  )
+})
+
+BgExpandBtn.displayName = 'BgExpandBtn'
+
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
@@ -793,5 +837,6 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   SidebarExpandBtn,
+  BgExpandBtn,
   useSidebar,
 }

@@ -155,8 +155,13 @@ body {
       width:100%;
 }
 
+.gloss-c {
+      transition: transform 300ms ease;
+}
+
 [data-gstate="e"] {
       transform: translateY(0);
+      
 }
 
 [data-gstate="c"] {

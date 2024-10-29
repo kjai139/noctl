@@ -10,9 +10,9 @@ export default function AppSidebar () {
             <SidebarHeader></SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>
+                    <SidebarGroupLabel className="items-center">
                         Glossary tab
-                        <SidebarExpandBtn></SidebarExpandBtn>
+                        {/* <SidebarExpandBtn className="ml-auto"></SidebarExpandBtn> */}
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <GlossaryTable>

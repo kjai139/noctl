@@ -29,7 +29,7 @@ export default function OutputSelect () {
     }
     return (
         <div className="flex flex-col gap-2">
-        <Label htmlFor="output-select"><span className="text-lg">Output Language</span></Label>
+        <Label htmlFor="outputlang-select"><span className="text-lg">Output Language</span></Label>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
             <SelectTrigger id="outputlang-select">
