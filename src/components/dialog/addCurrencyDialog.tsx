@@ -134,7 +134,7 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
     
                                     let price = (node.defaultPrice.unit_amount / 100).toFixed(2)
                                     return (
-                                        <Button disabled={isLoading} onClick={() => getPaymentInt(node.id)} variant={'outline'} key={`pdl-${node.id}`} className="flex justify-between h-auto">
+                                        <Button disabled={isLoading} onClick={() => getPaymentInt(node.id)} variant={'outline'} key={`pdl-${node.id}`} className="flex-col md:flex-row justify-between h-auto gap-2">
                                             <span className="flex flex-col">
                                                 <span className="text-lg font-semibold">
                                                 {node.name}

@@ -111,6 +111,11 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         getUserCurrency()
     }, [])
 
+    const handleSelectItem = () => {
+        setIsDialogOpen(true)
+        setDropdownOpen(false)
+    }
+
     return (
         <>
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
@@ -126,7 +131,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator></DropdownMenuSeparator>
                 <DropdownMenuGroup>
-                    <DropdownMenuItem className='flex gap-2 items-center' onSelect={() => setIsDialogOpen(true)}>
+                    <DropdownMenuItem className='flex gap-2 items-center' onSelect={handleSelectItem}>
                     <FaMoneyBillTrendUp></FaMoneyBillTrendUp>
                     <span>Add currency</span>
                     </DropdownMenuItem>
