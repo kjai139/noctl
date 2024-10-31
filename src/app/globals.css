@@ -159,14 +159,14 @@ body {
       transition: transform 300ms ease;
 }
 
-[data-gstate="e"] {
+/* [data-gstate="e"] {
       transform: translateY(0);
       
 }
 
 [data-gstate="c"] {
       transform: translateY(100%);
-}
+} */
 
 @container rcont (max-width: 780px) {
       .r-wrap-cont {

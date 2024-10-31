@@ -38,7 +38,9 @@ type SidebarContext = {
   setExpandState: React.Dispatch<React.SetStateAction<'c' | 'e'>>,
   toggleExpand: () => void,
   isAnimating: boolean,
-  setIsAnimating: React.Dispatch<React.SetStateAction<boolean>>
+  setIsAnimating: React.Dispatch<React.SetStateAction<boolean>>,
+  showButton: boolean,
+  setShowButton: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -76,6 +78,7 @@ const SidebarProvider = React.forwardRef<
     const [openMobile, setOpenMobile] = React.useState(false)
     const [expandState, setExpandState] = React.useState<'c' | 'e'>('e')
     const [isAnimating, setIsAnimating] = React.useState(false)
+    const [showButton, setShowButton] = React.useState(true)
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
@@ -107,10 +110,14 @@ const SidebarProvider = React.forwardRef<
     const toggleExpand = React.useCallback(() => {
       if (expandState === 'e') {
         setIsAnimating(true)
+        setShowButton(false)
         setExpandState('c')
+        console.log('Show button off expand c')
       } else if (expandState === 'c') {
         setIsAnimating(true)
+        setShowButton(false)
         setExpandState('e')
+        console.log('Showbutton off expand e')
       }
     }, [expandState])
 
@@ -148,8 +155,10 @@ const SidebarProvider = React.forwardRef<
         toggleExpand,
         isAnimating,
         setIsAnimating,
+        showButton,
+        setShowButton
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isAnimating, expandState, setIsAnimating, toggleExpand]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isAnimating, expandState, setIsAnimating, toggleExpand, showButton, setShowButton]
     )
 
     return (
@@ -201,9 +210,10 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile, expandState, isAnimating, setIsAnimating } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, expandState, isAnimating, setIsAnimating, setShowButton } = useSidebar()
 
-    
+    const internalRef = React.useRef(null)
+    React.useImperativeHandle(ref, () =>  internalRef.current)
 
     if (collapsible === "none") {
       return (
@@ -221,15 +231,31 @@ const Sidebar = React.forwardRef<
     }
 
     React.useEffect(() => {
+      console.log('INTERNAL REF:', internalRef.current)
+      const handleTransitionEnd = () => {
+        setShowButton(true)
+        console.log('Transition finished')
+        
+      }
+      console.log('USe effect ran from expandstate change')
+      
+      internalRef.current.addEventListener('transitionend', handleTransitionEnd)
+
+      return () => {
+        internalRef.current.removeEventListener('transitionend', handleTransitionEnd)
+      }
+    }, [expandState, setShowButton])
+
+    /* React.useEffect(() => {
       let timeout:ReturnType<typeof setTimeout>
       if (expandState  === 'c') {
         timeout = setTimeout(() => setIsAnimating(false), 500)
       } else if (expandState === 'e') {
       
-        /* window.scrollTo({
+        window.scrollTo({
           top: document.body.scrollHeight,
           behavior: 'smooth'
-        }) */
+        })
         timeout = setTimeout(() => {
           setIsAnimating(false)
           
@@ -237,7 +263,7 @@ const Sidebar = React.forwardRef<
       }
 
       return () => clearTimeout(timeout)
-    }, [expandState])
+    }, [expandState]) */
 
     /* if (isMobile) {
       return (
@@ -261,8 +287,8 @@ const Sidebar = React.forwardRef<
 
     return (
       <div
-        ref={ref}
-        className={`group peer gloss-c md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1 ${isAnimating && expandState === 'e' ? 'translate-y-0' : null} ${expandState === 'c' && !isAnimating ? 'h-0' : null} ${expandState === 'c' && isAnimating ? 'translate-y-full': null}`}
+        ref={internalRef}
+        className={`group peer gloss-c md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1 ${expandState === 'e' ? 'translate-y-0' : null} ${expandState === 'c' && !isAnimating ? 'h-0' : null} ${expandState === 'c' ? 'translate-y-full': null}`}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
@@ -442,11 +468,14 @@ SidebarExpandBtn.displayName = 'SidebarExpandBtn'
 
 const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
 
-  const { toggleExpand, expandState, isAnimating } = useSidebar()
-
-  console.log('IS ANIMATING', isAnimating)
+  const { toggleExpand, expandState, showButton } = useSidebar()
+ 
+  React.useEffect(() => {
+    console.log('SHOW BUTTON:', showButton)
+  }, [showButton])
+  
   return (
-    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${isAnimating ? 'hidden' : null}`} onClick={(event) => {
+    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null}`} onClick={(event) => {
       onClick?.(event)
       toggleExpand()
     }} {...props}>
