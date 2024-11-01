@@ -175,7 +175,7 @@ const SidebarProvider = React.forwardRef<
             className={cn(
               `group/sidebar-wrapper flex-col md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar`,
               {
-                "overflow-hidden": expandState === 'c'
+                "overflow-hidden": isAnimating
               },
               className
             )}
@@ -212,8 +212,8 @@ const Sidebar = React.forwardRef<
   ) => {
     const { isMobile, state, openMobile, setOpenMobile, expandState, isAnimating, setIsAnimating, setShowButton } = useSidebar()
 
-    const internalRef = React.useRef(null)
-    React.useImperativeHandle(ref, () =>  internalRef.current)
+    const internalRef = React.useRef<null | HTMLDivElement>(null)
+    React.useImperativeHandle(ref, () =>  internalRef.current ?? {} as HTMLDivElement)
 
     if (collapsible === "none") {
       return (
@@ -232,17 +232,24 @@ const Sidebar = React.forwardRef<
 
     React.useEffect(() => {
       console.log('INTERNAL REF:', internalRef.current)
+      const ele = internalRef.current
       const handleTransitionEnd = () => {
+        setIsAnimating(false)
         setShowButton(true)
         console.log('Transition finished')
         
       }
+
+      if (!ele) {
+        return
+      }
+      
       console.log('USe effect ran from expandstate change')
       
-      internalRef.current.addEventListener('transitionend', handleTransitionEnd)
+      ele.addEventListener('transitionend', handleTransitionEnd)
 
       return () => {
-        internalRef.current.removeEventListener('transitionend', handleTransitionEnd)
+        ele.removeEventListener('transitionend', handleTransitionEnd)
       }
     }, [expandState, setShowButton])
 
@@ -288,7 +295,7 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={internalRef}
-        className={`group peer gloss-c md:max-w-[380px] min-w-[300px] md:block md:sticky md:top-0 order-2 bottom-0 md:order-1 ${expandState === 'e' ? 'translate-y-0' : null} ${expandState === 'c' && !isAnimating ? 'h-0' : null} ${expandState === 'c' ? 'translate-y-full': null}`}
+        className={`group peer absolute gloss-c md:max-w-[380px] md:block md:sticky ${expandState === 'e' ? 'translate-x-0 min-w-[300px] w-full' : null} ${expandState === 'c' ? 'translate-x-[-100%] overflow-hidden min-w-[0px] w-0': null}`}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
@@ -323,7 +330,7 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex md:h-[100svh] h-auto w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            className="flex md:h-[100svh] h-[100svh] w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
           >
             {children}
           </div>
@@ -469,17 +476,17 @@ SidebarExpandBtn.displayName = 'SidebarExpandBtn'
 const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
 
   const { toggleExpand, expandState, showButton } = useSidebar()
- 
+  const iconSize = 30
   React.useEffect(() => {
     console.log('SHOW BUTTON:', showButton)
   }, [showButton])
   
   return (
-    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null}`} onClick={(event) => {
+    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' || expandState === 'e' ? 'absolute bottom-10 right-10' : null}`} onClick={(event) => {
       onClick?.(event)
       toggleExpand()
     }} {...props}>
-       {expandState === 'e' ? <PanelBottomClose></PanelBottomClose> : <PanelBottomOpen></PanelBottomOpen>}
+       {expandState === 'e' ? <PanelBottomClose size={iconSize}></PanelBottomClose> : <PanelBottomOpen size={iconSize}></PanelBottomOpen>}
     </Button>
   )
 })

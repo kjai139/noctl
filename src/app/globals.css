@@ -79,7 +79,7 @@
 body {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
 .cTwoBtn {
@@ -156,7 +156,11 @@ body {
 }
 
 .gloss-c {
-      transition: transform 300ms ease;
+      transition: all 300ms ease-in-out;
+      height: 100%;
+      background-color: var(--herobg);
+      z-index: 9999;
+      top:0;
 }
 
 /* [data-gstate="e"] {
