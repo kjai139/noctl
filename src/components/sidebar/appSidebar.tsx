@@ -1,5 +1,5 @@
 import GlossaryTable from "../tables/glossaryTable";
-import { Sidebar, SidebarContent, SidebarExpandBtn, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from "../ui/sidebar";
+import { Sidebar, SidebarContent, BgExpandBtn, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from "../ui/sidebar";
 
 
 
@@ -10,9 +10,11 @@ export default function AppSidebar () {
             <SidebarHeader></SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel className="items-center">
+                    <SidebarGroupLabel className="items-center justify-between">
                         Glossary tab
-                        {/* <SidebarExpandBtn className="ml-auto"></SidebarExpandBtn> */}
+                        
+                            <BgExpandBtn className="mb-4"></BgExpandBtn>
+                       
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <GlossaryTable>

@@ -155,12 +155,22 @@ body {
       width:100%;
 }
 
+.bgt-e {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      background-color: var(--herobg);
+}
+
+
 .gloss-c {
       transition: all 300ms ease-in-out;
       height: 100%;
       background-color: var(--herobg);
       z-index: 9999;
       top:0;
+      max-width: 380px;
+      position: fixed;
 }
 
 /* [data-gstate="e"] {

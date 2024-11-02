@@ -3,9 +3,9 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft, PanelBottomClose, PanelBottomOpen } from "lucide-react"
+import { PanelLeft, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile, useIsSmallScreen } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,8 @@ type SidebarContext = {
   setOpen: (open: boolean) => void
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
-  isMobile: boolean
+  isMobile: boolean,
+  isSmallScreen: boolean,
   toggleSidebar: () => void,
   expandState: "e" | "c",
   setExpandState: React.Dispatch<React.SetStateAction<'c' | 'e'>>,
@@ -75,6 +76,7 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
+    const isSmallScreen = useIsSmallScreen()
     const [openMobile, setOpenMobile] = React.useState(false)
     const [expandState, setExpandState] = React.useState<'c' | 'e'>('e')
     const [isAnimating, setIsAnimating] = React.useState(false)
@@ -120,6 +122,13 @@ const SidebarProvider = React.forwardRef<
         console.log('Showbutton off expand e')
       }
     }, [expandState])
+    //useeffect to reset sidebar state
+    React.useEffect(() => {
+      
+        setExpandState('e')
+        console.log('Expand state reset on small screen')
+      
+    }, [isSmallScreen])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -156,9 +165,10 @@ const SidebarProvider = React.forwardRef<
         isAnimating,
         setIsAnimating,
         showButton,
-        setShowButton
+        setShowButton,
+        isSmallScreen
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isAnimating, expandState, setIsAnimating, toggleExpand, showButton, setShowButton]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isAnimating, expandState, setIsAnimating, toggleExpand, showButton, setShowButton, isSmallScreen]
     )
 
     return (
@@ -302,6 +312,7 @@ const Sidebar = React.forwardRef<
         data-side={side}
         data-gstate={expandState}
       >
+      
         {/* This is what handles the sidebar gap on desktop */}
         {/* EDITING for mobile */}
         <div
@@ -449,22 +460,22 @@ SidebarHeader.displayName = "SidebarHeader"
 
 const SidebarExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
 
-  const { toggleExpand, expandState, isAnimating } = useSidebar()
-
+  const { toggleExpand, expandState, showButton } = useSidebar()
+  const iconSize = 30
   
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${isAnimating ? 'hidden' : null}`} onClick={(event) => {
-            onClick?.(event)
-            toggleExpand()
-          }} {...props}>
-            {expandState === 'e' ? <PanelBottomClose></PanelBottomClose> : <PanelBottomOpen></PanelBottomOpen>}
-          </Button>
+        <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} md:hidden ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' ? 'bgt-e' : null}`} onClick={(event) => {
+      onClick?.(event)
+      toggleExpand()
+    }} {...props}>
+       {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
+    </Button>
     </TooltipTrigger>
     <TooltipContent>
-      <p>Hide Glossary</p>
+      <p>{expandState === 'e' ? 'Hide glossary' : 'Open Glossary'}</p>
     </TooltipContent>
     </Tooltip>
     </TooltipProvider>
@@ -482,11 +493,11 @@ const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typ
   }, [showButton])
   
   return (
-    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' || expandState === 'e' ? 'absolute bottom-10 right-10' : null}`} onClick={(event) => {
+    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' ? 'gloss-b-e' : null}`} onClick={(event) => {
       onClick?.(event)
       toggleExpand()
     }} {...props}>
-       {expandState === 'e' ? <PanelBottomClose size={iconSize}></PanelBottomClose> : <PanelBottomOpen size={iconSize}></PanelBottomOpen>}
+       {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
     </Button>
   )
 })
