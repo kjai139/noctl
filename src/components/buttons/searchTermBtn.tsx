@@ -142,7 +142,9 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             }
             <div>
                 {isLoading ?
-                <div className="loader"></div>
+                <div className="flex justify-center items-center px-4 py-8">
+                <div className="searchLoader"></div>
+                </div>
                 : 
                 null
                 }

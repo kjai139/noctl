@@ -12,10 +12,10 @@ export default function TopNavInfo () {
                 <h1 className="text-2xl font-semibold">Modern Machine Translator</h1>
                 <div className="flex flex-col mt-1">
                 <p>
-                    MMTL uses some of the most accurate modern LLMs for translating Asian literature into English and vice versa. 
+                    MMTL uses the most modern LLMs for translating Asian languages into English. 
                 </p>
                 <p className="text-sm text-muted-foreground mt-4">
-                    Start by signing in with gmail to receive a one-time bonus of 10 free credits for the paid models.
+                    {`Start by signing in with gmail to receive a one-time bonus of 10 free credits for the paid model(s).`}
                 </p>
                 </div>
                 </div>

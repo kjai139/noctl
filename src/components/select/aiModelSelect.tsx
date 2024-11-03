@@ -18,9 +18,9 @@ const models = [
     {
         name:'Duo'
     },
-    {
+    /* {
         name:'Test-1'
-    }
+    } */
 
 ]
 

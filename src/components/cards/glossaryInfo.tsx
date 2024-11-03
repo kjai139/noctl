@@ -7,7 +7,7 @@ const notifications = [
       text:'New terms from subsequent translation request will continue to add onto the current glossary'
     },
     {
-      text:'The glossary file you upload must be in JSON format'
+      text:'The glossary file must be in proper .json format'
     },
     
     ]
@@ -20,7 +20,7 @@ export default function GlossaryInfo () {
                 <div>
                     <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
                 </div>
-                <p>A glossary is used to keep terms and names consistent when translating things such as novels. An editable glossary will be auto-generated after each successful prompt when appropirate. You can then edit as needed and also save and upload it for future use.</p>
+                <p>A glossary is used to keep terms and names consistent when translating things like novels. An editable glossary will be auto-generated after each successful prompt when appropirate. Edit as needed and you can also save it for future use.</p>
             </div>
             <ul className="flex flex-col gap-2">
                 {notifications && notifications.map((node, idx) => {

@@ -486,19 +486,26 @@ SidebarExpandBtn.displayName = 'SidebarExpandBtn'
 
 const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>> (({className, onClick, ...props}, ref) => {
 
-  const { toggleExpand, expandState, showButton } = useSidebar()
-  const iconSize = 30
+  const { toggleExpand, expandState, showButton, isSmallScreen } = useSidebar()
+  const iconSize = 26
   React.useEffect(() => {
     console.log('SHOW BUTTON:', showButton)
   }, [showButton])
   
   return (
-    <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' ? 'gloss-b-e' : null}`} onClick={(event) => {
-      onClick?.(event)
-      toggleExpand()
-    }} {...props}>
-       {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
-    </Button>
+    <>
+    {
+      isSmallScreen ? 
+      <Button ref={ref} variant={'ghost'} size={'icon'} className={`hover:bg-heroBg hover:text-inherit ${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' ? 'gloss-b-e' : null}`} onClick={(event) => {
+        onClick?.(event)
+        toggleExpand()
+      }} {...props}>
+         {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
+      </Button>
+      : null
+    }
+  
+    </>
   )
 })
 

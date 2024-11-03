@@ -1,3 +1,3 @@
 
 
-export const claudeCost = 2700
+export const claudeCost = 10

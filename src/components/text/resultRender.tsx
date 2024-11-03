@@ -84,7 +84,7 @@ export default function ResultRender () {
                     <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                         <h2 className="underline font-semibold">Model: Standard</h2>
                     </div>
-                    <div className="pt-8">
+                    <div className="pt-8 text-destructive font-semibold">
                         {standardResultError}
                     </div>
                 </ResultWrap> : null
@@ -108,7 +108,7 @@ export default function ResultRender () {
                     <div className="flex justify-between items-center sm:flex-row flex-col-reverse gap-2 sm:gap-0">
                         <h2 className="underline font-semibold">Model: Better-1</h2>
                     </div>
-                    <div className="pt-8">
+                    <div className="pt-8 text-destructive font-semibold">
                         {better1Error}
                     </div>
                 </ResultWrap> : null

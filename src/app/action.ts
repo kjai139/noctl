@@ -205,7 +205,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             throw new Error('Encountered a server error. Please try relogging.')
         } 
         if (existingUser.currencyAmt < claudeCost) {
-            throw new Error('You do not have enough currency to use this model.')
+            throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
         } 
     
         

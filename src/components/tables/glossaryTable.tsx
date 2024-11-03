@@ -257,7 +257,7 @@ export default function GlossaryTable () {
             <>
               <Button variant={'glossary'} className="gap-2" onClick={resetGlossary}>
                 <RiDeleteBin2Line></RiDeleteBin2Line>
-                <span>Clear</span>
+                <span>Clear All</span>
               </Button>
               <Button variant={'glossary'} onClick={downloadGlossary} className="gap-2">
                 <GrDocumentDownload></GrDocumentDownload>

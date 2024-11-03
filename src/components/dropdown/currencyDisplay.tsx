@@ -10,8 +10,10 @@ import { getStripe } from '@/lib/loadStripeClient';
 import RedirectResultModal from '../dialog/redirectResult';
 import { usePathname, useRouter } from 'next/navigation';
 import { UpdateUserCurrency } from '@/app/_utils/updateUserCurrency';
+import { TbHexagonLetterRFilled } from "react-icons/tb";
 import { useWorkState } from '@/app/_contexts/workStateContext';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { TbCircleLetterRFilled } from "react-icons/tb";
 interface CurrencyDisplayProps {
     session: Session | null,
     products: any
@@ -118,22 +120,33 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
 
     return (
         <>
+        
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <DropdownMenuTrigger asChild>
-                <Button variant={'outline'} className='flex gap-2 items-center'>
-                    <TbPigMoney color='#AA336A' size={30}></TbPigMoney>
-                    <span>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'Unavailable'}</span>
-                </Button>
-            </DropdownMenuTrigger>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={'outline'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow bg-primary hover:bg-primary hover:brightness-90'>
+                            {/* <TbHexagonLetterRFilled size={30} /> */}
+                            <TbCircleLetterRFilled color='#FFFFFF' size={30}></TbCircleLetterRFilled>
+                            <span className='text-lg text-primary-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'Unavailable'}</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Your request balance</p>
+                    </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
             <DropdownMenuContent>
                 <DropdownMenuLabel>
                     My Balance
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator></DropdownMenuSeparator>
                 <DropdownMenuGroup>
-                    <DropdownMenuItem className='flex gap-2 items-center' onSelect={handleSelectItem}>
+                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={handleSelectItem}>
                     <FaMoneyBillTrendUp></FaMoneyBillTrendUp>
-                    <span>Add currency</span>
+                    <span>Add request currency</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
