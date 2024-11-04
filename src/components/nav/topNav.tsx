@@ -49,7 +49,7 @@ export default async function TopNav() {
                 <Image src={siteLogo} height={30} width={30} alt="Site logo">
 
                 </Image>
-                <div className="font-semibold text-xl">
+                <div className="font-semibold text-xl hidden sm:block">
                     
                     MMTL
                 </div>

@@ -6,7 +6,8 @@ import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from
 import { auth } from "../../auth"
 import userModel from "./_models/userModel"
 import { claudeCost } from "@/lib/modelPrice"
-
+import { Ratelimit } from '@upstash/ratelimit'
+import redis from "@/lib/redis"
 
 const client = new Anthropic({
     apiKey:process.env.CLAUDE_API as string
@@ -18,8 +19,40 @@ interface translateTxtProps {
     glossary?:string
 }
 
+const geminiRatelimit = new Ratelimit({
+    redis: redis,
+    limiter: Ratelimit.slidingWindow(1, '10m')
+})
+
 
 export async function translateGemini({text, language, glossary}:translateTxtProps) {
+    try {
+        const session = await auth()
+        if (!session || !session.user) {
+            throw new Error('Please sign in to use this model.')
+        }
+
+        if (!session.user.id) {
+            throw new Error('Encountered a server error. Please try relogging.')
+        }
+
+        const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
+        if (!success) {
+            
+            const remainingTime = reset - Date.now()
+            const mins = Math.floor(remainingTime / 60000)
+            const seconds = Math.floor((remainingTime / 60000) / 1000)
+            console.log(reset, remainingTime, mins, seconds)
+            throw new Error(`You've hit the usage limit per hour. Please try again in ${mins}m ${seconds}s`)
+        }
+
+        
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+
+
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({

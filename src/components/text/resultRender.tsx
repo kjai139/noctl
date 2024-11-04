@@ -40,7 +40,7 @@ export default function ResultRender () {
     return (
         <>
         {
-            isLoading || curResult || altResult1 ? 
+            isLoading || curResult || altResult1 || standardResultError && better1Error ? 
             <div className="flex items-center justify-center flex-col relative min-h-screen">
             
             {isLoading ?

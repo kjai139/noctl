@@ -189,7 +189,7 @@ export default function MainInputForm () {
                     
                 } catch (err:any) {
                     console.log('Error in Standard API')
-                    console.error(err, typeof err)
+                    /* console.error(err, typeof err) */
                     if (err.message) {
                         setStandardResultError(`Standard Model: ${err.message}`)
                         throw new Error(err.message)
@@ -300,7 +300,7 @@ export default function MainInputForm () {
                     setOgCurResult(jsonResult2[0].translation)
                 } else {
                     console.log('Result2', result2)
-                    setStandardResultError(result1.reason.message)
+                    setStandardResultError(result2.reason.message)
                     
                 }
             } else if (model === 'Test-1') {
@@ -383,7 +383,7 @@ export default function MainInputForm () {
    
     return (
             
-            <div className="flex gap-8 justify-center my-8">
+            <div className="flex gap-8 justify-center items-center my-8">
                 {
                     errorMsg ?
                         <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
@@ -417,7 +417,7 @@ export default function MainInputForm () {
                                                 const target = e.target as HTMLTextAreaElement
                                                 target.style.height = 'auto';
                                                 target.style.height = `${target.scrollHeight}px`;
-                                            }} placeholder="Enter text..." {...field} className="sm:min-w-[600px] max-h-[300px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                            }} placeholder="Enter text..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                             </Textarea>
 

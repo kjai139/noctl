@@ -26,7 +26,7 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
                 <DropdownMenuTrigger asChild>
                     <Button variant={'ghost'} className="rounded-xl gap-2">
                     <FaUserCircle color="gray" size={30}></FaUserCircle>
-                    <span className="text-base">Sign in</span>
+                    <span className="text-base text-muted-foreground">Sign in</span>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

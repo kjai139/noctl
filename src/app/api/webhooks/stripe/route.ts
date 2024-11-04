@@ -74,16 +74,20 @@ export async function POST (req:NextRequest) {
                     let requests
                     switch (session4.amount) {
                         case 100:
-                            requests = 150
-                            console.log('[Stripe Webhook] Adding 150 request credits...')
+                            requests = 100
+                            console.log('[Stripe Webhook] Adding 100 request credits...')
                             break
                         case 1000:
-                            requests = 1550
-                            console.log('[Stripe Webhook] Adding 1550 request credits...')
+                            requests = 200
+                            console.log('[Stripe Webhook] Adding 200 request credits...')
+                            break
+                        case 20000:
+                            requests = 425
+                            console.log('[Stripe Webhook] Adding 425 request credits...')
                             break
                         default:
                             console.log('[Stripe Webhook] Unhandled currency amount detected:', session4.amount)
-                            break
+                            throw new Error('Unhandled currency amount')
                     }
     
                     await newTransaction.save({ session: dbSess })
@@ -106,9 +110,14 @@ export async function POST (req:NextRequest) {
 
                     await dbSess.commitTransaction()
                     console.log('[Stripe webhook] New transaction committed to DB successfully')
+                    console.log('[Stripe webhook] Returning a success response.')
+                    return NextResponse.json({
+                        success: true
+                    })
                 } catch (err) {
                     console.error(err)
                     await dbSess.abortTransaction()
+                    console.log(`[Stripe Webhook ${event.id}] Transaction aborted. Returned 500`)
                     return NextResponse.json({
                         message: `Error saving transaction to DB`
                     }, {
@@ -125,11 +134,14 @@ export async function POST (req:NextRequest) {
                 console.warn(event.type, 'Unhandled event type')
                 break
         }
+        console.log(`[Stripe webhook ${event.id}] Returning a success response At the end.`)
         return NextResponse.json({
             success: true
         })
+        
     } catch (err) {
         console.error(err)
+        console.log('[Stripe webhook] Webhook handler failed. returned 400')
         return NextResponse.json({
             message: "Webhook handler failed."
         }, {

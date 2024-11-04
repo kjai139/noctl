@@ -46,9 +46,12 @@ export default function ModelsDialog () {
                     </DialogDescription>
                 </DialogHeader>
                 <Table>
-                    <TableCaption>Each translation request handles up to 2000 characters. Text longer than that will be broken up into parts. Sign in with gmail to purchase currency.</TableCaption>
-                    <TableHeader>
-                        <TableRow>
+                    <TableCaption>
+                        <span>Each translation request handles up to 2000 characters. Text longer than that will be broken up into parts. Sign in with gmail to purchase currency.
+                            </span>
+                        </TableCaption>
+                    <TableHeader className="hidden sm:table-header-group">
+                        <TableRow className="hidden sm:table-row">
                             <TableHead>
                                 Model
                             </TableHead>
@@ -63,12 +66,12 @@ export default function ModelsDialog () {
                             </TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="flex flex-col sm:table-row-group">
                         {
                             models.map((model, idx) => {
                                 return (
-                                    <TableRow key={`mdl-${idx}`}>
-                                        <TableCell>
+                                    <TableRow key={`mdl-${idx}`} className="flex flex-col sm:table-row">
+                                        <TableCell className="font-semibold">
                                             {model.name}
                                         </TableCell>
                                         <TableCell className="text-center">
