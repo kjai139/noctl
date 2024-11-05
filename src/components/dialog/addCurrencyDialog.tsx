@@ -1,5 +1,5 @@
 'use client'
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { Separator } from "../ui/separator";
@@ -33,7 +33,6 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
 
     const getPaymentInt = async (itemId:string) => {
         setClientSecret('')
-        setErrorMsg('')
         setDpmCheckerLink('')
         setCurProduct(null)
         setIsLoading(true)
@@ -86,20 +85,40 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
         }
     }
 
+    useEffect(() => {
+        setErrorMsg('')
+        let timeoutId: NodeJS.Timeout | null = null
+        console.log('REset error msg')
+        if (isDialogOpen === false) {
+            timeoutId = setTimeout(() => {
+                setClientSecret('')
+                console.log('client secret reset')
+            }, 500)
+            
+        }
+
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId)
+            }
+            
+        }
+    }, [isDialogOpen])
+
     const openChangeHandler = (open:boolean) => {
-        if (!open) {
+        /* if (!open) {
             setTimeout(() => {
                 setClientSecret('')
             }, 500)
-        }
+        } */
         setIsDialogOpen(open)
     
     }
 
     const closeModal = () => {
-        setTimeout(() => {
+        /* setTimeout(() => {
             setClientSecret('')
-        }, 500)
+        }, 500) */
         setIsDialogOpen(false)
     }
 

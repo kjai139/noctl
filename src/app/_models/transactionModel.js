@@ -22,7 +22,13 @@ const TransactionModel = new Schema({
     },
     paymentId: {
         type:String,
+        unique:true,
         required: true,
+    },
+    status: {
+        type:String,
+        enum: ['pending', 'completed'],
+        default:'pending'
     }
 }, {
     timestamps: true

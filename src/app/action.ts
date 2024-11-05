@@ -8,6 +8,10 @@ import userModel from "./_models/userModel"
 import { claudeCost } from "@/lib/modelPrice"
 import { Ratelimit } from '@upstash/ratelimit'
 import redis from "@/lib/redis"
+import connectToMongoose from "@/lib/mongoose"
+import transactionModel from "./_models/transactionModel"
+import { CheckoutProduct } from "@/components/stripe/checkoutForm"
+
 
 const client = new Anthropic({
     apiKey:process.env.CLAUDE_API as string
@@ -23,6 +27,31 @@ const geminiRatelimit = new Ratelimit({
     redis: redis,
     limiter: Ratelimit.slidingWindow(1, '10m')
 })
+
+export async function createTransactionEntry (product:CheckoutProduct) {
+    try {
+        await connectToMongoose()
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Encountered an authentication error. Please try relogging.')
+        }
+
+        const newPendingTrans = new transactionModel({
+            paymentId: product.pId,
+            userId: session.user.id,
+            amount: product.amount,
+            transactionType:'purchase'
+        })
+
+        await newPendingTrans.save()
+        return 'success'
+
+
+    } catch (err) {
+        console.error(err)
+        return false
+    }
+}
 
 
 export async function translateGemini({text, language, glossary}:translateTxtProps) {

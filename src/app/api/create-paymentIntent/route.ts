@@ -26,11 +26,6 @@ export async function POST(request:NextRequest) {
     //Database connection issue on signIn
     
     if (!item.userId) {
-        /* console.log('User is not logged in, checking database...')
-        await connectToMongoose()
-        const existingUser = await userModel.findOne({
-            email: item.userEmail
-        }) */
        console.log('[Stripe create pi] User Id from DB missing...')
         return NextResponse.json({
             message: 'Account error, please try relogging.'
@@ -38,37 +33,63 @@ export async function POST(request:NextRequest) {
             status:503
         })
 
-    }
-    const product = await stripeInstance.products.retrieve(item.id, {
-        expand:['default_price']
-    })
-    if (!product) {
-        throw new Error('Product is null/undefined')
-    }
-    const priceObj = product.default_price as Stripe.Price
-    const unitPrice = priceObj.unit_amount!
-    const currency = priceObj.currency
-
-    
-
-    const paymentInt = await stripeInstance.paymentIntents.create({
-        amount: unitPrice,
-        currency: currency,
-        metadata: {
-            userId: item.userId
+    } else {
+        console.log('[Stripe create pi] User Id Found. Checking server status...')
+        try {
+            await connectToMongoose()
+            const existingUser = await userModel.findById(item.userId)
+            if (!existingUser) {
+                return NextResponse.json({
+                    message: 'Encountered a server error. Please try again later.'
+                })
+            }
+        } catch (err) {
+            console.error(err)
+            console.log('[Stripe Creating PaymentIntent] Encountered a server error, please try again later.')
+            return NextResponse.json({
+                message: 'Encountered a server error. Please try again later.'
+            })
         }
-    })
-   console.log('ITEM ******', item)
-   console.log('PRODUCT*******', product)
-
-   return NextResponse.json({
-        amount: unitPrice,
-        currency:currency,
-        productName: product.name,
-        productDesc: product.description,
-        pId: paymentInt.id,
-        clientSecret:  paymentInt.client_secret,
-        userId: paymentInt.metadata.userId,
-        dpmCheckerLink: `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentInt.id}`,
-   })
+    }
+    try {
+        const product = await stripeInstance.products.retrieve(item.id, {
+            expand:['default_price']
+        })
+        if (!product) {
+            throw new Error('Product is null/undefined')
+        }
+        const priceObj = product.default_price as Stripe.Price
+        const unitPrice = priceObj.unit_amount!
+        const currency = priceObj.currency
+    
+        
+    
+        const paymentInt = await stripeInstance.paymentIntents.create({
+            amount: unitPrice,
+            currency: currency,
+            metadata: {
+                userId: item.userId
+            }
+        })
+       console.log('ITEM ******', item)
+       console.log('PRODUCT*******', product)
+    
+       return NextResponse.json({
+            amount: unitPrice,
+            currency:currency,
+            productName: product.name,
+            productDesc: product.description,
+            pId: paymentInt.id,
+            clientSecret:  paymentInt.client_secret,
+            userId: paymentInt.metadata.userId,
+            dpmCheckerLink: `https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=${paymentInt.id}`,
+       })
+    } catch (err) {
+        console.error(err)
+        console.log('[Stripe Creating PaymentIntent] Encountered a server error, please try again later.')
+        return NextResponse.json({
+            message: 'Encountered a server error. Please try again later.'
+        })
+    }
+    
 }

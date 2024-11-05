@@ -20,12 +20,13 @@ export type CheckoutProduct = {
     name:string,
     description:string,
     amount:number,
-    currency:string
+    currency:string,
+    pId: string,
 }
 
 interface CheckoutFormProps {
     dpmCheckerLink: string,
-    product: CheckoutProduct | null,
+    product: CheckoutProduct,
     setIsDialogOpen?: React.Dispatch<SetStateAction<boolean>>,
     closeModal: () => void,
     session: Session | null
@@ -45,14 +46,17 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
 
     const { setUserCurrency } = useWorkState()
     
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!stripe || !elements) {
             // Stripe.js hasn't yet loaded.
             // Make sure to disable form submission until Stripe.js has loaded.
             return;
         }
+        console.log('[Stripe confirmPayment] paymentIntent Id:', product.pId)
         setIsLoading(true)
+
+        // TODO:add create pending transac here and then make webhook finish it
         try {
             const response = await stripe.confirmPayment({
                 elements: elements,
