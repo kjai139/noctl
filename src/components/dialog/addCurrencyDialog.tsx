@@ -74,6 +74,7 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
         } catch (err) {
             console.error(err)
             setIsLoading(false)
+            setErrorMsg('Encountered a server error. Please try again later.')
         }
         
     }

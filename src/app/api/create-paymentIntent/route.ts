@@ -41,6 +41,8 @@ export async function POST(request:NextRequest) {
             if (!existingUser) {
                 return NextResponse.json({
                     message: 'Encountered a server error. Please try again later.'
+                }, {
+                    status: 500
                 })
             }
         } catch (err) {
@@ -48,6 +50,8 @@ export async function POST(request:NextRequest) {
             console.log('[Stripe Creating PaymentIntent] Encountered a server error, please try again later.')
             return NextResponse.json({
                 message: 'Encountered a server error. Please try again later.'
+            }, {
+                status:500
             })
         }
     }
@@ -89,6 +93,8 @@ export async function POST(request:NextRequest) {
         console.log('[Stripe Creating PaymentIntent] Encountered a server error, please try again later.')
         return NextResponse.json({
             message: 'Encountered a server error. Please try again later.'
+        }, {
+            status: 500
         })
     }
     

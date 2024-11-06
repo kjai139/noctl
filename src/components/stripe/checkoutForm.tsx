@@ -14,7 +14,8 @@ import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { type Session } from 'next-auth'
 import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
-import { oneDollarCurAmt, tenDollarsCurAmt } from "@/lib/currencyPrice";
+import { fiveDollarCurAmt, oneDollarCurAmt, tenDollarsCurAmt } from "@/lib/currencyPrice";
+import { createTransactionEntry } from "@/app/action";
 
 export type CheckoutProduct = {
     name:string,
@@ -58,6 +59,10 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
 
         // TODO:add create pending transac here and then make webhook finish it
         try {
+            const createPendingEntry = await createTransactionEntry(product)
+            if (!createPendingEntry) {
+                throw new Error('Encountered a server error. Your payment was not processed, please try again later.')
+            }
             const response = await stripe.confirmPayment({
                 elements: elements,
                 confirmParams: {
@@ -73,6 +78,9 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                 switch (response.paymentIntent.amount) {
                     case 1000:
                         setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + tenDollarsCurAmt : null)
+                        break
+                    case 500:
+                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + fiveDollarCurAmt : null)
                         break
                     case 100:
                         setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + oneDollarCurAmt : null)
@@ -93,7 +101,14 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             
         } catch (err) {
             console.error(err)
+            if (err instanceof Error) {
+                setMessage(err.message)
+            } else {
+                setMessage('An unexpected error has occured. Please try again later.')
+            }
             setIsLoading(false)
+            
+            
         }
     }
 

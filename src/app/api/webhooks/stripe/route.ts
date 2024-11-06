@@ -6,7 +6,7 @@ import TransactiionModel from '@/app/_models/transactionModel'
 import mongoose from 'mongoose'
 import userModel from "@/app/_models/userModel";
 
-export async function POST (req:NextRequest) {
+export async function POST(req: NextRequest) {
     const body = await req.text()
     const sig = req.headers.get('stripe-signature')
 
@@ -30,6 +30,7 @@ export async function POST (req:NextRequest) {
             await connectToMongoose()
         } catch (err) {
             console.error('[Sripe Webhook] Error connecting to MONGODB', err)
+            throw err
         }
         switch (event.type) {
             case "checkout.session.async_payment_succeeded":
@@ -50,85 +51,161 @@ export async function POST (req:NextRequest) {
 
                 console.log(`[Stripe webhook] Checking if event ID ${event.id} exists`)
 
+                let requests
+                switch (session4.amount) {
+                    case 500:
+                        requests = 100
+                        console.log('[Stripe Webhook] Adding 100 request credits...')
+                        break
+                    case 1000:
+                        requests = 200
+                        console.log('[Stripe Webhook] Adding 200 request credits...')
+                        break
+                    case 20000:
+                        requests = 425
+                        console.log('[Stripe Webhook] Adding 425 request credits...')
+                        break
+                    default:
+                        console.log('[Stripe Webhook] Unhandled currency amount detected:', session4.amount)
+                        throw new Error('Unhandled currency amount')
+                }
+
                 const existingTransaction = await TransactiionModel.findOne({
-                    eventId: event.id
+                    paymentId: session4.id
                 })
 
+                //Pending Transaction found
                 if (existingTransaction) {
-                    console.log(`Transaction event ${event.id} already processed.`)
-                    return NextResponse.json({
-                        success:true
-                    })
-                }
-                const dbSess = await mongoose.startSession()
-                dbSess.startTransaction()
-                try {
-                    
-                    const newTransaction = new TransactiionModel({
-                        paymentId: session4.id,
-                        userId: session4.metadata.userId,
-                        amount: session4.amount,
-                        transactionType:'purchase'
-    
-                    })
-                    let requests
-                    switch (session4.amount) {
-                        case 100:
-                            requests = 100
-                            console.log('[Stripe Webhook] Adding 100 request credits...')
-                            break
-                        case 1000:
-                            requests = 200
-                            console.log('[Stripe Webhook] Adding 200 request credits...')
-                            break
-                        case 20000:
-                            requests = 425
-                            console.log('[Stripe Webhook] Adding 425 request credits...')
-                            break
-                        default:
-                            console.log('[Stripe Webhook] Unhandled currency amount detected:', session4.amount)
-                            throw new Error('Unhandled currency amount')
-                    }
-    
-                    await newTransaction.save({ session: dbSess })
-                    const userUpdate = await userModel.updateOne(
-                        {
-                            _id:session4.metadata.userId
-                        }, 
-                        {
-                            $inc: {
-                                currencyAmt: requests
+                    //if event already happened
+                    if (existingTransaction.eventId && existingTransaction.eventId === event.id) {
+                        console.log(`[Stripe Webhook] Transaction already processed eventId: ${existingTransaction.eventId}`)
+
+                        return NextResponse.json({
+                            success: true
+                        })
+                    } else {
+                        //New event
+                        console.log('[Stripe Webhook] New payment succeed Event')
+
+                        //if names and amount did not match
+                        if (existingTransaction.userId !== session4.metadata.userId || existingTransaction.amount !== session4.amount) {
+                            console.log(`[Stripe Webhook] ${existingTransaction.paymentId} ***user or amount did not match***`)
+                            existingTransaction.amount = session4.amount
+                            existingTransaction.userId = session4.metadata.userId
+                        }
+                        existingTransaction.status = 'completed'
+
+                        const dbSess = await mongoose.startSession()
+                        dbSess.startTransaction()
+
+
+                        try {
+                            await existingTransaction.save({
+                                session: dbSess
+                            })
+                            console.log('[Stripe webhook] Trasnaction updated to completed')
+
+                            const userUpdate = await userModel.updateOne(
+                                {
+                                    _id: session4.metadata.userId
+                                },
+                                {
+                                    $inc: {
+                                        currencyAmt: requests
+                                    }
+                                }, {
+                                session: dbSess
                             }
-                        }, {
+                            )
+                            console.log('[Stripe webhook] User currency updated')
+
+                            if (userUpdate.modifiedCount !== 1) {
+                                throw new Error('Transaction Failed! Unable to update user currencyAmt')
+                            }
+
+                            await dbSess.commitTransaction()
+                            console.log('[Stripe webhook] Pending Transaction -> Complete')
+                            return NextResponse.json({
+                                success:true
+                            })
+                            
+
+                        } catch (err) {
+                            console.error(err)
+                            await dbSess.abortTransaction()
+                            console.log('[Stripe webhook] Error updating database, transaction aborted')
+                            return NextResponse.json({
+                                message: '[Stripe webhook] Error updating database, transaction aborted'
+                            }, {
+                                status: 500
+                            })
+                        } finally {
+                            dbSess.endSession()
+                            console.log('DB Transaction Session ended.')
+                        }
+
+                    }
+
+                } else {
+                    //Pending Transaction not found in DB
+                    console.log('[Stripe Webhook] Pending Transaction not found, creating transaction...')
+
+                    const dbSess = await mongoose.startSession()
+                    dbSess.startTransaction()
+                    try {
+
+                        const newTransaction = new TransactiionModel({
+                            paymentId: session4.id,
+                            userId: session4.metadata.userId,
+                            amount: session4.amount,
+                            transactionType: 'purchase',
+                            eventId: event.id,
+                            status: 'completed'
+
+                        })
+
+
+                        await newTransaction.save({ session: dbSess })
+                        const userUpdate = await userModel.updateOne(
+                            {
+                                _id: session4.metadata.userId
+                            },
+                            {
+                                $inc: {
+                                    currencyAmt: requests
+                                }
+                            }, {
                             session: dbSess
                         }
-                    )
+                        )
 
-                    if (userUpdate.modifiedCount !== 1) {
-                        throw new Error('Transaction Failed! Unable to update user currencyAmt')
+                        if (userUpdate.modifiedCount !== 1) {
+                            throw new Error('Transaction Failed! Unable to update user currencyAmt')
+                        }
+
+                        await dbSess.commitTransaction()
+                        console.log('[Stripe webhook] New transaction committed to DB successfully')
+                        console.log('[Stripe webhook] Returning a success response.')
+                        return NextResponse.json({
+                            success: true
+                        })
+                    } catch (err) {
+                        console.error(err)
+                        await dbSess.abortTransaction()
+                        console.log(`[Stripe Webhook ${event.id}] Transaction aborted. Returned 500`)
+                        return NextResponse.json({
+                            message: `Error saving transaction to DB`
+                        }, {
+                            status: 500
+                        })
+                    } finally {
+                        dbSess.endSession()
+                        console.log('DB Transaction Session ended.')
                     }
-
-                    await dbSess.commitTransaction()
-                    console.log('[Stripe webhook] New transaction committed to DB successfully')
-                    console.log('[Stripe webhook] Returning a success response.')
-                    return NextResponse.json({
-                        success: true
-                    })
-                } catch (err) {
-                    console.error(err)
-                    await dbSess.abortTransaction()
-                    console.log(`[Stripe Webhook ${event.id}] Transaction aborted. Returned 500`)
-                    return NextResponse.json({
-                        message: `Error saving transaction to DB`
-                    }, {
-                        status: 500
-                    })
-                } finally {
-                    dbSess.endSession()
-                    console.log('DB Transaction Session ended.')
                 }
-                
-                
+
+
+
 
             default:
                 console.warn(event.type, 'Unhandled event type')
@@ -138,14 +215,14 @@ export async function POST (req:NextRequest) {
         return NextResponse.json({
             success: true
         })
-        
+
     } catch (err) {
         console.error(err)
         console.log('[Stripe webhook] Webhook handler failed. returned 400')
         return NextResponse.json({
             message: "Webhook handler failed."
         }, {
-            status:400
+            status: 400
         })
     }
 }

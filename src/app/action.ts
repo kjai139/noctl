@@ -36,6 +36,16 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             throw new Error('Encountered an authentication error. Please try relogging.')
         }
 
+        const existingTransaction = await transactionModel.findOne({
+            paymentId: product.pId
+        })
+
+        if (existingTransaction) {
+            console.log('[createTransEntry]  Pending Payment Id found')
+            
+            return existingTransaction._id.toString()
+        }
+
         const newPendingTrans = new transactionModel({
             paymentId: product.pId,
             userId: session.user.id,
@@ -44,7 +54,8 @@ export async function createTransactionEntry (product:CheckoutProduct) {
         })
 
         await newPendingTrans.save()
-        return 'success'
+        console.log(`[createTransEntry] Pending entry created, id: ${newPendingTrans._id}`)
+        return newPendingTrans._id.toString()
 
 
     } catch (err) {
