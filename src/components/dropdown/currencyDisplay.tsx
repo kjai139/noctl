@@ -13,7 +13,10 @@ import { UpdateUserCurrency } from '@/app/_utils/updateUserCurrency';
 import { TbHexagonLetterRFilled } from "react-icons/tb";
 import { useWorkState } from '@/app/_contexts/workStateContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+
+import { BsReceipt } from "react-icons/bs";
 import { TbCircleLetterRFilled } from "react-icons/tb";
+
 interface CurrencyDisplayProps {
     session: Session | null,
     products: any
@@ -147,6 +150,10 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                     <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={handleSelectItem}>
                     <FaMoneyBillTrendUp></FaMoneyBillTrendUp>
                     <span>Add request currency</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted'>
+                    <BsReceipt></BsReceipt>
+                    <span>Purchase History</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>

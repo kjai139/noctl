@@ -14,7 +14,7 @@ import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { type Session } from 'next-auth'
 import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
-import { fiveDollarCurAmt, oneDollarCurAmt, tenDollarsCurAmt } from "@/lib/currencyPrice";
+import { fiveDollarCurAmt, oneDollarCurAmt, tenDollarsCurAmt, twentyDollarCurAmt } from "@/lib/currencyPrice";
 import { createTransactionEntry } from "@/app/action";
 
 export type CheckoutProduct = {
@@ -49,6 +49,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
     
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setMessage('')
         if (!stripe || !elements) {
             // Stripe.js hasn't yet loaded.
             // Make sure to disable form submission until Stripe.js has loaded.
@@ -82,8 +83,8 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                     case 500:
                         setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + fiveDollarCurAmt : null)
                         break
-                    case 100:
-                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + oneDollarCurAmt : null)
+                    case 2000:
+                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + twentyDollarCurAmt : null)
                         break
                     default:
                         console.log(`[Client Currency Update] Unhandled currency amount after successful transaction: ${response.paymentIntent.amount}`)

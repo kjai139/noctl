@@ -34,5 +34,7 @@ const TransactionModel = new Schema({
     timestamps: true
 })
 
+/* TransactionModel.index({createdAt: 1}, {expireAfterSeconds: 7884000}) */
+
 
 export default mongoose.models.Transaction || mongoose.model('Transaction', TransactionModel)

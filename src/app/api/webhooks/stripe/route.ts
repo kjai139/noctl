@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
                         console.log('[Stripe Webhook] New payment succeed Event')
 
                         //if names and amount did not match
-                        if (existingTransaction.userId !== session4.metadata.userId || existingTransaction.amount !== session4.amount) {
+                        if (existingTransaction.userId.toString() !== session4.metadata.userId || existingTransaction.amount !== session4.amount) {
                             console.log(`[Stripe Webhook] ${existingTransaction.paymentId} ***user or amount did not match***`)
                             existingTransaction.amount = session4.amount
                             existingTransaction.userId = session4.metadata.userId
