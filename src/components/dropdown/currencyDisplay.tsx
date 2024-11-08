@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 
 import { BsReceipt } from "react-icons/bs";
 import { TbCircleLetterRFilled } from "react-icons/tb";
+import PurchaseHistoryDialog from '../dialog/purchaseHistoryDialog';
 
 interface CurrencyDisplayProps {
     session: Session | null,
@@ -30,6 +31,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
 
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isPhOpen, setIsPhOpen] = useState(false)
     const [redirectMsg, setRedirectMsg] = useState('')
     const [isResultOpen, setIsResultOpen] = useState(false)
     const [isRedirectSuccess, setIsRedirectSuccess] = useState(false)
@@ -116,8 +118,20 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         getUserCurrency()
     }, [])
 
-    const handleSelectItem = () => {
-        setIsDialogOpen(true)
+    const handleSelectItem = (idx:number) => {
+
+        switch (idx) {
+            case 0:
+                setIsDialogOpen(true)
+                break
+            case 1:
+                setIsPhOpen(true) 
+                break
+            default:
+                console.error('Unhandled menu select item')
+                break
+        }
+       
         setDropdownOpen(false)
     }
 
@@ -147,11 +161,11 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator></DropdownMenuSeparator>
                 <DropdownMenuGroup>
-                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={handleSelectItem}>
+                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={() => handleSelectItem(0)}>
                     <FaMoneyBillTrendUp></FaMoneyBillTrendUp>
                     <span>Add request currency</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted'>
+                    <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={() => handleSelectItem(1)}>
                     <BsReceipt></BsReceipt>
                     <span>Purchase History</span>
                     </DropdownMenuItem>
@@ -159,6 +173,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
             </DropdownMenuContent>
         </DropdownMenu>
         <AddCurrencyDialog session={session} products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
+        <PurchaseHistoryDialog isDialogOpen={isPhOpen} onOpenChange={setIsPhOpen}></PurchaseHistoryDialog>
         <RedirectResultModal isOpen={isResultOpen} setIsOpen={setIsResultOpen} isSuccess={isRedirectSuccess} resultMsg={redirectMsg}></RedirectResultModal>
         </>
     )

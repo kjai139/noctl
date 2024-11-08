@@ -50,7 +50,9 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             paymentId: product.pId,
             userId: session.user.id,
             amount: product.amount,
-            transactionType:'purchase'
+            transactionType:'purchase',
+            productName: product.productName,
+            productDesc: product.productDesc
         })
 
         await newPendingTrans.save()

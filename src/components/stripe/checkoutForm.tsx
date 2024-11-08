@@ -19,10 +19,11 @@ import { createTransactionEntry } from "@/app/action";
 
 export type CheckoutProduct = {
     name:string,
-    description:string,
+    productDesc:string,
     amount:number,
     currency:string,
     pId: string,
+    productName: string,
 }
 
 interface CheckoutFormProps {

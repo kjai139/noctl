@@ -1,3 +1,5 @@
+import { string } from 'zod'
+
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -29,6 +31,13 @@ const TransactionModel = new Schema({
         type:String,
         enum: ['pending', 'completed'],
         default:'pending'
+    },
+    productName: {
+        type:String,
+
+    },
+    productDesc: {
+        type:String
     }
 }, {
     timestamps: true
