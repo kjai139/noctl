@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
                         requests = 200
                         console.log('[Stripe Webhook] Adding 200 request credits...')
                         break
-                    case 20000:
+                    case 2000:
                         requests = 425
                         console.log('[Stripe Webhook] Adding 425 request credits...')
                         break
@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
                             existingTransaction.userId = session4.metadata.userId
                         }
                         existingTransaction.status = 'completed'
+                        existingTransaction.expiresAt = null
 
                         const dbSess = await mongoose.startSession()
                         dbSess.startTransaction()

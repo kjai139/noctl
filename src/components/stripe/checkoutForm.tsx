@@ -16,9 +16,9 @@ import { type Session } from 'next-auth'
 import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
 import { fiveDollarCurAmt, oneDollarCurAmt, tenDollarsCurAmt, twentyDollarCurAmt } from "@/lib/currencyPrice";
 import { createTransactionEntry } from "@/app/action";
+import UpdateTransStatus from "@/app/_utils/updateTransStatus";
 
 export type CheckoutProduct = {
-    name:string,
     productDesc:string,
     amount:number,
     currency:string,
@@ -59,7 +59,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
         console.log('[Stripe confirmPayment] paymentIntent Id:', product.pId)
         setIsLoading(true)
 
-        // TODO:add create pending transac here and then make webhook finish it
+        
         try {
             const createPendingEntry = await createTransactionEntry(product)
             if (!createPendingEntry) {
@@ -77,7 +77,8 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 console.log('Payment successful.')
                 setPaymentSuccess(true)
-                switch (response.paymentIntent.amount) {
+
+                /* switch (response.paymentIntent.amount) {
                     case 1000:
                         setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + tenDollarsCurAmt : null)
                         break
@@ -90,7 +91,10 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
                     default:
                         console.log(`[Client Currency Update] Unhandled currency amount after successful transaction: ${response.paymentIntent.amount}`)
                         break
-                }
+                } */
+               await UpdateTransStatus(product.pId)
+               const updatedCur = await UpdateUserCurrency()
+               setUserCurrency(updatedCur)
                 setIsLoading(false)
             }
             if (response.error?.type === "card_error" || response.error?.type === "validation_error" || response.error?.type === 'invalid_request_error') {
@@ -120,8 +124,8 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
         <>
             <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                <span className="text-lg">{product?.name}</span>
-                <span className="text-sm text-muted-foreground">{product?.description}</span>
+                <span className="text-lg">{product?.productName}</span>
+                <span className="text-sm text-muted-foreground">{product?.productDesc}</span>
                 </div>
                 <div>
                     {

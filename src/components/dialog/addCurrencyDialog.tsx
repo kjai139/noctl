@@ -9,6 +9,7 @@ import { getStripe } from '../../lib/loadStripeClient'
 import CompletedPage from "../stripe/completedPage";
 import CheckoutForm, { CheckoutProduct } from "../stripe/checkoutForm";
 import { type Session } from 'next-auth'
+import { DeletePaymentIntentDB } from "@/app/action";
 
 const stripePromise = getStripe()
 
@@ -57,8 +58,8 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                 
                 setDpmCheckerLink(data.dpmCheckerLink);
                 const product = {
-                    name:data.productName,
-                    description:data.productDesc,
+                    productName:data.productName,
+                    productDesc:data.productDesc,
                     amount:data.amount,
                     currency:data.currency,
                     pId:data.pId
@@ -120,6 +121,10 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
         /* setTimeout(() => {
             setClientSecret('')
         }, 500) */
+        /* if (curProduct !== null && curProduct !== undefined && curProduct.pId) {
+            DeletePaymentIntentDB(curProduct?.pId)
+        } */
+        
         setIsDialogOpen(false)
     }
 

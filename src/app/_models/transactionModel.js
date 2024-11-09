@@ -11,7 +11,6 @@ const TransactionModel = new Schema({
     },
     eventId: {
         type:String,
-        unique:true,
     },
     amount: {
         type:Number,
@@ -29,8 +28,8 @@ const TransactionModel = new Schema({
     },
     status: {
         type:String,
-        enum: ['pending', 'completed'],
-        default:'pending'
+        enum: ['incomplete','pending', 'completed'],
+        default:'incomplete'
     },
     productName: {
         type:String,
@@ -38,12 +37,24 @@ const TransactionModel = new Schema({
     },
     productDesc: {
         type:String
-    }
+    },
+    expiresAt: {
+        type:Date,
+        default: null
+    },
+    statusVerified: {
+        type:Boolean,
+        default:false
+    },
 }, {
     timestamps: true
 })
 
 /* TransactionModel.index({createdAt: 1}, {expireAfterSeconds: 7884000}) */
+
+TransactionModel.index({expiresAt: 1}, {
+    expireAfterSeconds: 0
+})
 
 
 export default mongoose.models.Transaction || mongoose.model('Transaction', TransactionModel)

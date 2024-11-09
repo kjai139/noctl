@@ -50,6 +50,59 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
       
     }
 
+    const getUserCurrency = async () => {
+        if (!session.user.id) {
+            console.log('[Get user currency] User ID missing.')
+            setUserCurrency(null)
+            return null
+        }
+        try {
+            const currencyAmt = await UpdateUserCurrency()
+
+            if (currencyAmt === null) {
+                throw new Error(`Encountered a server error getting user's currency balance`)
+            } else {
+                console.log('[Get User Currency]', currencyAmt)
+                setUserCurrency(currencyAmt)
+            }
+
+
+        } catch (err) {
+            console.error(err)
+            setUserCurrency(null)
+        }
+    }
+
+    const handleRedirect = async () => {
+        try {
+            
+            const stripe = await getStripe()
+            const searchParams = new URLSearchParams(window.location.search)
+            const clientSecret = searchParams.get('payment_intent_client_secret')
+            console.log('PI CS :', clientSecret)
+            if (clientSecret) {
+                setIsResultLoading(true)
+                setIsResultOpen(true)
+                setIsInitiated(true)
+                const response = await stripe.retrievePaymentIntent(clientSecret)
+
+                console.log(response)
+                if (response.paymentIntent.status === 'succeeded') {
+                    setRedirectMsg('Your payment was successful.')
+                    
+                    setIsRedirectSuccess(true)
+                } else {
+                    setRedirectMsg('Your payment was unsuccessful.')
+                }
+                setIsResultLoading(false)
+            }   
+        } catch (err) {
+            console.error(err)
+            setRedirectMsg('Error getting payment status')
+            setIsResultLoading(false)
+        }
+    }
+
     useEffect(() => {
         if (!isResultOpen && isInitiated) {
             router.replace(pathname)
@@ -58,62 +111,11 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     }, [isResultOpen])
 
     useEffect(() => {
-        const handleRedirect = async () => {
-            try {
-                
-                const stripe = await getStripe()
-                const searchParams = new URLSearchParams(window.location.search)
-                const clientSecret = searchParams.get('payment_intent_client_secret')
-                console.log('PI CS :', clientSecret)
-                if (clientSecret) {
-                    setIsResultLoading(true)
-                    setIsResultOpen(true)
-                    setIsInitiated(true)
-                    const response = await stripe.retrievePaymentIntent(clientSecret)
-
-                    console.log(response)
-                    if (response.paymentIntent.status === 'succeeded') {
-                        setRedirectMsg('Your payment was successful.')
-                        
-                        setIsRedirectSuccess(true)
-                    } else {
-                        setRedirectMsg('Your payment was unsuccessful.')
-                    }
-                    setIsResultLoading(false)
-                }   
-            } catch (err) {
-                console.error(err)
-                setRedirectMsg('Error getting payment status')
-                setIsResultLoading(false)
-            }
-        }
 
         handleRedirect()
     }, [])
 
     useEffect(() => {
-        const getUserCurrency = async () => {
-            if (!session.user.id) {
-                console.log('[Get user currency] User ID missing.')
-                return
-            }
-            try {
-                const currencyAmt = await UpdateUserCurrency({
-                    userId:session.user.id
-                })
-
-                if (currencyAmt === null) {
-                    throw new Error(`Encountered a server error getting user's currency balance`)
-                } else {
-                    console.log('[Get User Currency]', currencyAmt)
-                    setUserCurrency(currencyAmt)
-                }
-
-
-            } catch (err) {
-                console.error(err)
-            }
-        }
 
         getUserCurrency()
     }, [])
@@ -146,7 +148,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                         <Button variant={'outline'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow bg-primary hover:bg-primary hover:brightness-90'>
                             {/* <TbHexagonLetterRFilled size={30} /> */}
                             <TbCircleLetterRFilled color='#FFFFFF' size={30}></TbCircleLetterRFilled>
-                            <span className='text-lg text-primary-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'Unavailable'}</span>
+                            <span className='text-lg text-primary-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'N/A'}</span>
                         </Button>
                     </DropdownMenuTrigger>
                     </TooltipTrigger>

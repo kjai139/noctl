@@ -8,5 +8,8 @@ export interface TransactionObjModel {
     paymentId: string,
     status: 'pending' | 'completed',
     productName: string,
-    productDesc: string
+    productDesc: string,
+    expiresAt: Date | null,
+    createdAt?: any,
+    updatedAt?:any
 }

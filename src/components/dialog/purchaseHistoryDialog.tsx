@@ -16,15 +16,17 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
 
     const [errorMsg, setErrorMsg] = useState('')
     const [transArr, setTransArr] = useState<[] | null>()
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchPhistory = async () => {
+        setIsLoading(true)
         try {
             const response = await fetch('/api/purchase/getHistory', {
                 next: {
                     tags: ['purchaseH']
                 }
             })
-
+            setIsLoading(false)
             if (response.ok) {
                 const json = await response.json()
                 console.log('[fetchPhistory] ', json)
@@ -35,6 +37,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
             }
 
         } catch (err) {
+            setIsLoading(false)
             console.log(err)
             if (err instanceof Error) {
                 setErrorMsg(err.message)
@@ -43,8 +46,11 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
     }
 
     useEffect(() => {
-        fetchPhistory()
-    }, [])
+        if (isDialogOpen) {
+            fetchPhistory()
+        }
+        
+    }, [isDialogOpen])
 
 
     return (
@@ -58,19 +64,28 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                         Record of your purchases
                     </DialogDescription>
                 </DialogHeader>
-                <Separator></Separator>
+                {/* <Separator></Separator> */}
                 {
-                    errorMsg ? 
+                    isLoading ?
+                    <div className="flex justify-center items-center min-h-[330px] w-full z-10 spin-bd">
+                    <div className="spinner">
+
+                    </div>
+                    </div> : null
+                }
+                {
+                    errorMsg && !isLoading ? 
                     <div>
                         {errorMsg}
                     </div> : null
                 }
-                {   !errorMsg ?
+                {   !errorMsg && !isLoading ?
+                <div className="max-h-[330px]">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Item</TableHead>
-                                <TableHead>Description</TableHead>
+                                {/* <TableHead>Description</TableHead> */}
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Purchase Date</TableHead>
                                 <TableHead>Status</TableHead>
@@ -79,20 +94,24 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                         <TableBody>
                             {
                                 transArr && transArr.map((trans:TransactionObjModel, idx) => {
+                                    let formatAmt = (trans.amount / 100).toFixed(2)
+                                    let date = new Date(trans.createdAt)
+                                    let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
                                     return (
                                         <TableRow key={`trans-${idx}`}>
                                             <TableCell>
                                                 {trans.productName}
 
                                             </TableCell>
-                                            <TableCell>
+                                            {/* <TableCell>
                                                 {trans.productDesc}
+                                            </TableCell> */}
+                                            <TableCell>
+                                                {formatAmt}
                                             </TableCell>
                                             <TableCell>
-                                                {trans.amount}
-                                            </TableCell>
-                                            <TableCell>
-                                                {trans.createdAt}
+                                                {formatDate}
                                             </TableCell>
                                             <TableCell>
                                                 {trans.status}
@@ -104,6 +123,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
 
                         </TableBody>
                     </Table>
+                    </div>
                     : null
                 }
                 

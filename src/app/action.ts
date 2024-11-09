@@ -11,6 +11,7 @@ import redis from "@/lib/redis"
 import connectToMongoose from "@/lib/mongoose"
 import transactionModel from "./_models/transactionModel"
 import { CheckoutProduct } from "@/components/stripe/checkoutForm"
+import { revalidateTag } from "next/cache"
 
 
 const client = new Anthropic({
@@ -45,6 +46,7 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             
             return existingTransaction._id.toString()
         }
+        const expirationTime = 15 * 60 * 1000
 
         const newPendingTrans = new transactionModel({
             paymentId: product.pId,
@@ -52,13 +54,35 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             amount: product.amount,
             transactionType:'purchase',
             productName: product.productName,
-            productDesc: product.productDesc
+            productDesc: product.productDesc,
+            expiresAt: new Date(Date.now() + expirationTime)
         })
 
         await newPendingTrans.save()
         console.log(`[createTransEntry] Pending entry created, id: ${newPendingTrans._id}`)
+        revalidateTag('purchaseH')
         return newPendingTrans._id.toString()
 
+
+    } catch (err) {
+        console.error(err)
+        return false
+    }
+}
+
+export async function DeletePaymentIntentDB (pId:string) {
+    try {
+        await connectToMongoose()
+        const result = await transactionModel.deleteOne({
+            pId:pId
+        })
+        if (result.deletedCount > 0) {
+            console.log('[DeletePiDB] Pending PI deleted.')
+            return true
+        } else {
+            console.log(`[DeletePiDB] pId:${pId} not found.`)
+            return false
+        }
 
     } catch (err) {
         console.error(err)
