@@ -29,13 +29,14 @@ export type CheckoutProduct = {
 interface CheckoutFormProps {
     dpmCheckerLink: string,
     product: CheckoutProduct,
+    isDialogOpen?: boolean,
     setIsDialogOpen?: React.Dispatch<SetStateAction<boolean>>,
     closeModal: () => void,
     session: Session | null
     
 }
 
-export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen, closeModal, session}:CheckoutFormProps) {
+export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, closeModal, session}:CheckoutFormProps) {
 
     const stripe = useStripe()
     const elements = useElements()
@@ -46,7 +47,20 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
     const [paymentSuccess, setPaymentSuccess] = useState(false)
     const [paymentFailed, setPaymentFailed] = useState(false)
 
+
     const { setUserCurrency } = useWorkState()
+
+    const handleUpdateCurrency = async () => {
+        try {
+            const updatedCur = await UpdateUserCurrency()
+            console.log('[UpdateUserCur]', updatedCur)
+            setUserCurrency(updatedCur)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+
     
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -76,25 +90,16 @@ export default function CheckoutForm ({dpmCheckerLink, product, setIsDialogOpen,
             console.log('response confirm payment', response)
             if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 console.log('Payment successful.')
-                setPaymentSuccess(true)
+                
 
-                /* switch (response.paymentIntent.amount) {
-                    case 1000:
-                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + tenDollarsCurAmt : null)
-                        break
-                    case 500:
-                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + fiveDollarCurAmt : null)
-                        break
-                    case 2000:
-                        setUserCurrency((prev) => prev !== undefined && prev !== null ? prev + twentyDollarCurAmt : null)
-                        break
-                    default:
-                        console.log(`[Client Currency Update] Unhandled currency amount after successful transaction: ${response.paymentIntent.amount}`)
-                        break
-                } */
-               await UpdateTransStatus(product.pId)
-               const updatedCur = await UpdateUserCurrency()
-               setUserCurrency(updatedCur)
+                try {
+                    await UpdateTransStatus(product.pId)
+                } catch (err) {
+                    
+                    throw new Error(`Payment was successful, but encountered a rare server problem. If you don't see the transaction Id -"${product.pId}" in your payment history, please contact support with the Id for updates.`)
+                }
+               
+               setPaymentSuccess(true)
                 setIsLoading(false)
             }
             if (response.error?.type === "card_error" || response.error?.type === "validation_error" || response.error?.type === 'invalid_request_error') {

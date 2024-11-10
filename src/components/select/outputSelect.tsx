@@ -32,7 +32,7 @@ export default function OutputSelect () {
         <Label htmlFor="outputlang-select"><span className="text-lg">Output Language</span></Label>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
-            <SelectTrigger id="outputlang-select">
+            <SelectTrigger id="outputlang-select" className="bg-background">
                 <SelectValue placeholder="Select Language">
                 </SelectValue>
             </SelectTrigger>

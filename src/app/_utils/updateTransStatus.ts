@@ -16,8 +16,11 @@ export default async function UpdateTransStatus (pId:string) {
             await existingTrans.save()
         } else {
             console.log(`[Update trans status] Could not locate pId${pId}`)
+            throw new Error(`[Update trans status] Could not locate pId${pId}`)
         }
+       /* throw new Error('Testing Error') */
     } catch (err) {
         console.error(err)
+        throw err
     }
 }

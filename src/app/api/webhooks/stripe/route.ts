@@ -84,6 +84,13 @@ export async function POST(req: NextRequest) {
                             success: true
                         })
                     } else {
+                        if (existingTransaction.statusVerified) {
+                            console.log('[Stripe Webhook] New Event but statusVerified')
+
+                            return NextResponse.json({
+                                success:true
+                            })
+                        }
                         //New event
                         console.log('[Stripe Webhook] New payment succeed Event')
 

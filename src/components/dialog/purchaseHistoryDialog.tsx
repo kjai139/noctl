@@ -55,7 +55,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="max-w-[800px] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         Purchase History
@@ -85,7 +85,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Item</TableHead>
-                                {/* <TableHead>Description</TableHead> */}
+                                <TableHead>Payment Id</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Purchase Date</TableHead>
                                 <TableHead>Status</TableHead>
@@ -104,9 +104,9 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                                 {trans.productName}
 
                                             </TableCell>
-                                            {/* <TableCell>
-                                                {trans.productDesc}
-                                            </TableCell> */}
+                                            <TableCell className="w-[100px] sm:w-auto">
+                                                {trans.paymentId}
+                                            </TableCell>
                                             <TableCell>
                                                 {formatAmt}
                                             </TableCell>

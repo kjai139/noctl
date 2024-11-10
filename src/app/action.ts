@@ -5,13 +5,16 @@ import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
 import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
 import { auth } from "../../auth"
 import userModel from "./_models/userModel"
-import { claudeCost } from "@/lib/modelPrice"
+import { claudeCost, openAiCost } from "@/lib/modelPrice"
 import { Ratelimit } from '@upstash/ratelimit'
 import redis from "@/lib/redis"
 import connectToMongoose from "@/lib/mongoose"
 import transactionModel from "./_models/transactionModel"
 import { CheckoutProduct } from "@/components/stripe/checkoutForm"
 import { revalidateTag } from "next/cache"
+import { z } from "zod"
+import {openAi} from '../lib/openAi'
+import { zodResponseFormat } from 'openai/helpers/zod'
 
 
 const client = new Anthropic({
@@ -46,7 +49,7 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             
             return existingTransaction._id.toString()
         }
-        const expirationTime = 15 * 60 * 1000
+        const expirationTime = 30 * 60 * 1000
 
         const newPendingTrans = new transactionModel({
             paymentId: product.pId,
@@ -290,11 +293,97 @@ export async function translateTxtNoTool ({text, language, glossary}:translateTx
 }
 
 
+export async function translateGpt ({text, language, glossary}:translateTxtProps) {
+    try {
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Please sign in to use this model.')
+        }
+
+        const existingUser = await userModel.findById(session.user.id)
+
+        if (!existingUser) {
+            throw new Error('Encountered a server error. Please try relogging.')
+        } 
+        if (existingUser.currencyAmt < openAiCost) {
+            throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
+        } 
+
+
+        let jsonGlossary
+        let filteredGlossary:GlossaryItem[]
+        let formattedGlossary 
+        let prompt
+        if (glossary) {
+            jsonGlossary = JSON.parse(glossary)
+            console.log('[OpenAi] Unedited glossary - ',jsonGlossary )
+            filteredGlossary = jsonGlossary
+        
+            //set with words.has doesnt check partial
+            console.log('filteredlist', filteredGlossary)
+            formattedGlossary = `
+            Glossary -
+            ${filteredGlossary.map(term => `
+                Term: ${term.term},
+                Translation: ${term.definition}
+                `).join('')}
+            `
+            console.log('[OpenAi] formattedGLoss', formattedGlossary)
+            if (filteredGlossary.length > 0) {
+                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} and return me a list of special terms, skills, people names extracted from the text - \n ${text}`
+                console.log('[OpenAi] prompt 1 used', prompt)
+            } else {
+                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, people names from the text - \n ${text}`
+                console.log('[OpenAi] prompt 2 used')
+            }
+            
+        } else {
+            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
+            console.log('[OpenAi] prompt 2 used')
+        }
+        const glossaryResponse = z.object({
+            term: z.string(),
+            definition: z.string()
+        })
+
+        const translatedTxtResponse = z.object({
+            glossary: z.array(glossaryResponse),
+            text: z.string()
+        })
+
+        const completion = await openAi.beta.chat.completions.parse({
+            model:'gpt-4o-mini-2024-07-18',
+            messages: [
+                {
+                    role: "system",
+                    content: prompt
+                }
+            ],
+            response_format: zodResponseFormat(translatedTxtResponse, "translation_response"),
+            max_tokens:8192,
+        })
+
+        const translation_response = completion.choices[0].message
+        console.log('[OpenAi] translation response', translation_response)
+        if (translation_response.parsed) {
+            console.log('[OpenAi] parsed', translation_response.parsed)
+            return translation_response.parsed
+        } else if (translation_response.refusal) {
+            console.log('[OpenAi] refusal', translation_response.refusal)
+        }
+    
+    } catch (err) {
+        console.error('[OpenAi] Error, ', err)
+        throw err
+    }
+}
+
+
 export async function translateTxt ({text, language, glossary}:translateTxtProps) {
     try {
 
         const session = await auth()
-        if (!session || !session.user) {
+        if (!session || !session.user.id) {
             throw new Error('Please sign in to use this model.')
         }
 

@@ -41,6 +41,8 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     const pathname = usePathname()
     const { userCurrency, setUserCurrency } = useWorkState()
 
+    const [hasMounted, setHasMounted] = useState(false)
+
     const handleItemClick = (e:any) => {
         e.preventDefault()
         setDropdownOpen(false)
@@ -115,10 +117,20 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         handleRedirect()
     }, [])
 
-    useEffect(() => {
+    /* useEffect(() => {
 
         getUserCurrency()
-    }, [])
+    }, []) */
+
+    useEffect(() => {
+        if (isDialogOpen === false && hasMounted) {
+            console.log('[UseEffect getUserCurrency ran]')
+            getUserCurrency()
+        } else {
+            console.log('has mounted to true')
+            setHasMounted(true)
+        }
+    }, [isDialogOpen, hasMounted])
 
     const handleSelectItem = (idx:number) => {
 

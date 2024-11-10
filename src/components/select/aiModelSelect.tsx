@@ -2,6 +2,7 @@ import { SetStateAction } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
 import { Label } from "../ui/label"
 import { ModelsType } from "@/app/_types/glossaryType"
+import { Separator } from "../ui/separator"
 
 
 interface AiModelSelectProps {
@@ -16,11 +17,28 @@ const models = [
         name:'Better-1'
     },
     {
-        name:'Duo'
-    },
+        name:'Better-2'
+    }
+    
     /* {
         name:'Test-1'
     } */
+
+]
+
+const duoModels = [
+    {
+        name: 'Standard / Better-1',
+        model:'sb1'
+    },
+    {
+        name:'Standard / Better-2',
+        model:'sb2'
+    },
+    {
+        name:'Better-1 / Better-2',
+        model:'b12'
+    },
 
 ]
 
@@ -46,6 +64,19 @@ export default function AiModelSelect({setModel}:AiModelSelectProps) {
                     models.map((node, idx) => {
                         return (
                             <SelectItem value={node.name} key={`models-${idx}`}>
+                                    {node.name} 
+                            </SelectItem>
+                        )
+                    })
+                }
+                <span className="mt-2 p-2 w-full justify-center font-semibold text-sm">
+                    Duo Modes
+                </span>
+                <Separator></Separator>
+                {
+                    duoModels.map((node, idx) => {
+                        return (
+                            <SelectItem value={node.name} key={`duoModels-${idx}`}>
                                     {node.name} 
                             </SelectItem>
                         )
