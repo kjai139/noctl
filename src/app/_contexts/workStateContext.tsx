@@ -21,22 +21,50 @@ interface workStateContextType {
     setGlossary: React.Dispatch<React.SetStateAction<GlossaryItem[]>>;
     user: UserState | null;
     setUser: React.Dispatch<React.SetStateAction<UserState | null>>;
-    curResult: string,
-    setCurResult: React.Dispatch<React.SetStateAction<string>>;
+    //curResult > slot1resultdisplay
+    slot1ResultDisplay: string,
+    setSlot1ResultDisplay: React.Dispatch<React.SetStateAction<string>>;
+
+    //curRaw > slot1Raw
+    slot1Raw:string,
+    setSlot1Raw: React.Dispatch<React.SetStateAction<string>>;
+
+    //ogCurresult >  slo1Txt
+    slot1Txt: string,
+    setSlot1Txt:React.Dispatch<React.SetStateAction<string>>;
+
+    slot1ModelName:string,
+    setSlot1ModelName:React.Dispatch<React.SetStateAction<string>>;
+
+    slot1Error:string,
+    setSlot1Error: React.Dispatch<React.SetStateAction<string>>;
+
+    //slot2 alt 
+    slot2ResultDisplay: string,
+    setSlot2ResultDisplay: React.Dispatch<React.SetStateAction<string>>;
+
+    slot2Raw:string,
+    setSlot2Raw: React.Dispatch<React.SetStateAction<string>>;
+
+    slot2Txt: string,
+    setSlot2Txt:React.Dispatch<React.SetStateAction<string>>;
+
+    slot2ModelName:string,
+    setSlot2ModelName:React.Dispatch<React.SetStateAction<string>>;
+    
+    slot2Error:string,
+    setSlot2Error: React.Dispatch<React.SetStateAction<string>>;
+
+    //other
+
     unsure: UnsureItem[];
     setUnsure: React.Dispatch<React.SetStateAction<UnsureItem[]>>;
     isLoading: boolean,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     chunks: string[],
     setChunks:React.Dispatch<React.SetStateAction<string[]>>;
-    altResult1: string,
-    setAltResult1: React.Dispatch<React.SetStateAction<string>>;
-    curRaw:string,
-    setCurRaw: React.Dispatch<React.SetStateAction<string>>;
-    ogAltResult:string,
-    setOgAltResult:React.Dispatch<React.SetStateAction<string>>;
-    ogCurResult: string,
-    setOgCurResult:React.Dispatch<React.SetStateAction<string>>;
+    
+    
     userCurrency: number | null,
     setUserCurrency: React.Dispatch<React.SetStateAction<number | null>>,
     standardResultError: string,
@@ -55,15 +83,26 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
 
     const [glossary, setGlossary] = useState<GlossaryItem[]>([])
     const [user, setUser] = useState<UserState | null>(null)
-    const [curResult, setCurResult] = useState('')
+
+    //result states
+    const [slot1ResultDisplay, setSlot1ResultDisplay] = useState('')
+    const [slot1Raw, setSlot1Raw] = useState('')
+    const [slot1Txt, setSlot1Txt] = useState('')
+    const [slot1Error, setSlot1Error] = useState('')
+
+    const [slot2ResultDisplay, setSlot2ResultDisplay] = useState('')
+    const [slot2Raw, setSlot2Raw] = useState('')
+    const [slot2Txt, setSlot2Txt] = useState('')
+    const [slot2Error, setSlot2Error] = useState('')
+
+    const [slot1ModelName, setSlot1ModelName] = useState('')
+    const [slot2ModelName, setSlot2ModelName] = useState('')
+
+
     const [unsure, setUnsure] = useState<UnsureItem[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [chunks, setChunks] = useState<string[]>([])
-    const [altResult1, setAltResult1] = useState('')
-    const [curRaw, setCurRaw] = useState('')
-
-    const [ogAltResult, setOgAltResult] = useState('')
-    const [ogCurResult, setOgCurResult] = useState('')
+    
     const [standardResultError, setStandardResultError] = useState('')
     const [better1Error, setBetter1Error] = useState('')
 
@@ -71,7 +110,7 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
 
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, curResult, setCurResult, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, altResult1, setAltResult1, curRaw, setCurRaw, ogAltResult, setOgAltResult, setOgCurResult, ogCurResult, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, slot1ResultDisplay, setSlot1ResultDisplay, slot1Txt, setSlot1Txt, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot1Raw, setSlot1Raw, slot2Txt, setSlot2Txt, slot2Raw, setSlot2Raw, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError, setSlot1ModelName, slot1ModelName, setSlot2ModelName, slot2ModelName, setSlot1Error, slot1Error, setSlot2Error, slot2Error}}>
             {children}
         </workStateContext.Provider>
     )
