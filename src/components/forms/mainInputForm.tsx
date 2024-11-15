@@ -18,6 +18,7 @@ import ErrorResultAlert from "../dialog/errorResult";
 import Anthropic from "@anthropic-ai/sdk";
 import { claudeCost, openAiCost } from "@/lib/modelPrice";
 import { useOutputContext } from "@/app/_contexts/outputContext";
+import { useSession } from "next-auth/react";
 
 
 const tokenLimit = 10000
@@ -49,13 +50,14 @@ function TextAreaWatched({ control }: { control: Control<z.infer<typeof formSche
 
 export default function MainInputForm() {
     // curResult = Standard
-    const { setGlossary, slot1ResultDisplay, setSlot1ResultDisplay, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error } = useWorkState()
+    const { setGlossary, slot1ResultDisplay, setSlot1ResultDisplay, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
     const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('standard')
     const [errorMsg, setErrorMsg] = useState('')
+    const {data: session} = useSession()
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -66,6 +68,11 @@ export default function MainInputForm() {
     })
 
     const onSubmitTest = async (values: z.infer<typeof formSchema>) => {
+        if (!session || !session.user.id) {
+            console.log('[onSubmit] User is not logged in - ', session)
+            setErrorMsg('Please sign in to use the models.')
+            return
+        }
         if (values.targetText.length > textLimit) {
             console.log(`Text too long. ${values.targetText.length} / ${textLimit} Splitting...`)
 
@@ -206,6 +213,10 @@ export default function MainInputForm() {
 
             } else if (model === 'b1') {
                 setSlot1ModelName('Better-1')
+                if (userCurrency && userCurrency < claudeCost) {
+                    setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
+                    return
+                }
                 const result: any = await translateTxt(params)
                 console.log('Api response:', result)
                 try {
@@ -324,6 +335,11 @@ export default function MainInputForm() {
                 
             } else if (model === 'b2') {
                 setSlot1ModelName('Better-2')
+
+                if (userCurrency && userCurrency < openAiCost) {
+                    setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
+                    return
+                }
                 try {
                     const result = await translateGpt(params)
                     console.log('[translateGpt] ', result)

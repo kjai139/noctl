@@ -25,11 +25,11 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
     const [termType, setTermType] = useState('')
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e:any) => {
         setTermInput(e.target.value)
     }
 
-    const handleDefChange = (e) => {
+    const handleDefChange = (e:any) => {
         setDefInput(e.target.value)
     }
 
@@ -45,7 +45,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                 setTermError('Term name cannot be blank')   
             }
             if (!defInput) {
-                setDefError('Definition cannot be blank') 
+                setDefError('Translated term cannot be blank') 
             }
             if (!termType) {
                 setTermTypeError('Choose a valid type')
@@ -59,7 +59,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                 
                     const newTerm:GlossaryItem = {
                         term: termInput,
-                        definition: defInput,
+                        translated_term: defInput,
                         term_type: termType
                     } 
     
@@ -121,10 +121,10 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                     </span>
                 </div>
                 <div className="flex flex-col">
-                    <Label htmlFor="definition" className="mb-2">
-                        Definition
+                    <Label htmlFor="translatedTerm" className="mb-2">
+                        Translated Term
                     </Label>
-                    <Input autoComplete="off" id="definition" value={defInput} onChange={handleDefChange} placeholder="Kappa"></Input>
+                    <Input autoComplete="off" id="translatedTerm" value={defInput} onChange={handleDefChange} placeholder="Kappa"></Input>
                     <span className="px-2">
                         {
                             defError ?

@@ -2,7 +2,7 @@
 
 export interface GlossaryItem {
     term:string,
-    definition:string,
+    translated_term:string,
     term_type?: 'term' | 'name' | 'skill'
 }
 

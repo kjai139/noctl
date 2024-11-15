@@ -62,8 +62,8 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             const json = JSON.parse(response)
             console.log(json)
             setIsLoading(false)
-            const definition = json[0].response
-            const interp = json[0].translation
+            const definition = json[0].explanation
+            const interp = json[0].translated_term
             if (interp && interp !== 'null') {
                 setCurInterp(interp)
             }
@@ -94,8 +94,8 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                 const json = JSON.parse(response)
                 console.log(json)
                 setIsLoading(false)
-                const definition = json[0].response
-                const interp = json[0].translation
+                const definition = json[0].explanation
+                const interp = json[0].translated_term
                 setResult(definition)
                 setCurInterp(interp)
 

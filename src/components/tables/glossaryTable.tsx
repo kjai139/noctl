@@ -38,12 +38,12 @@ interface GlossaryTableTypes {
 const glossary1:GlossaryItem[] = [
   {
       term:'Kappa',
-      definition:'Sarcastic word spammed',
+      translated_term:'Sarcastic word spammed',
       term_type:'term'
   },
   {
       term:'KEKL',
-      definition:'making fun of something',
+      translated_term:'making fun of something',
       term_type: 'term'
   }
 ]
@@ -64,7 +64,7 @@ export default function GlossaryTable () {
         const updatedData = glossary.map((node, idx) => {
             if (id === idx) {
                 return (
-                    {...node, definition: newDef}
+                    {...node, translated_term: newDef}
                 )
             } else {
                 return node
@@ -198,7 +198,7 @@ export default function GlossaryTable () {
             <TableRow>
               {/* <TableHead className="w-[60px]">Type</TableHead> */}
               <TableHead className="w-[100px]">Term</TableHead>
-              <TableHead>Definition</TableHead>
+              <TableHead>Translation</TableHead>
               
 
 
@@ -222,11 +222,11 @@ export default function GlossaryTable () {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                  <Input type="text" maxLength={30} value={node.definition} onChange={(e) => handleInputchange(e.target.value, idx)}>
+                  <Input type="text" maxLength={30} value={node.translated_term} onChange={(e) => handleInputchange(e.target.value, idx)}>
                   </Input>
                   </TooltipTrigger>
                   <TooltipContent>
-                  <span>{node.definition}</span>
+                  <span>{node.translated_term}</span>
                   </TooltipContent>
                   </Tooltip>
                   </TooltipProvider>

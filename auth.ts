@@ -27,6 +27,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     })
   ],
+  cookies: {
+    sessionToken: {
+      name: 'mmtl-session-token'
+    }
+  },
   callbacks: {
     async jwt({token, account, profile, user}) {
       try {

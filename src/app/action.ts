@@ -98,14 +98,14 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
     try {
         const session = await auth()
         if (!session || !session.user) {
-            throw new Error('Please sign in to use this model.')
+            throw new Error('Encountered an authentication error. Please sign in to use this model.')
         }
 
         if (!session.user.id) {
             throw new Error('Encountered a server error. Please try relogging.')
         }
 
-        const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
+        /* const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
         if (!success) {
             
             const remainingTime = reset - Date.now()
@@ -113,7 +113,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
             const seconds = Math.floor((remainingTime / 60000) / 1000)
             console.log(reset, remainingTime, mins, seconds)
             throw new Error(`You've hit the usage limit per hour. Please try again in ${mins}m ${seconds}s`)
-        }
+        } */
 
         
     } catch (err) {
@@ -159,7 +159,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                                 properties: {
                                         terms: {
                                             type:SchemaType.ARRAY,
-                                            description: "A list of terms, skills, and names",
+                                            description: "A list of terms, skills, and names, along with their translation",
                                             items: {
                                                 type:SchemaType.OBJECT,
                                                 properties: {
@@ -167,9 +167,9 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                                                         type:SchemaType.STRING,
                                                         description: "term name or people name or skill name in the original text's language"
                                                     },
-                                                    definition:{
+                                                    translated_term:{
                                                         type:SchemaType.STRING,
-                                                        description:"the term or name in the translated language"
+                                                        description:"The translated version of the terms you used."
                                                     },
                                                     term_type : {
                                                         type:SchemaType.STRING,
@@ -205,18 +205,20 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
             Glossary -
             ${filteredGlossary.map(term => `
                 Term: ${term.term},
-                Translation: ${term.definition}
+                Translation: ${term.translated_term}
                 `).join('')}
             `
-            prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
+            prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
         } else {
-             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
+            console.log('[Gemini] Prompt 2 used')
+             prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
         }
 
         const result = await model.generateContent(prompt)
-        console.log('gem result:', result)
-
+        console.log('[Gemini] result:', result)
+        console.log('[Gemini] Result', result.response.text())
         return result.response.text()
+        
     } catch (err:any) {
         console.error(err.message)
         let errMsg
@@ -254,7 +256,7 @@ export async function translateTxtNoTool ({text, language, glossary}:translateTx
             Glossary -
             ${filteredGlossary.map(term => `
                 Term: ${term.term},
-                Translation: ${term.definition}
+                Translation: ${term.translated_term}
                 `).join('')}
             `
             console.log('formattedGLoss', formattedGlossary)
@@ -325,7 +327,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
             Glossary -
             ${filteredGlossary.map(term => `
                 Term: ${term.term},
-                Translation: ${term.definition}
+                Translation: ${term.translated_term}
                 `).join('')}
             `
             console.log('[OpenAi] formattedGLoss', formattedGlossary)
@@ -343,7 +345,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
         }
         const glossaryResponse = z.object({
             term: z.string(),
-            definition: z.string()
+            translated_term: z.string()
         })
 
         const translatedTxtResponse = z.object({
@@ -420,7 +422,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             Glossary -
             ${filteredGlossary.map(term => `
                 Term: ${term.term},
-                Translation: ${term.definition}
+                Translation: ${term.translated_term}
                 `).join('')}
             `
             console.log('formattedGLoss', formattedGlossary)
@@ -468,7 +470,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                                             type:"string",
                                              description: "term name or people name or skill name in the original text's language"
                                         },
-                                        "definition": {
+                                        "translated_term": {
                                             type:"string",
                                             description:"the term or name in the translated language"
                                         },
@@ -477,7 +479,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                                             description:"term | name | skill"
                                         }
                                     },
-                                    required:["term", "definition"]
+                                    required:["term", "translated_term"]
                                 },
                                 description:"Extract a list of special terms, skills, and people names from the text"
                             }
@@ -542,20 +544,20 @@ export async function TermLookup ({term, context, language}:TermLookupProps) {
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
             generationConfig: {
-                temperature: 1,
+                temperature: 0.75,
                 responseMimeType: 'application/json',
                 responseSchema: {
                     type: SchemaType.ARRAY,
                     items: {
                         type:SchemaType.OBJECT,
                         properties: {
-                            response: {
+                            explanation: {
                                 type: SchemaType.STRING,
-                                description:'The meaning of the word the user prompted for'
+                                description:'explanation of the word'
                             },
-                            translation: {
+                            translated_term: {
                                 type:SchemaType.STRING,
-                                description:'The direct translation of the word. Do not include anything else. Return null if not applicable'
+                                description:'Meaning of the word. No brackets'
                             }
                            
                         }
@@ -565,7 +567,7 @@ export async function TermLookup ({term, context, language}:TermLookupProps) {
             
         })
 
-        const prompt = `What does ${term} mean${context ? `in this context? ${context}` : ''}\n Please answer in ${language}`
+        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''}`
 
         const result = await model.generateContent(prompt)
         console.log('gem result:', result)
