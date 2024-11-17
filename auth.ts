@@ -1,12 +1,10 @@
 import NextAuth, { type DefaultSession } from "next-auth"
 import Google from 'next-auth/providers/google'
-import connectToMongoose from '@/lib/mongoose'
-import User from '@/app/_models/userModel'
 
 
 declare module "next-auth" {
   interface Session {
-    user : {
+    user: {
       currencyAmt: number
     } & DefaultSession['user'];
 
@@ -33,9 +31,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }
   },
   callbacks: {
-    async jwt({token, account, profile, user}) {
+    async jwt({ token, account, profile, user }) {
       try {
-        await connectToMongoose()
         if (user) {
           if (!profile || !profile.email) {
             console.log('token', token)
@@ -44,22 +41,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             console.log('user', user)
             throw new Error('User does not have an email in profile')
           }
-          const existingUser = await User.findOne({
-            email:profile.email
-          })
+          const encodedEmail = encodeURIComponent(profile.email)
+          let baseFetchUrl
+          if (process.env.NODE_ENV === 'development') {
+            baseFetchUrl = 'http://localhost:3000'
+          } else if (process.env.NODE_ENV === 'production') {
+            baseFetchUrl = ''
+          }
+          const response = await fetch(`${baseFetchUrl}/api/user/get?email=${encodedEmail}`)
 
-          if (!existingUser) {
-            console.log('User does not exist')
-            const newUser = await User.create({
-              email: profile.email
-            })
+          if (response.ok) {
+            const data = await response.json()
+            console.log('[JWT CB] userId:', data.userId)
+            token.id = data.userId
 
-            console.log('NEW USER CREATED:', newUser)
-
-            token.id = newUser._id
-          } else {
-            console.log('User already exists : ', existingUser)
-            token.id = existingUser._id
           }
         }
 
@@ -72,17 +67,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 
     },
-    async session({session, token}) {
+    async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id.toString()
-        session.user.currencyAmt = token.currencyAmt as number
-      
+
       }
       if (token?.dbError) {
         return {
           ...session,
           error: true,
-          errorMessage: 'Database connection issue, please try relogging / try again later.'
+          errorMessage: 'Encountered an error connecting to our database.'
         }
       }
       return session

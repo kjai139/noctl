@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import { BsReceipt } from "react-icons/bs";
 import { TbCircleLetterRFilled } from "react-icons/tb";
 import PurchaseHistoryDialog from '../dialog/purchaseHistoryDialog';
+import ErrorResultAlert from '../dialog/errorResult';
 
 interface CurrencyDisplayProps {
     session: Session | null,
@@ -40,6 +41,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     const router = useRouter()
     const pathname = usePathname()
     const { userCurrency, setUserCurrency } = useWorkState()
+    const [errorMsg, setErrorMsg] = useState('')
 
     const [hasMounted, setHasMounted] = useState(false)
 
@@ -59,19 +61,20 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
             return null
         }
         try {
-            const currencyAmt = await UpdateUserCurrency()
-
-            if (currencyAmt === null) {
-                throw new Error(`Encountered a server error getting user's currency balance`)
-            } else {
-                console.log('[Get User Currency]', currencyAmt)
-                setUserCurrency(currencyAmt)
-            }
+            const currencyAmt = await UpdateUserCurrency()           
+            console.log('[Get User Currency]', currencyAmt)
+            setUserCurrency(currencyAmt)
+            
 
 
         } catch (err) {
             console.error(err)
             setUserCurrency(null)
+            if (err instanceof Error) {
+                setErrorMsg(err.message)
+            } else {
+                setErrorMsg('Encountered an unexpected error while retrieving your balance.')
+            }
         }
     }
 
@@ -177,7 +180,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                 <DropdownMenuGroup>
                     <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={() => handleSelectItem(0)}>
                     <FaMoneyBillTrendUp></FaMoneyBillTrendUp>
-                    <span>Add request currency</span>
+                    <span>Add Request Currency</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className='flex gap-2 items-center hover:cursor-pointer hover:bg-muted' onSelect={() => handleSelectItem(1)}>
                     <BsReceipt></BsReceipt>
@@ -189,6 +192,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         <AddCurrencyDialog session={session} products={products} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}></AddCurrencyDialog>
         <PurchaseHistoryDialog isDialogOpen={isPhOpen} onOpenChange={setIsPhOpen}></PurchaseHistoryDialog>
         <RedirectResultModal isOpen={isResultOpen} setIsOpen={setIsResultOpen} isSuccess={isRedirectSuccess} resultMsg={redirectMsg}></RedirectResultModal>
+        <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
         </>
     )
 }

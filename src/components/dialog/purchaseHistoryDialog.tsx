@@ -80,7 +80,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                     </div> : null
                 }
                 {   !errorMsg && !isLoading ?
-                <div className="max-h-[330px]">
+                <div className="h-[330px]">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -93,7 +93,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                         </TableHeader>
                         <TableBody>
                             {
-                                transArr && transArr.map((trans:TransactionObjModel, idx) => {
+                                transArr && transArr.length > 0 && transArr.map((trans:TransactionObjModel, idx) => {
                                     let formatAmt = (trans.amount / 100).toFixed(2)
                                     let date = new Date(trans.createdAt)
                                     let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -119,6 +119,13 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                         </TableRow>
                                     )
                                 })
+                            }
+                            {
+                                transArr && transArr.length === 0 &&
+                                <div className="pt-4 text-muted-foreground">
+                                    You have not made any purchases.
+
+                                </div>
                             }
 
                         </TableBody>

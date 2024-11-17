@@ -121,10 +121,11 @@ export default function MainInputForm() {
         setSlot2Error('')
         setBetter1Error('')
         setStandardResultError('')
-        setIsLoading(true)
+        
         try {
-            let normalizedGlossary
+            let normalizedGlossary  
             let filteredGlossary
+            /* filterGlossary only consists of words from the glossary that exists in the query text */
             const normalizedtext = text.toLowerCase()
                 .replace(/[(){}\[\]<>]/g, ' ')
                 .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
@@ -143,22 +144,21 @@ export default function MainInputForm() {
                 if (normalizedGlossary) {
                     filteredGlossary = normalizedGlossary.filter((entry: GlossaryItem) => normalizedtext.includes(entry.term))
                 }
-
-
             }
 
 
-            console.log('Non filtered Glossary:', glossary)
-            console.log('Filtered Glossary:', filteredGlossary)
+            console.log('[Api Lookup] Non filtered Glossary:', glossary)
+            console.log('[Api Lookup] Filtered Glossary:', filteredGlossary)
 
             const params = {
                 text: text,
                 language: language,
                 ...(glossary.length > 0 && { glossary: JSON.stringify(filteredGlossary) })
             }
-            console.log('Params used:', params)
+            console.log('[Api Lookup] Params used:', params)
 
             if (model === 'standard') {
+                setIsLoading(true)
                 try {
                     setSlot1ModelName('Standard')
                     const result = await translateGemini(params)
@@ -217,6 +217,7 @@ export default function MainInputForm() {
                     setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
                     return
                 }
+                setIsLoading(true)
                 const result: any = await translateTxt(params)
                 console.log('Api response:', result)
                 try {
@@ -271,6 +272,10 @@ export default function MainInputForm() {
             } else if (model === 'sb1') {
                 setSlot1ModelName('Standard')
                 setSlot2ModelName('Better-1')
+
+                if (userCurrency && userCurrency < claudeCost) {
+                    setErrorMsg(`You do not have enough currency. ${userCurrency} / ${claudeCost}`)
+                }
                 
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateTxt(params),
@@ -335,12 +340,15 @@ export default function MainInputForm() {
                 
             } else if (model === 'b2') {
                 setSlot1ModelName('Better-2')
-
-                if (userCurrency && userCurrency < openAiCost) {
-                    setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
-                    return
-                }
+                console.log('user cur', userCurrency, openAiCost)
+                
                 try {
+                    if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
+                        console.log(openAiCost > userCurrency)
+                        throw new Error(`You do not have enough currency to use this model. (${userCurrency} / ${openAiCost}). Please purchase more at the currency tab.`)
+                    }
+                    
+                    setIsLoading(true)
                     const result = await translateGpt(params)
                     console.log('[translateGpt] ', result)
 

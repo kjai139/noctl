@@ -151,7 +151,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                         properties: {
                             translation: {
                                 type: SchemaType.STRING,
-                                description:'The translation of the text which the user prompted for'
+                                description:'The translation of the text which the user prompted for.'
                             },
                             glossary: {
                                 type:SchemaType.OBJECT,
