@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
 
     let event: Stripe.Event
     try {
-        /* event = stripe.webhooks.constructEvent(body, sig as string, process.env.STRIPE_WEBHOOK_LOCAL_SECRET as string) */
-        event = stripe.webhooks.constructEvent(body, sig as string, 'whsec_p8j7AhEXGkt3r465P8k4wgzwuJLXiSP2')
+        event = stripe.webhooks.constructEvent(body, sig as string, process.env.STRIPE_WEBHOOK_LOCAL_SECRET as string)
+        
         console.log('[Stripe] Listening to Webhook events')
     } catch (err) {
         console.error(err)
