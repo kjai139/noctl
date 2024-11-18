@@ -17,14 +17,14 @@ export async function GET(request:NextRequest) {
 
         const existingUserTrans = await transactionModel.find({
             userId: session.user.id,
-            $or: [
+            /* $or: [
                 {
                     status: 'pending'
                 },
                 {
                     status:'completed'
                 }
-            ]
+            ] */
         }).sort({
             createdAt: -1
         })

@@ -49,7 +49,8 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             
             return existingTransaction._id.toString()
         }
-        const expirationTime = 30 * 60 * 1000
+        const expirationTime = 7 * 24 * 60 * 60 * 1000
+        //7 days
 
         const newPendingTrans = new transactionModel({
             paymentId: product.pId,

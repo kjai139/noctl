@@ -15,7 +15,7 @@ export default function TopNavInfo () {
                     MMTL uses the most modern LLMs for translating Asian languages into English. 
                 </p>
                 <p className="text-sm text-muted-foreground mt-4">
-                    {`Start by signing in with gmail to receive a one-time bonus of 10 free credits for the paid model(s).`}
+                    {`Start by signing in with gmail to receive a one-time bonus of 10 free credits for the paid models.`}
                 </p>
                 </div>
                 </div>

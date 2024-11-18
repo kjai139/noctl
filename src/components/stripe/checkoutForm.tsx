@@ -3,7 +3,7 @@ import {
     PaymentElement,
     useStripe,
     useElements
-  } from "@stripe/react-stripe-js";
+} from "@stripe/react-stripe-js";
 import { SetStateAction, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
@@ -19,9 +19,9 @@ import { createTransactionEntry } from "@/app/action";
 import UpdateTransStatus from "@/app/_utils/updateTransStatus";
 
 export type CheckoutProduct = {
-    productDesc:string,
-    amount:number,
-    currency:string,
+    productDesc: string,
+    amount: number,
+    currency: string,
     pId: string,
     productName: string,
 }
@@ -33,10 +33,10 @@ interface CheckoutFormProps {
     setIsDialogOpen?: React.Dispatch<SetStateAction<boolean>>,
     closeModal: () => void,
     session: Session | null
-    
+
 }
 
-export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, closeModal, session}:CheckoutFormProps) {
+export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, closeModal, session }: CheckoutFormProps) {
 
     const stripe = useStripe()
     const elements = useElements()
@@ -46,6 +46,8 @@ export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, cl
 
     const [paymentSuccess, setPaymentSuccess] = useState(false)
     const [paymentFailed, setPaymentFailed] = useState(false)
+
+    const [dbErrorMsg, setDbErrorMsg] = useState('')
 
 
     const { setUserCurrency } = useWorkState()
@@ -61,9 +63,10 @@ export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, cl
     }
 
 
-    
-    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setDbErrorMsg('')
         setMessage('')
         if (!stripe || !elements) {
             // Stripe.js hasn't yet loaded.
@@ -73,7 +76,7 @@ export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, cl
         console.log('[Stripe confirmPayment] paymentIntent Id:', product.pId)
         setIsLoading(true)
 
-        
+
         try {
             const createPendingEntry = await createTransactionEntry(product)
             if (!createPendingEntry) {
@@ -84,32 +87,32 @@ export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, cl
                 confirmParams: {
                     return_url: "http://localhost:3000"
                 },
-                redirect:'if_required'
-                
+                redirect: 'if_required'
+
             });
             console.log('response confirm payment', response)
             if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 console.log('Payment successful.')
-                
+
 
                 try {
                     await UpdateTransStatus(product.pId)
                 } catch (err) {
+                    setDbErrorMsg(`However, we encountered a problem with our database. Payment ID - "${product.pId}". Check your payment history for more details.`)
                     
-                    throw new Error(`Payment was successful, but encountered a rare server problem. If you don't see the transaction Id -"${product.pId}" in your payment history, please contact support with the Id for updates.`)
                 }
-               
-               setPaymentSuccess(true)
+
+                setPaymentSuccess(true)
                 setIsLoading(false)
             }
             if (response.error?.type === "card_error" || response.error?.type === "validation_error" || response.error?.type === 'invalid_request_error') {
-            setMessage(response.error.message || 'An unexpected error has occured');
-            setIsLoading(false)
+                setMessage(response.error.message || 'An unexpected error has occured');
+                setIsLoading(false)
             } else {
-            setMessage("An unexpected error occurred.");
-            setIsLoading(false)
+                setMessage("An unexpected error occurred.");
+                setIsLoading(false)
             }
-            
+
         } catch (err) {
             console.error(err)
             if (err instanceof Error) {
@@ -118,81 +121,90 @@ export default function CheckoutForm ({dpmCheckerLink, product, isDialogOpen, cl
                 setMessage('An unexpected error has occured. Please try again later.')
             }
             setIsLoading(false)
-            
-            
+
+
         }
     }
 
-    
+
 
     return (
         <>
             <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                <span className="text-lg">{product?.productName}</span>
-                <span className="text-sm text-muted-foreground">{product?.productDesc}</span>
+                    <span className="text-lg">{product?.productName}</span>
+                    <span className="text-sm text-muted-foreground">{product?.productDesc}</span>
                 </div>
                 <div>
                     {
-                        product && product.amount ? 
-                        <span>
-                            {`${(product.amount / 100).toFixed(2)} ${product.currency.toUpperCase()}`}
-                        </span>
-                    : null}
+                        product && product.amount ?
+                            <span>
+                                {`${(product.amount / 100).toFixed(2)} ${product.currency.toUpperCase()}`}
+                            </span>
+                            : null}
                 </div>
             </div>
             <Separator className="mt-4"></Separator>
-            
+
             {
-                paymentSuccess && !isLoading ? 
-                <div className="flex flex-col gap-8 items-center p-10">
-                    <SuccessAnimatedIcon></SuccessAnimatedIcon>
-                    <div className="flex flex-col gap-4">
-                    <span>
-                        Payment Successful
-                    </span>
-                    <Button variant={'pmt'} onClick={() => closeModal()}>Close</Button>
+                paymentSuccess && !isLoading ?
+                    <div className="flex flex-col gap-8 items-center p-10">
+                        <SuccessAnimatedIcon></SuccessAnimatedIcon>
+                        <div className="flex flex-col gap-4">
+                            <span className="text-center">
+                                Payment Successful
+                            </span>
+                            {dbErrorMsg ? 
+                            <span className="text-destructive flex flex-col gap-2 font-semibold">
+                                <p>{dbErrorMsg}</p>
+                                <p>
+                                Contact support with that ID if you need help.
+                                </p>
+                            </span> : null
+                            }
+                            <Button variant={'pmt'} onClick={() => closeModal()}>Close</Button>
+                        </div>
                     </div>
-                </div>
-                : null
+                    : null
 
             }
-            {!paymentFailed && !paymentSuccess? 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 min-height-[240px]">
-                <div className="flex flex-col items-center gap-4">
-                    
-                    <span className="flex gap-2 items-center">
-                        <IoIosLock></IoIosLock>
-                        <span>
-                        <strong>Safe & secured</strong> checkout guranteed
-                        </span>
-                    </span>
-                    <span>
-                    <Image src={StripePowered} alt="Powered by Stripe Logo" unoptimized></Image>
-                    </span>
-                </div>
-                <div className="min-h-[230px] relative">
-                {
-                isLoading && !paymentFailed && !paymentSuccess ?
-                <div className="flex justify-center items-center min-h-[230px] absolute w-full z-10 spin-bd">
-                <div className="spinner">
-
-                </div>
-                </div> : null
-                }
-                <PaymentElement options={{
-                    layout: 'tabs'
-                }}></PaymentElement>
-                </div>
-                <div className="justify-between flex">
-                {message && 
-                <div id="payment-message" className="text-destructive font-semibold">{message}
-                </div>}
-                <Button disabled={isLoading} className="ml-auto">Pay now</Button>
-                </div>
            
-                
-            </form> : null}
+            {!paymentFailed && !paymentSuccess ?
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4 min-height-[240px]">
+                    <div className="flex flex-col items-center gap-4">
+
+                        <span className="flex gap-2 items-center">
+                            <IoIosLock></IoIosLock>
+                            <span>
+                                <strong>Safe & secured</strong> checkout guranteed
+                            </span>
+                        </span>
+                        <span>
+                            <Image src={StripePowered} alt="Powered by Stripe Logo" unoptimized></Image>
+                        </span>
+                    </div>
+                    <div className="min-h-[230px] relative">
+                        {
+                            isLoading && !paymentFailed && !paymentSuccess ?
+                                <div className="flex justify-center items-center min-h-[230px] absolute w-full z-10 spin-bd">
+                                    <div className="spinner">
+
+                                    </div>
+                                </div> : null
+                        }
+                        <PaymentElement options={{
+                            layout: 'tabs'
+                        }}></PaymentElement>
+                    </div>
+                    <div className="justify-between flex">
+                        {message &&
+                            <div id="payment-message" className="text-destructive font-semibold">{message}
+                            </div>}
+                        <Button disabled={isLoading} className="ml-auto">Pay now</Button>
+                    </div>
+
+
+                </form> : null}
             {/* <div id="dpm-annotation">
         <p className="mt-4">
           Payment methods are dynamically displayed based on customer location, order amount, and currency.&nbsp;

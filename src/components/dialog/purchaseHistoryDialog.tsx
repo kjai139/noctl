@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Separator } from "../ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { TransactionObjModel } from "@/app/_types/transactionType";
+import { Button } from "../ui/button";
 
 interface PurchaseHistoryDialogProps {
     isDialogOpen: boolean,
@@ -114,7 +115,15 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                                 {formatDate}
                                             </TableCell>
                                             <TableCell>
+                                                {trans.status === 'pending' ?
+                                                <span>
+                                                    {trans.status}
+                                                    <Button>Check status</Button>
+                                                </span> :
+                                                <>
                                                 {trans.status}
+                                                </>
+                                                }
                                             </TableCell>
                                         </TableRow>
                                     )
