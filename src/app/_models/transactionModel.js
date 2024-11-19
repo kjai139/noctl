@@ -28,7 +28,7 @@ const TransactionModel = new Schema({
     },
     status: {
         type:String,
-        enum: ['incomplete','pending', 'completed'],
+        enum: ['incomplete','pending', 'completed', 'cancelled'],
         default:'incomplete'
     },
     productName: {

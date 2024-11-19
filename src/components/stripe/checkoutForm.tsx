@@ -98,7 +98,7 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                 try {
                     await UpdateTransStatus(product.pId)
                 } catch (err) {
-                    setDbErrorMsg(`However, we encountered a problem with our database. Payment ID - "${product.pId}". Check your payment history for more details.`)
+                    setDbErrorMsg(`However, we encountered a possible connection issue. Check the payment history tab and your balance. Contact support if needed.`)
                     
                 }
 
@@ -152,12 +152,12 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                         <SuccessAnimatedIcon></SuccessAnimatedIcon>
                         <div className="flex flex-col gap-4">
                             <span className="text-center">
-                                Payment Successful
+                                {`Payment Successful. Payment ID:${product.pId}`}
                             </span>
                             {dbErrorMsg ? 
                             <span className="text-destructive flex flex-col gap-2 font-semibold">
                                 <p>{dbErrorMsg}</p>
-                                <p>
+                                <p className="text-sm">
                                 Contact support with that ID if you need help.
                                 </p>
                             </span> : null

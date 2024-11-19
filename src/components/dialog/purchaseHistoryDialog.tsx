@@ -1,9 +1,10 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { TransactionObjModel } from "@/app/_types/transactionType";
 import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
 interface PurchaseHistoryDialogProps {
     isDialogOpen: boolean,
@@ -18,6 +19,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
     const [errorMsg, setErrorMsg] = useState('')
     const [transArr, setTransArr] = useState<[] | null>()
     const [isLoading, setIsLoading] = useState(false)
+    const [isVerifying, setIsVerifying] = useState(false)
 
     const fetchPhistory = async () => {
         setIsLoading(true)
@@ -46,6 +48,21 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
         }
     }
 
+    const verifyPiStatus = async (pId:string) => {
+        try {
+            setIsVerifying(true)
+            const response = await fetch(`/api/purchase/verify?pId=${pId}`)
+            if (response.ok) {
+                const data = await response.json()
+                console.log(data)
+            }
+            setIsVerifying(false)
+        } catch (err) {
+            console.error(err)
+            setIsVerifying(false)
+        }
+    }
+
     useEffect(() => {
         if (isDialogOpen) {
             fetchPhistory()
@@ -62,7 +79,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                         Purchase History
                     </DialogTitle>
                     <DialogDescription>
-                        Record of your purchases
+                        Record of your payment attempts
                     </DialogDescription>
                 </DialogHeader>
                 {/* <Separator></Separator> */}
@@ -81,9 +98,12 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                     </div> : null
                 }
                 {   !errorMsg && !isLoading ?
-                <div className="h-[330px]">
+                <div className="h-auto md:h-[330px]">
                     <Table>
-                        <TableHeader>
+                        <TableCaption className="my-4">
+                            Any successful payments that are showing up as "pending" or "incomplete" should resolve itself within the next few hours, but feel free to contact support with that payment ID for assistance.
+                        </TableCaption>
+                        <TableHeader className="hidden md:table-header-group">
                             <TableRow>
                                 <TableHead>Item</TableHead>
                                 <TableHead>Payment Id</TableHead>
@@ -100,30 +120,37 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                     let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
                                     return (
-                                        <TableRow key={`trans-${idx}`}>
+                                        <TableRow key={`trans-${idx}`} className="flex flex-col md:table-row">
                                             <TableCell>
                                                 {trans.productName}
 
                                             </TableCell>
-                                            <TableCell className="w-[100px] sm:w-auto">
+                                            <TableCell className="w-[100px] md:w-auto">
                                                 {trans.paymentId}
                                             </TableCell>
                                             <TableCell>
-                                                {formatAmt}
+                                                ${formatAmt}
                                             </TableCell>
                                             <TableCell>
                                                 {formatDate}
                                             </TableCell>
                                             <TableCell>
-                                                {trans.status === 'pending' ?
+                                                {/* {trans.status === 'pending' && !trans.statusVerified || trans.status === 'incomplete' && !trans.statusVerified ?
+                                                <span className="flex justify-between items-center gap-2">
+                                                    <span>
+                                                    {trans.status}
+                                                    </span>
+                                                    <Button onClick={() => verifyPiStatus(trans.paymentId)} disabled={isVerifying} size={'sm'} className="rounded">{isVerifying ? <Loader2 className="animate-spin"></Loader2> : 'Check Status'}
+                                                    <span className="md:hidden ml-1">Verifying Status</span>
+                                                    </Button>
+                                                </span> :
+                                                <span>
+                                                {trans.status}
+                                                </span>
+                                                } */}
                                                 <span>
                                                     {trans.status}
-                                                    <Button>Check status</Button>
-                                                </span> :
-                                                <>
-                                                {trans.status}
-                                                </>
-                                                }
+                                                </span>
                                             </TableCell>
                                         </TableRow>
                                     )

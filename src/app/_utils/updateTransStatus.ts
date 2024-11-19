@@ -28,7 +28,7 @@ export default async function UpdateTransStatus (pId:string) {
 
        
     } catch (err) {
-        console.error(err)
+        console.error('[UpdateTransStatus]', err)
         throw err
     }
 }

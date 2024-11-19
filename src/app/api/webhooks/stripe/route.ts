@@ -188,7 +188,8 @@ export async function POST(req: NextRequest) {
                             transactionType: 'purchase',
                             eventId: event.id,
                             status: 'completed',
-                            productName: productName
+                            productName: productName,
+                            expiresAt: null
 
                         })
 
