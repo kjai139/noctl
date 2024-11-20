@@ -3,6 +3,7 @@ import { useWorkState } from "@/app/_contexts/workStateContext"
 import { useEffect, useRef, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import ResultWrap from "../wrapper/resultWrap"
+import ErrorResult from "./errorResult"
 
 
 export default function ResultRender() {
@@ -37,6 +38,7 @@ export default function ResultRender() {
     }, [isLoading])
 
 
+
     return (
         <>
             {
@@ -67,51 +69,42 @@ export default function ResultRender() {
                                 <div className="border-t-2 my-8 w-full"></div>
                                 <div className="r-cont">
                                     <span className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-center r-wrap-cont">
+                                        
                                         {
                                             slot1ResultDisplay ?
-                                                <ResultWrap>
-                                                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                                                        <h2 className="underline font-semibold">{`Model: ${slot1ModelName}`}</h2>
-                                                        <ResultRenderTaskbar setCurDisplay={setSlot1ResultDisplay} curRaw={slot1Raw} curOgTxt={slot1Txt} setCurRaw={setSlot1Raw} text={slot1ResultDisplay}></ResultRenderTaskbar>
-                                                    </div>
-                                                    <div className="pt-8">
-                                                        {slot1ResultDisplay}
-                                                    </div>
+                                                <ResultWrap 
+                                                setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot1ResultDisplay}
+                                                slotModelName={slot1ModelName}
+                                                slotTxt={slot1Txt}
+                                                slotRaw={slot1Raw}
+                                                slotResultDisplay={slot1ResultDisplay}
+                                                >
                                                 </ResultWrap> : null}
                                         {
                                             slot1Error ?
-                                                <ResultWrap>
-                                                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                                                        <h2 className="underline font-semibold">Model: Standard</h2>
-                                                    </div>
-                                                    <div className="pt-8 text-destructive font-semibold">
-                                                        {standardResultError}
-                                                    </div>
-                                                </ResultWrap> : null
+                                                <ErrorResult slotError={slot1Error}
+                                                slotModelName={slot1ModelName}
+                                                >
+                                                </ErrorResult> : null
 
                                         }
                                         {
                                             slot2ResultDisplay ?
-                                                <ResultWrap>
-                                                    <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                                                        <h2 className="underline font-semibold">{`Model: Better-1`}</h2>
-                                                        <ResultRenderTaskbar curOgTxt={slot2Txt} curRaw={slot1Raw} setCurDisplay={setSlot2ResultDisplay} setCurRaw={setSlot1Raw} text={slot2ResultDisplay}></ResultRenderTaskbar>
-                                                    </div>
-                                                    <div className="pt-8">
-                                                        {slot2ResultDisplay}
-                                                    </div>
-                                                </ResultWrap> : null
+                                            <ResultWrap 
+                                            setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot2ResultDisplay}
+                                            slotModelName={slot2ModelName}
+                                            slotTxt={slot2Txt}
+                                            slotRaw={slot1Raw}
+                                            slotResultDisplay={slot2ResultDisplay}
+                                            >
+                                            </ResultWrap> : null
                                         }
                                         {
                                             slot2Error ?
-                                                <ResultWrap>
-                                                    <div className="flex justify-between items-center sm:flex-row flex-col-reverse gap-2 sm:gap-0">
-                                                        <h2 className="underline font-semibold">Model: Better-1</h2>
-                                                    </div>
-                                                    <div className="pt-8 text-destructive font-semibold">
-                                                        {better1Error}
-                                                    </div>
-                                                </ResultWrap> : null
+                                            <ErrorResult slotError={slot2Error}
+                                            slotModelName={slot2ModelName}
+                                            >
+                                            </ErrorResult> : null
 
                                         }
                                     </span>

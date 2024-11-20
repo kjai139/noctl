@@ -50,7 +50,7 @@ function TextAreaWatched({ control }: { control: Control<z.infer<typeof formSche
 
 export default function MainInputForm() {
     // curResult = Standard
-    const { setGlossary, slot1ResultDisplay, setSlot1ResultDisplay, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
+    const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
     const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -106,6 +106,7 @@ export default function MainInputForm() {
         language: string,
         model: ModelsType
     }
+
 
 
 
@@ -212,15 +213,17 @@ export default function MainInputForm() {
 
 
             } else if (model === 'b1') {
-                setSlot1ModelName('Better-1')
+                
                 if (userCurrency && userCurrency < claudeCost) {
                     setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
                     return
                 }
                 setIsLoading(true)
-                const result: any = await translateTxt(params)
-                console.log('Api response:', result)
+                
                 try {
+                    setSlot2ModelName('Better-1')
+                    const result: any = await translateTxt(params)
+                    console.log('Api response:', result)
                     if (result && result[0]) {
                         if (result[0].type === 'tool_use') {
                             const textResult = result[0].input.text
@@ -243,9 +246,7 @@ export default function MainInputForm() {
                             } else {
                                 setGlossary(glossaryResult)
                             }
-    
-    
-    
+
     
                             setSlot2ResultDisplay(textResult)
                             setSlot2Txt(textResult)
@@ -511,7 +512,7 @@ export default function MainInputForm() {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
-                                        }} placeholder="Enter text..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                        }} placeholder="Enter or paste your text..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                         </Textarea>
 

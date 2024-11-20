@@ -160,15 +160,15 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                 <Tooltip>
                     <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant={'outline'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow bg-primary hover:bg-primary hover:brightness-90'>
+                        <Button variant={'ghost'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow currencyBtn hover:brightness-90'>
                             {/* <TbHexagonLetterRFilled size={30} /> */}
-                            <TbCircleLetterRFilled color='#FFFFFF' size={30}></TbCircleLetterRFilled>
-                            <span className='text-lg text-primary-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'N/A'}</span>
+                            <TbCircleLetterRFilled size={30}></TbCircleLetterRFilled>
+                            <span className='text-lg text-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'N/A'}</span>
                         </Button>
                     </DropdownMenuTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Your request balance</p>
+                        <p>Currency tab</p>
                     </TooltipContent>
             </Tooltip>
             </TooltipProvider>

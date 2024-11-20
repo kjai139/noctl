@@ -221,16 +221,19 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
         return result.response.text()
         
     } catch (err:any) {
-        console.error(err.message)
+        console.error('[gemini api] error', err)
         let errMsg
         if (err.message) {
+            console.log('[Gemini API] Error message', err.message)
             errMsg = err.message.toLowerCase()
             if (errMsg.includes('safety')) {
                 throw new Error('No NSFW / dangerous / offensive content.')
             } else if (errMsg.includes('rate limit')) {
                 throw new Error('Encountered a rate limit error. Please try again later.')
-            } else if (err.Msg.includes('unauthorized') || errMsg.includes('invalid api key') || errMsg.includes('missing token')) {
+            } else if (errMsg.includes('unauthorized') || errMsg.includes('invalid api key') || errMsg.includes('missing token')) {
                 throw new Error('Encountered an authorization error. Please try again later.')
+            } else if (errMsg.includes('503')) {
+                throw new Error('Model is overloaded at the moment. Please try again later.')
             }
         } else {
             throw new Error('An unknown server error has occured. Please try again later.')
