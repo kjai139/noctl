@@ -21,15 +21,15 @@ interface workStateContextType {
     setGlossary: React.Dispatch<React.SetStateAction<GlossaryItem[]>>;
     user: UserState | null;
     setUser: React.Dispatch<React.SetStateAction<UserState | null>>;
-    //curResult > slot1resultdisplay
+    
     slot1ResultDisplay: string,
     setSlot1ResultDisplay: React.Dispatch<React.SetStateAction<string>>;
-
-    //curRaw > slot1Raw
     slot1Raw:string,
     setSlot1Raw: React.Dispatch<React.SetStateAction<string>>;
+    isSlot1RawOn: boolean,
+    setIsSlot1RawOn: React.Dispatch<React.SetStateAction<boolean>>;
 
-    //ogCurresult >  slo1Txt
+    
     slot1Txt: string,
     setSlot1Txt:React.Dispatch<React.SetStateAction<string>>;
 
@@ -55,10 +55,12 @@ interface workStateContextType {
     slot2Error:string,
     setSlot2Error: React.Dispatch<React.SetStateAction<string>>;
 
+    isSlot2RawOn: boolean,
+    setIsSlot2RawOn: React.Dispatch<React.SetStateAction<boolean>>;
+
     //other
 
-    unsure: UnsureItem[];
-    setUnsure: React.Dispatch<React.SetStateAction<UnsureItem[]>>;
+    
     isLoading: boolean,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     chunks: string[],
@@ -89,17 +91,18 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
     const [slot1Raw, setSlot1Raw] = useState('')
     const [slot1Txt, setSlot1Txt] = useState('')
     const [slot1Error, setSlot1Error] = useState('')
+    const [isSlot1RawOn, setIsSlot1RawOn] = useState(false)
 
     const [slot2ResultDisplay, setSlot2ResultDisplay] = useState('')
     const [slot2Raw, setSlot2Raw] = useState('')
     const [slot2Txt, setSlot2Txt] = useState('')
     const [slot2Error, setSlot2Error] = useState('')
+    const [isSlot2RawOn, setIsSlot2RawOn] = useState(false)
 
     const [slot1ModelName, setSlot1ModelName] = useState('')
     const [slot2ModelName, setSlot2ModelName] = useState('')
 
 
-    const [unsure, setUnsure] = useState<UnsureItem[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [chunks, setChunks] = useState<string[]>([])
     
@@ -110,7 +113,7 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
 
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, slot1ResultDisplay, setSlot1ResultDisplay, slot1Txt, setSlot1Txt, unsure, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot1Raw, setSlot1Raw, slot2Txt, setSlot2Txt, slot2Raw, setSlot2Raw, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError, setSlot1ModelName, slot1ModelName, setSlot2ModelName, slot2ModelName, setSlot1Error, slot1Error, setSlot2Error, slot2Error}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, slot1ResultDisplay, setSlot1ResultDisplay, slot1Txt, setSlot1Txt, isSlot1RawOn, setIsSlot1RawOn, isSlot2RawOn, setIsSlot2RawOn, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot1Raw, setSlot1Raw, slot2Txt, setSlot2Txt, slot2Raw, setSlot2Raw, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError, setSlot1ModelName, slot1ModelName, setSlot2ModelName, slot2ModelName, setSlot1Error, slot1Error, setSlot2Error, slot2Error}}>
             {children}
         </workStateContext.Provider>
     )

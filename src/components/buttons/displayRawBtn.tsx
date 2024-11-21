@@ -1,18 +1,19 @@
 'use client'
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
 import { TbListDetails } from "react-icons/tb";
 
 interface DisplayRawBtnProps {
     setCurDisplay: any,
     curRaw: string,
-    setCurRaw:any,
+    setIsRawOn: React.Dispatch<SetStateAction<boolean>>
     curOgTxt: string,
+    isRawOn:boolean,
 }
 
-export default function DisplayRawBtn ({setCurDisplay, curRaw, setCurRaw, curOgTxt}:DisplayRawBtnProps) {
+export default function DisplayRawBtn ({setCurDisplay, curRaw, setIsRawOn, isRawOn, curOgTxt}:DisplayRawBtnProps) {
 
-    const [isRawOn, setIsRawOn] = useState(false)
+    
 
     const toggleRaw = () => {
         console.log('[Toggle Raw] curRaw : ', curRaw)

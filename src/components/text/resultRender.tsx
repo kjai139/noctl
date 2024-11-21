@@ -8,7 +8,7 @@ import ErrorResult from "./errorResult"
 
 export default function ResultRender() {
 
-    const { slot1ResultDisplay, slot1Txt, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, standardResultError, better1Error, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
+    const { slot1ResultDisplay, slot1Txt, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -78,6 +78,8 @@ export default function ResultRender() {
                                                 slotTxt={slot1Txt}
                                                 slotRaw={slot1Raw}
                                                 slotResultDisplay={slot1ResultDisplay}
+                                                isRawOn={isSlot1RawOn}
+                                                setIsRawOn={setIsSlot1RawOn}
                                                 >
                                                 </ResultWrap> : null}
                                         {
@@ -96,6 +98,8 @@ export default function ResultRender() {
                                             slotTxt={slot2Txt}
                                             slotRaw={slot1Raw}
                                             slotResultDisplay={slot2ResultDisplay}
+                                            isRawOn={isSlot2RawOn}
+                                            setIsRawOn={setIsSlot2RawOn}
                                             >
                                             </ResultWrap> : null
                                         }

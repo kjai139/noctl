@@ -50,7 +50,7 @@ function TextAreaWatched({ control }: { control: Control<z.infer<typeof formSche
 
 export default function MainInputForm() {
     // curResult = Standard
-    const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, setUnsure, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
+    const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
     const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -215,13 +215,13 @@ export default function MainInputForm() {
             } else if (model === 'b1') {
                 
                 if (userCurrency && userCurrency < claudeCost) {
-                    setErrorMsg('You do not have enough currency to use this model. Please purchase more at the currency tab.')
-                    return
+                    throw new Error('You do not have enough currency to use this model. Please purchase more at the currency tab.')
+                    
                 }
                 setIsLoading(true)
                 
                 try {
-                    setSlot2ModelName('Better-1')
+                    setSlot1ModelName('Better-1')
                     const result: any = await translateTxt(params)
                     console.log('Api response:', result)
                     if (result && result[0]) {
@@ -248,8 +248,8 @@ export default function MainInputForm() {
                             }
 
     
-                            setSlot2ResultDisplay(textResult)
-                            setSlot2Txt(textResult)
+                            setSlot1ResultDisplay(textResult)
+                            setSlot1Txt(textResult)
                             setUserCurrency((prev) => {
                                 if (prev !== null && prev !== undefined) {
                                     return prev - claudeCost
@@ -275,19 +275,21 @@ export default function MainInputForm() {
                 setSlot2ModelName('Better-1')
 
                 if (userCurrency && userCurrency < claudeCost) {
-                    setErrorMsg(`You do not have enough currency. ${userCurrency} / ${claudeCost}`)
+                    throw new Error(`You do not have enough currency. ${userCurrency} / ${claudeCost}`)
+                    
                 }
-                
+                setIsLoading(true)
                 const [result1, result2]: [any, any] = await Promise.allSettled([
-                    translateTxt(params),
-                    translateGemini(params)
+                    translateGemini(params),
+                    translateTxt(params)
+                    
                 ])
                 //claude
-                if (result1.status === 'fulfilled') {
-                    const result1Response = result1.value[0]
-                    if (result1Response.type === 'tool_use') {
-                        const textResult = result1Response.input.text
-                        const glossaryResult = result1Response.input.glossary
+                if (result2.status === 'fulfilled') {
+                    const result2Response = result2.value[0]
+                    if (result2Response.type === 'tool_use') {
+                        const textResult = result2Response.input.text
+                        const glossaryResult = result2Response.input.glossary
 
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
                             console.log('Normalized Glossary used')
@@ -305,10 +307,6 @@ export default function MainInputForm() {
                             setGlossary(glossaryResult)
                         }
 
-
-
-
-
                         setSlot2ResultDisplay(textResult)
 
                         setSlot2Txt(textResult)
@@ -321,20 +319,43 @@ export default function MainInputForm() {
 
                     }
                 } else {
-                    console.log('Result1', result1)
-                    setSlot2Error(result1.reason.message)
+                    console.log('[Sb1] slot2 not fulfilled', result2)
+                    setSlot2Error(result2.reason.message)
 
                 }
                 // gemini
-                if (result2.status === 'fulfilled') {
-                    console.log('result2', result2)
-                    const jsonResult2 = JSON.parse(result2.value)
-                    console.log(jsonResult2)
-                    setSlot1ResultDisplay(jsonResult2[0].translation)
-                    setSlot1Txt(jsonResult2[0].translation)
+                if (result1.status === 'fulfilled') {
+                    console.log('[Sb1] Slot 1', result1)
+                    const jsonResult1 = JSON.parse(result1.value)
+                    console.log(jsonResult1)
+                    //use glossary if b1 hits error
+                    if (result2.status !== 'fulfilled') {
+                        console.log('[sb1] using standard glossary')
+                        if (jsonResult1[0].glossary?.terms) {
+                            const glossaryResult = jsonResult1[0].glossary.terms
+    
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('Normalized Glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
+                            }
+                        }
+                    }
+                    setSlot1ResultDisplay(jsonResult1[0].translation)
+                    setSlot1Txt(jsonResult1[0].translation)
                 } else {
-                    console.log('Result2', result2)
-                    setSlot1Error(result2.reason.message)
+                    console.log('[Sb1] slot1 not fulfilled', result1)
+                    setSlot1Error(result1.reason.message)
 
                 }
                 
@@ -346,7 +367,7 @@ export default function MainInputForm() {
                 try {
                     if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
                         console.log(openAiCost > userCurrency)
-                        throw new Error(`You do not have enough currency to use this model. (${userCurrency} / ${openAiCost}). Please purchase more at the currency tab.`)
+                        throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}).`)
                     }
                     
                     setIsLoading(true)
@@ -401,17 +422,203 @@ export default function MainInputForm() {
                     }
                 }
 
+            } else if (model === 'sb2') {
+                setSlot1ModelName('Standard')
+                setSlot2ModelName('Better-2')
+
+                if (userCurrency && userCurrency < openAiCost) {
+                    throw new Error(`You do not have enough currency. ${userCurrency} / ${openAiCost}`)
+                }
+                setIsLoading(true)
+                const [result1, result2]: [any, any] = await Promise.allSettled([
+                    translateGemini(params),
+                    translateGpt(params)
+                    
+                ])
+                //openai
+                if (result2.status === 'fulfilled') {
+                    const result2Response = result2.value
+                    const textResult = result2Response.text
+                    const glossaryResult = result2Response.glossary
+                
+
+                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        console.log('Normalized Glossary used')
+                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                        glossaryResult.forEach((newentry: GlossaryItem) => {
+                            if (!termSet.has(newentry.term.toLowerCase())) {
+                                termSet.add(newentry.term)
+                                normalizedGlossary.unshift(newentry)
+                            } else {
+                                console.log(`Entry ${newentry.term} already exists.`)
+                            }
+                        })
+                        setGlossary(normalizedGlossary)
+                    } else {
+                        setGlossary(glossaryResult)
+                    }
+
+                    setSlot2ResultDisplay(textResult)
+
+                    setSlot2Txt(textResult)
+                    setUserCurrency((prev) => {
+                        if (prev !== null && prev !== undefined) {
+                            return prev - openAiCost
+                        }
+                        return prev
+                    })
+
+                
+                } else {
+                    console.log('[Sb1] slot2 not fulfilled', result2)
+                    setSlot2Error(result2.reason.message)
+
+                }
+                // gemini
+                if (result1.status === 'fulfilled') {
+                    console.log('[Sb1] Slot 1', result1)
+                    const jsonResult1 = JSON.parse(result1.value)
+                    console.log(jsonResult1)
+                    //use glossary if b1 hits error
+                    if (result2.status !== 'fulfilled') {
+                        console.log('[sb1] using standard glossary')
+                        if (jsonResult1[0].glossary?.terms) {
+                            const glossaryResult = jsonResult1[0].glossary.terms
+    
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('Normalized Glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
+                            }
+                        }
+                    }
+                    
+                    setSlot1ResultDisplay(jsonResult1[0].translation)
+                    setSlot1Txt(jsonResult1[0].translation)
+                } else {
+                    console.log('[Sb1] slot1 not fulfilled', result1)
+                    setSlot1Error(result1.reason.message)
+
+                }
+            } else if (model === 'b12') {
+                
+                const totalCost = openAiCost + claudeCost
+                if (userCurrency && userCurrency < totalCost) {
+                    setErrorMsg(`You do not have enough currency. ${userCurrency} / ${totalCost}`)
+                }
+                setIsLoading(true)
+                setSlot1ModelName('Better-1')
+                setSlot2ModelName('Better-2')
+                const [result1, result2]: [any, any] = await Promise.allSettled([
+                    translateTxt(params),
+                    translateGpt(params)
+                    
+                ])
+
+                //openai
+                if (result2.status === 'fulfilled') {
+                    const result2Response = result2.value[0]
+                    const textResult = result2Response.text
+                    const glossaryResult = result2Response.glossary
+                
+
+                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                        console.log('Normalized Glossary used')
+                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                        glossaryResult.forEach((newentry: GlossaryItem) => {
+                            if (!termSet.has(newentry.term.toLowerCase())) {
+                                termSet.add(newentry.term)
+                                normalizedGlossary.unshift(newentry)
+                            } else {
+                                console.log(`Entry ${newentry.term} already exists.`)
+                            }
+                        })
+                        setGlossary(normalizedGlossary)
+                    } else {
+                        setGlossary(glossaryResult)
+                    }
+
+                    setSlot2ResultDisplay(textResult)
+
+                    setSlot2Txt(textResult)
+                    setUserCurrency((prev) => {
+                        if (prev !== null && prev !== undefined) {
+                            return prev - openAiCost
+                        }
+                        return prev
+                    })
+
+                
+                } else {
+                    console.log('[Sb12] slot2 not fulfilled', result2)
+                    setSlot2Error(result2.reason.message)
+
+                }
+                //claude
+                if (result1.status === 'fulfilled') {
+                    const result1Response = result2.value[0]
+                    if (result1Response.type === 'tool_use') {
+                        const textResult = result1Response.input.text
+                        const glossaryResult = result1Response.input.glossary
+
+                        /* if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry: GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())) {
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        } */
+
+                        setSlot1ResultDisplay(textResult)
+
+                        setSlot1Txt(textResult)
+                        setUserCurrency((prev) => {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - claudeCost
+                            }
+                            return prev
+                        })
+
+                    }
+                } else {
+                    console.log('[Sb12] slot1 not fulfilled', result1)
+                    setSlot2Error(result1.reason.message)
+
+                }
+
+
             }
 
             setIsLoading(false)
         } catch (err: any) {
             console.error(err, typeof err)
-            if (err.message) {
-                setErrorMsg(err.message)
+            if (!navigator.onLine) {
+                setErrorMsg("You're offline. Please check your connection.")
             } else {
-                setErrorMsg('Encountered an unknown server error. If problem persists, try again later')
+                if (err.message) {
+                    setErrorMsg(err.message)
+                } else {
+                    setErrorMsg('Encountered an unknown server error. If problem persists, try again later.')
+                }
             }
-
             setIsLoading(false)
 
 

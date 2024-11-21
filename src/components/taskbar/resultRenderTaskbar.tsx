@@ -7,14 +7,16 @@ interface ResultRenderTaskbarProps {
     curRaw: string,
     curOgTxt: string,
     setCurRaw: React.Dispatch<SetStateAction<string>>,
-    text: string
+    text: string,
+    isRawOn: boolean,
+    setIsRawOn: React.Dispatch<SetStateAction<boolean>>
 }
 
-export default function ResultRenderTaskbar ({setCurDisplay, curRaw, curOgTxt, setCurRaw, text}:ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar ({setCurDisplay, curRaw, curOgTxt, setCurRaw, setIsRawOn, isRawOn, text}:ResultRenderTaskbarProps) {
 
     return (
         <div className="flex gap-2">
-        <DisplayRawBtn setCurDisplay={setCurDisplay} curRaw={curRaw} curOgTxt={curOgTxt} setCurRaw={setCurRaw}></DisplayRawBtn>
+        <DisplayRawBtn setCurDisplay={setCurDisplay} curRaw={curRaw} curOgTxt={curOgTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn}></DisplayRawBtn>
         <CopyTextBtn text={text}></CopyTextBtn>
         </div>
     )
