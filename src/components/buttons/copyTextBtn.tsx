@@ -3,20 +3,30 @@ import { ImCopy } from "react-icons/im";
 import { Button } from "../ui/button"
 import { useState } from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
+import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 
 interface CopyTextBtnProps {
-    text: string
+    text: string,
+    isRawOn:boolean,
 }
 
-export default function CopyTextBtn ({text}: CopyTextBtnProps) {
+export default function CopyTextBtn ({text, isRawOn}: CopyTextBtnProps) {
 
     const [isCopied, setIsCopied] = useState(false)
+    const { clipboardTxt } = useClipboardContext()
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(text)
-            setIsCopied(true)
-            setTimeout(() => setIsCopied(false), 2000)
+            if (isRawOn) {
+                await navigator.clipboard.writeText(clipboardTxt)
+                setIsCopied(true)
+                setTimeout(() => setIsCopied(false), 2000)
+            } else {
+                await navigator.clipboard.writeText(text)
+                setIsCopied(true)
+                setTimeout(() => setIsCopied(false), 2000)
+            }
+            
 
         } catch (err) {
             console.error('Failed to copy text: ', err)

@@ -16,10 +16,10 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setIsRawOn, isRaw
     
 
     const toggleRaw = () => {
-        console.log('[Toggle Raw] curRaw : ', curRaw)
-        console.log('[Toggle Raw] curOgTxt: ', curOgTxt)
+        /* console.log('[Toggle Raw] curRaw : ', curRaw)
+        console.log('[Toggle Raw] curOgTxt: ', curOgTxt) */
         if (!isRawOn) {
-            const normalizedRaw = curRaw.replace(/\n+/g, '\n').trim()
+            /* const normalizedRaw = curRaw.replace(/\n+/g, '\n').trim()
             const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
             const normalizedTxt = curOgTxt.replace(/\n+/g, '\n').trim()
             const resultLines = normalizedTxt.split('\n')
@@ -40,10 +40,10 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setIsRawOn, isRaw
             console.log('RAW TEXT NORMALIZED', normalizedTxt)
 
             const result = mergedLines.join('\n')
-            setCurDisplay(result)
+            setCurDisplay(result) */
             setIsRawOn(true)
         } else if (isRawOn) {
-            setCurDisplay(curOgTxt)
+            /* setCurDisplay(curOgTxt) */
             setIsRawOn(false)
         }
         

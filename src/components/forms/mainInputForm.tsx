@@ -719,7 +719,7 @@ export default function MainInputForm() {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
-                                        }} placeholder="Enter or paste your text..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                        }} placeholder="Enter or paste your text here..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                         </Textarea>
 

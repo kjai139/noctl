@@ -17,7 +17,7 @@ export default function ResultRenderTaskbar ({setCurDisplay, curRaw, curOgTxt, s
     return (
         <div className="flex gap-2">
         <DisplayRawBtn setCurDisplay={setCurDisplay} curRaw={curRaw} curOgTxt={curOgTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn}></DisplayRawBtn>
-        <CopyTextBtn text={text}></CopyTextBtn>
+        <CopyTextBtn isRawOn={isRawOn} text={text}></CopyTextBtn>
         </div>
     )
 }
