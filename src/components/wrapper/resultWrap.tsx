@@ -1,4 +1,4 @@
-
+'use client'
 import { SetStateAction } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import { useClipboardContext } from "@/app/_contexts/clipboardContext"
@@ -45,7 +45,7 @@ export default function ResultWrap({ slotModelName, setSlotResultDisplay, setSlo
             return mergedLines.map((line, idx) => {
                 return (
                     <div key={`line${idx}`}>
-                        <p className={`${idx % 2 === 0? 'text-muted-foreground' : ''}`}>
+                        <p className={`${idx % 2 === 0? 'text-muted-foreground' : 'mb-8'}`}>
                             {line}
                         </p>
                     </div>

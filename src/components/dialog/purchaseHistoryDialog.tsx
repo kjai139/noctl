@@ -100,9 +100,10 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                 {   !errorMsg && !isLoading ?
                 <div className="h-auto md:h-[330px]">
                     <Table>
+                        {transArr && transArr.length > 0 ?
                         <TableCaption className="my-4">
                             Any successful payments that are showing up as "pending" or "incomplete" should resolve itself within the next few hours, but feel free to contact support with that payment ID for assistance.
-                        </TableCaption>
+                        </TableCaption> : null}
                         <TableHeader className="hidden md:table-header-group">
                             <TableRow>
                                 <TableHead>Item</TableHead>
@@ -156,16 +157,18 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                     )
                                 })
                             }
-                            {
+                            
+
+                        </TableBody>
+                        
+                    </Table>
+                    {
                                 transArr && transArr.length === 0 &&
                                 <div className="pt-4 text-muted-foreground">
                                     You have not made any purchases.
 
                                 </div>
-                            }
-
-                        </TableBody>
-                    </Table>
+                        }
                     </div>
                     : null
                 }

@@ -9,7 +9,7 @@ export default function StarsIcons ({rating}:{rating: number}) {
     const stars = []
     const color = '#facc15'
 
-    for (let i = 0; rating >= i; i++) {
+    for (let i = 0; 5 > i; i++) {
         if (rating - i > 0 && rating - i !== .5) {
             stars.push(
                 <IoIosStar key={`star${i}`} color={color}></IoIosStar>
@@ -29,6 +29,10 @@ export default function StarsIcons ({rating}:{rating: number}) {
         } else if (rating - 1 < 0) {
             stars.push(
                 <IoIosStarOutline key={`star${i}`}></IoIosStarOutline>
+            )
+        } else {
+            stars.push(
+                <IoIosStarOutline key={`star${i}`} color={color}></IoIosStarOutline>
             )
         }
     }

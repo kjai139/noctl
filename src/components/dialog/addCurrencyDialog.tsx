@@ -135,8 +135,11 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
                     <DialogTitle>
                         Add Currency
                     </DialogTitle>
-                    <DialogDescription>
-                    Buy currency to use the paid models
+                    <DialogDescription className="flex flex-col">
+                        <span>
+                            All purchases are final and not refundable
+                        </span>
+                    
                     </DialogDescription>
                 </DialogHeader>
                 <Separator></Separator>

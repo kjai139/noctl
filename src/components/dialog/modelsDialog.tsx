@@ -19,10 +19,16 @@ const models = [
         pricing: "100 requests @ $5 USD"
     },
     {
-        name:"Duo",
+        name:"Better-2",
         accuracy: 4.5,
-        info: "Uses both the 'Standard' model and 'Better-1' for side by side comparisons.",
-        pricing:'100 requests @ $5 USD'
+        info: "About the same as Better-1. Sometimes better sometimes worse.",
+        pricing: "100 requests @ $5 USD"
+    },
+    {
+        name:"Duo modes",
+        accuracy: 4.5,
+        info: "Uses 2 models at the same time for comparison.",
+        pricing:'Uses the total cost of the two models.'
     },
 
 ]

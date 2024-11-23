@@ -4,9 +4,8 @@ import { Textarea } from "../ui/textarea";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
-import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "../ui/select";
 import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateTxt, translateTxtNoTool } from "@/app/action";
+import { translateGemini, translateGpt, translateTxt} from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -524,16 +523,18 @@ export default function MainInputForm() {
                     translateGpt(params)
                     
                 ])
+                console.log('[b12] result1', result1)
+                console.log('[b12] result2', result2)
 
                 //openai
                 if (result2.status === 'fulfilled') {
-                    const result2Response = result2.value[0]
+                    const result2Response = result2.value
                     const textResult = result2Response.text
                     const glossaryResult = result2Response.glossary
                 
 
                     if (normalizedGlossary && normalizedGlossary.length > 0) {
-                        console.log('Normalized Glossary used')
+                        console.log('[b12] Glossary used in request')
                         const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                         glossaryResult.forEach((newentry: GlossaryItem) => {
                             if (!termSet.has(newentry.term.toLowerCase())) {
@@ -545,6 +546,7 @@ export default function MainInputForm() {
                         })
                         setGlossary(normalizedGlossary)
                     } else {
+                        console.log('[b12] Set glossary from 1')
                         setGlossary(glossaryResult)
                     }
 
@@ -557,6 +559,7 @@ export default function MainInputForm() {
                         }
                         return prev
                     })
+                    console.log('[b12] 2:', userCurrency, '-', openAiCost)
 
                 
                 } else {
@@ -566,26 +569,30 @@ export default function MainInputForm() {
                 }
                 //claude
                 if (result1.status === 'fulfilled') {
-                    const result1Response = result2.value[0]
+                    const result1Response = result1.value[0]
                     if (result1Response.type === 'tool_use') {
                         const textResult = result1Response.input.text
                         const glossaryResult = result1Response.input.glossary
+                        if (result2.status !== 'fulfilled') {
+                            console.log('[b12] using 2 glossary')
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('Normalized Glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
+                            }
+                        }
 
-                        /* if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            console.log('Normalized Glossary used')
-                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                            glossaryResult.forEach((newentry: GlossaryItem) => {
-                                if (!termSet.has(newentry.term.toLowerCase())) {
-                                    termSet.add(newentry.term)
-                                    normalizedGlossary.unshift(newentry)
-                                } else {
-                                    console.log(`Entry ${newentry.term} already exists.`)
-                                }
-                            })
-                            setGlossary(normalizedGlossary)
-                        } else {
-                            setGlossary(glossaryResult)
-                        } */
+                        
 
                         setSlot1ResultDisplay(textResult)
 
@@ -596,7 +603,7 @@ export default function MainInputForm() {
                             }
                             return prev
                         })
-
+                        console.log('[b12] 1:', userCurrency, '-', claudeCost)
                     }
                 } else {
                     console.log('[Sb12] slot1 not fulfilled', result1)
@@ -609,7 +616,7 @@ export default function MainInputForm() {
 
             setIsLoading(false)
         } catch (err: any) {
-            console.error(err, typeof err)
+            console.error(err)
             if (!navigator.onLine) {
                 setErrorMsg("You're offline. Please check your connection.")
             } else {
@@ -719,7 +726,7 @@ export default function MainInputForm() {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
-                                        }} placeholder="Enter or paste your text here..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[700px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                        }} placeholder="Enter or paste your text here..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[680px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                         </Textarea>
 

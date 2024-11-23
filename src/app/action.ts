@@ -15,6 +15,7 @@ import { revalidateTag } from "next/cache"
 import { z } from "zod"
 import {openAi} from '../lib/openAi'
 import { zodResponseFormat } from 'openai/helpers/zod'
+import OpenAI, { OpenAIError } from "openai"
 
 
 const client = new Anthropic({
@@ -227,15 +228,19 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
             console.log('[Gemini API] Error message', err.message)
             errMsg = err.message.toLowerCase()
             if (errMsg.includes('safety')) {
-                throw new Error('No NSFW / dangerous / offensive content.')
+                throw new Error('No NSFW / Dangerous / Offensive content.')
             } else if (errMsg.includes('rate limit')) {
                 throw new Error('Encountered a rate limit error. Please try again later.')
             } else if (errMsg.includes('unauthorized') || errMsg.includes('invalid api key') || errMsg.includes('missing token')) {
                 throw new Error('Encountered an authorization error. Please try again later.')
             } else if (errMsg.includes('503')) {
                 throw new Error('Model is overloaded at the moment. Please try again later.')
+            } else {
+                console.error('[Gemini API unhandled Error]', err)
+                throw new Error('Oops, something went wrong. Please try again later.')
             }
         } else {
+            console.error('[TranslateGemini] Unhandled error type')
             throw new Error('An unknown server error has occured. Please try again later.')
         }
         
@@ -245,7 +250,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
 }
 
 
-export async function translateTxtNoTool ({text, language, glossary}:translateTxtProps) {
+/* export async function translateTxtNoTool ({text, language, glossary}:translateTxtProps) {
     try {
         let jsonGlossary
         let filteredGlossary:GlossaryItem[]
@@ -296,7 +301,7 @@ export async function translateTxtNoTool ({text, language, glossary}:translateTx
     } catch (err) {
         console.error(err)
     }
-}
+} */
 
 
 export async function translateGpt ({text, language, glossary}:translateTxtProps) {
@@ -376,11 +381,32 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
             return translation_response.parsed
         } else if (translation_response.refusal) {
             console.log('[OpenAi] refusal', translation_response.refusal)
+            throw new Error(translation_response.refusal)
         }
     
     } catch (err) {
-        console.error('[OpenAi] Error, ', err)
-        throw err
+        console.error('[translateGpt] Encountered an error, ', err)
+        if (err instanceof OpenAI.APIError) {
+            if (err.status == 400) {
+                throw new Error('Bad request')
+            } else if (err.status === 401) {
+                throw new Error('Invalid Auth')
+            } else if (err.status == 403) {
+                throw new Error('Unsupported country, region, or territory.')
+            } else if (err.status == 429) {
+                throw new Error('Exceeded current quota. Please contact support.')
+            } else if (err.status == 500) {
+                throw new Error('Server is having issues at the moment. Please try again later.')
+            } else if (err.status == 503) {
+                throw new Error('Servers are experiencing high traffic. Please try after a brief wait.')
+            }
+        } else if (err instanceof Error) {
+            throw err
+        } else {
+            console.error('[translateGPT] Unhandled error type')
+            throw new Error('Something went wrong. Please try again later.')
+        }
+        
     }
 }
 
@@ -401,9 +427,6 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         if (existingUser.currencyAmt < claudeCost) {
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
         } 
-    
-        
-
 
         /* const normalizedtext = text.toLowerCase()
         .replace(/[(){}\[\]<>]/g, ' ')  
@@ -510,7 +533,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         console.log(`[TranslateTxt] user currency updated`)
         return message.content
     } catch (err) {
-        console.error(err)
+        console.error('[translateTxt] Error', err)
         if (err instanceof Anthropic.APIError) {
             switch (err.status) {
                 case 400:
@@ -528,8 +551,12 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                 default:
                     throw new Error('An unknown server error has occured.')
             }
-        } else {
+        } else if (err instanceof Error) {
+            
             throw err
+        } else {
+            console.log('[translateTxt] Hit an unhandled error type')
+            throw new Error('Something went wrong. Please try again later.')
         }
         
     }
