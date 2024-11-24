@@ -7,7 +7,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { SetStateAction, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 
 interface AddGlossaryEntryBtnProps {
     glossary: GlossaryItem[],
@@ -39,36 +38,31 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
 
 
     const addTerm = () => {
-        console.log('Term ADD - ', termInput, defInput, termType)
-        if (!termInput || !defInput || !termType) {
+        console.log('Term ADD - ', termInput, defInput)
+        if (!termInput || !defInput) {
             if (termInput === '' || !termInput) {
                 setTermError('Term name cannot be blank')   
             }
             if (!defInput) {
                 setDefError('Translated term cannot be blank') 
             }
-            if (!termType) {
+            /* if (!termType) {
                 setTermTypeError('Choose a valid type')
-            }
-        } else if (termInput && defInput && termType) {
+            } */
+        } else if (termInput && defInput) {
             const doesTermExist = glossary.some(obj => obj.term === termInput)
             if (doesTermExist) {
                 setTermError('Term already exists.')
             } else {
-                if (termType === 'name' || termType === 'term') {
-                
                     const newTerm:GlossaryItem = {
-                        term: termInput,
-                        translated_term: defInput,
-                        term_type: termType
-                    } 
-    
-                    console.log(newTerm)
-                    setGlossary((prev) => [...prev, newTerm])
-                    setIsOpen(false)
-                } else {
-                    setTermTypeError('Choose a valid type')
-                }
+                    term: termInput,
+                    translated_term: defInput,
+                } 
+
+                console.log(newTerm)
+                setGlossary((prev) => [...prev, newTerm])
+                setIsOpen(false)
+                
             }
         }   
         
@@ -133,7 +127,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                     </span>
                 </div>
                 <div>
-                    <Label className="mb-2">Term type</Label>
+                   {/*  <Label className="mb-2">Term type</Label>
                     <Select value={termType} onValueChange={handleTermChange}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a type">
@@ -151,7 +145,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>
-                    </Select>
+                    </Select> */}
                     <span className="p-2">
                         {
                             termTypeError ?

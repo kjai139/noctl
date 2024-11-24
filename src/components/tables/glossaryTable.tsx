@@ -138,7 +138,8 @@ export default function GlossaryTable () {
 
     useEffect(() => {
       console.log('gloss lang set to :', lang)
-    },[lang])
+      console.log('Glossary set:', glossary)
+    },[lang, glossary])
 
     return (
       <div className="flex flex-col gap-4 lg:max-w-[560px] max-w-none flex-1">

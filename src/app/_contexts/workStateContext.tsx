@@ -3,12 +3,6 @@
 import React, { createContext, SetStateAction, useContext, useState } from "react"
 import { GlossaryItem } from "../_types/glossaryType"
 
-interface UnsureItem {
-    line: string,
-    translation: string,
-    certainty: string
-    
-}
 
 interface UserState {
     id:string,

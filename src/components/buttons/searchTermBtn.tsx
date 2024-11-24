@@ -119,7 +119,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         <Tooltip>
             <TooltipTrigger asChild>
                 
-                        <Button size={'sm'} variant={'ghost'} onClick={() => termLookup()}>
+                        <Button size={'sm'} variant={'ghostgloss'} onClick={() => termLookup()}>
                         <TbReportSearch size={20}></TbReportSearch>
                         </Button>
                 

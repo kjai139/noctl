@@ -20,7 +20,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         pmt: "hover:opacity-90 bg-[#5bb543] text-primary-foreground shadow",
-        glossary: "cTwoBtn text-primary-foreground shadow"
+        glossary: "cTwoBtn text-primary-foreground shadow",
+        ghostgloss: "hover:bg-gray-300",
       },
       size: {
         default: "h-9 px-4 py-2",

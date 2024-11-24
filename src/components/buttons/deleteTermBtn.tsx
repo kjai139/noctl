@@ -13,7 +13,7 @@ export default function DeleteTermBtn ({onClick}:DeleteTermBtnProps) {
         <Tooltip>
             <TooltipTrigger asChild>
                 
-            <Button variant={'ghost'} onClick={onClick}>
+            <Button variant={'ghostgloss'} onClick={onClick}>
             <TiDeleteOutline size={20}></TiDeleteOutline>
 
             </Button>

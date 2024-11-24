@@ -173,10 +173,10 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
                                                         type:SchemaType.STRING,
                                                         description:"The translated version of the terms you used."
                                                     },
-                                                    term_type : {
+                                                    /* term_type : {
                                                         type:SchemaType.STRING,
                                                         description:"term | name | skill"
-                                                    }
+                                                    } */
                                                     /* confidence_level: {
                                                         type:SchemaType.STRING,
                                                         description:"The confidence level of the translation's accuracy on a scale of 1-10"
@@ -501,10 +501,10 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                                             type:"string",
                                             description:"the term or name in the translated language"
                                         },
-                                        "term_type": {
+                                        /* "term_type": {
                                             type:"string",
                                             description:"term | name | skill"
-                                        }
+                                        } */
                                     },
                                     required:["term", "translated_term"]
                                 },
