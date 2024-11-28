@@ -1,7 +1,7 @@
 'use server'
 
 import Anthropic from "@anthropic-ai/sdk"
-import { GlossaryItem, GlossaryType } from "./_types/glossaryType"
+import { GlossaryItem, GlossaryType, ModelsType } from "./_types/glossaryType"
 import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
 import { auth } from "../../auth"
 import userModel from "./_models/userModel"
@@ -93,6 +93,31 @@ export async function DeletePaymentIntentDB (pId:string) {
         console.error(err)
         return false
     }
+}
+
+export async function translateText({model, prompt, userId}:{
+    model:ModelsType,
+    prompt: string,
+    userId:string
+    
+}) {
+    const ttl = 3600
+    const job = {
+        id: `jb-${Date.now()}`,
+        userId: userId,
+        prompt: prompt,
+        status: 'pending',
+    }
+    try {
+        await redis.set(job.id, JSON.stringify(job), {ex:ttl})
+        console.log(`[translateText] Job ${job.id} saved.`)
+        return job.id
+
+    } catch(err) {
+        console.error('[translateText] Error', err)
+        throw new Error('translateText Error. Check logs.')
+    }
+
 }
 
 
