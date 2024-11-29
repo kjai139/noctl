@@ -13,19 +13,19 @@ import transactionModel from "./_models/transactionModel"
 import { CheckoutProduct } from "@/components/stripe/checkoutForm"
 import { revalidateTag } from "next/cache"
 import { z } from "zod"
-import {openAi} from '../lib/openAi'
+import { openAi } from '../lib/openAi'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import OpenAI, { OpenAIError } from "openai"
 
 
 const client = new Anthropic({
-    apiKey:process.env.CLAUDE_API as string
+    apiKey: process.env.CLAUDE_API as string
 })
 
 interface translateTxtProps {
-    text:string,
-    language:string,
-    glossary?:string
+    text: string,
+    language: string,
+    glossary?: string
 }
 
 const geminiRatelimit = new Ratelimit({
@@ -33,7 +33,7 @@ const geminiRatelimit = new Ratelimit({
     limiter: Ratelimit.slidingWindow(1, '10m')
 })
 
-export async function createTransactionEntry (product:CheckoutProduct) {
+export async function createTransactionEntry(product: CheckoutProduct) {
     try {
         await connectToMongoose()
         const session = await auth()
@@ -47,7 +47,7 @@ export async function createTransactionEntry (product:CheckoutProduct) {
 
         if (existingTransaction) {
             console.log('[createTransEntry]  Pending Payment Id found')
-            
+
             return existingTransaction._id.toString()
         }
         const expirationTime = 7 * 24 * 60 * 60 * 1000
@@ -57,7 +57,7 @@ export async function createTransactionEntry (product:CheckoutProduct) {
             paymentId: product.pId,
             userId: session.user.id,
             amount: product.amount,
-            transactionType:'purchase',
+            transactionType: 'purchase',
             productName: product.productName,
             productDesc: product.productDesc,
             expiresAt: new Date(Date.now() + expirationTime)
@@ -75,11 +75,11 @@ export async function createTransactionEntry (product:CheckoutProduct) {
     }
 }
 
-export async function DeletePaymentIntentDB (pId:string) {
+export async function DeletePaymentIntentDB(pId: string) {
     try {
         await connectToMongoose()
         const result = await transactionModel.deleteOne({
-            pId:pId
+            pId: pId
         })
         if (result.deletedCount > 0) {
             console.log('[DeletePiDB] Pending PI deleted.')
@@ -95,11 +95,11 @@ export async function DeletePaymentIntentDB (pId:string) {
     }
 }
 
-export async function translateText({model, prompt, userId}:{
-    model:ModelsType,
+export async function translateText({ model, prompt, userId }: {
+    model: ModelsType,
     prompt: string,
-    userId:string
-    
+    userId: string
+
 }) {
     const ttl = 3600
     const job = {
@@ -109,11 +109,11 @@ export async function translateText({model, prompt, userId}:{
         status: 'pending',
     }
     try {
-        await redis.set(job.id, JSON.stringify(job), {ex:ttl})
+        await redis.set(job.id, JSON.stringify(job), { ex: ttl })
         console.log(`[translateText] Job ${job.id} saved.`)
         return job.id
 
-    } catch(err) {
+    } catch (err) {
         console.error('[translateText] Error', err)
         throw new Error('translateText Error. Check logs.')
     }
@@ -121,7 +121,7 @@ export async function translateText({model, prompt, userId}:{
 }
 
 
-export async function translateGemini({text, language, glossary}:translateTxtProps) {
+export async function translateGemini({ text, language, glossary }: translateTxtProps) {
     try {
         const session = await auth()
         if (!session || !session.user) {
@@ -142,135 +142,31 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
             throw new Error(`You've hit the usage limit per hour. Please try again in ${mins}m ${seconds}s`)
         } */
 
-        
+
     } catch (err) {
         console.error(err)
         throw err
     }
 
 
-    try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            safetySettings: [
-                {
-                    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                    threshold:HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                {
-                    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                {
-                    category:HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
-                },
-                
-            ],
-            generationConfig: {
-                temperature: 0,
-                responseMimeType: 'application/json',
-                responseSchema: {
-                    type: SchemaType.ARRAY,
-                    items: {
-                        type:SchemaType.OBJECT,
-                        properties: {
-                            translation: {
-                                type: SchemaType.STRING,
-                                description:'The translation of the text which the user prompted for.'
-                            },
-                            glossary: {
-                                type:SchemaType.OBJECT,
-                                description:'A glossary of term names, skill names, and people names extracted from the text',
-                                properties: {
-                                        terms: {
-                                            type:SchemaType.ARRAY,
-                                            description: "A list of terms, skills, and names, along with their translation",
-                                            items: {
-                                                type:SchemaType.OBJECT,
-                                                properties: {
-                                                    term:{
-                                                        type:SchemaType.STRING,
-                                                        description: "term name or people name or skill name in the original text's language"
-                                                    },
-                                                    translated_term:{
-                                                        type:SchemaType.STRING,
-                                                        description:"The translated version of the terms you used."
-                                                    },
-                                                    /* term_type : {
-                                                        type:SchemaType.STRING,
-                                                        description:"term | name | skill"
-                                                    } */
-                                                    /* confidence_level: {
-                                                        type:SchemaType.STRING,
-                                                        description:"The confidence level of the translation's accuracy on a scale of 1-10"
-                                                    } */
-                                                }
-                                            }
-                                        },
-                                        
-                                        
-                                        
+    let prompt
 
-                                    }
-                                
-                            }
-                           
-                        }
-                    }
-                }
-            },
-            
-        })
-
-        let prompt
-
-        if (glossary) {
-            const filteredGlossary:GlossaryItem[] = JSON.parse(glossary)
-            const formattedGlossary = `
-            Glossary -
-            ${filteredGlossary.map(term => `
-                Term: ${term.term},
-                Translation: ${term.translated_term}
-                `).join('')}
-            `
-            prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
-        } else {
-            console.log('[Gemini] Prompt 2 used')
-             prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
-        }
-
-        const result = await model.generateContent(prompt)
-        console.log('[Gemini] result:', result)
-        console.log('[Gemini] Result', result.response.text())
-        return result.response.text()
-        
-    } catch (err:any) {
-        console.error('[gemini api] error', err)
-        let errMsg
-        if (err.message) {
-            console.log('[Gemini API] Error message', err.message)
-            errMsg = err.message.toLowerCase()
-            if (errMsg.includes('safety')) {
-                throw new Error('No NSFW / Dangerous / Offensive content.')
-            } else if (errMsg.includes('rate limit')) {
-                throw new Error('Encountered a rate limit error. Please try again later.')
-            } else if (errMsg.includes('unauthorized') || errMsg.includes('invalid api key') || errMsg.includes('missing token')) {
-                throw new Error('Encountered an authorization error. Please try again later.')
-            } else if (errMsg.includes('503')) {
-                throw new Error('Model is overloaded at the moment. Please try again later.')
-            } else {
-                console.error('[Gemini API unhandled Error]', err)
-                throw new Error('Oops, something went wrong. Please try again later.')
-            }
-        } else {
-            console.error('[TranslateGemini] Unhandled error type')
-            throw new Error('An unknown server error has occured. Please try again later.')
-        }
-        
-        
+    if (glossary) {
+        const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
+        const formattedGlossary = `
+                    Glossary -
+                    ${filteredGlossary.map(term => `
+                        Term: ${term.term},
+                        Translation: ${term.translated_term}
+                        `).join('')}
+                    `
+        prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
+    } else {
+        console.log('[Gemini] Prompt 2 used')
+        prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
     }
+
+    //TODO  SAVE TO REDIS HERE AND THEN RETURN JOB ID FOR POLL
 
 }
 
@@ -329,7 +225,7 @@ export async function translateGemini({text, language, glossary}:translateTxtPro
 } */
 
 
-export async function translateGpt ({text, language, glossary}:translateTxtProps) {
+export async function translateGpt({ text, language, glossary }: translateTxtProps) {
     try {
         const session = await auth()
         if (!session || !session.user.id) {
@@ -340,21 +236,21 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
 
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
-        } 
+        }
         if (existingUser.currencyAmt < openAiCost) {
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
-        } 
+        }
 
 
         let jsonGlossary
-        let filteredGlossary:GlossaryItem[]
-        let formattedGlossary 
+        let filteredGlossary: GlossaryItem[]
+        let formattedGlossary
         let prompt
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
-            console.log('[OpenAi] Unedited glossary - ',jsonGlossary )
+            console.log('[OpenAi] Unedited glossary - ', jsonGlossary)
             filteredGlossary = jsonGlossary
-        
+
             //set with words.has doesnt check partial
             console.log('filteredlist', filteredGlossary)
             formattedGlossary = `
@@ -372,7 +268,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
                 prompt = `Please translate this text to ${language} and extract a list of special terms, skills, people names from the text - \n ${text}`
                 console.log('[OpenAi] prompt 2 used')
             }
-            
+
         } else {
             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
             console.log('[OpenAi] prompt 2 used')
@@ -388,7 +284,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
         })
 
         const completion = await openAi.beta.chat.completions.parse({
-            model:'gpt-4o-mini-2024-07-18',
+            model: 'gpt-4o-mini-2024-07-18',
             messages: [
                 {
                     role: "system",
@@ -396,7 +292,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
                 }
             ],
             response_format: zodResponseFormat(translatedTxtResponse, "translation_response"),
-            max_tokens:8192,
+            max_tokens: 8192,
         })
 
         const translation_response = completion.choices[0].message
@@ -408,7 +304,7 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
             console.log('[OpenAi] refusal', translation_response.refusal)
             throw new Error(translation_response.refusal)
         }
-    
+
     } catch (err) {
         console.error('[translateGpt] Encountered an error, ', err)
         if (err instanceof OpenAI.APIError) {
@@ -431,12 +327,12 @@ export async function translateGpt ({text, language, glossary}:translateTxtProps
             console.error('[translateGPT] Unhandled error type')
             throw new Error('Something went wrong. Please try again later.')
         }
-        
+
     }
 }
 
 
-export async function translateTxt ({text, language, glossary}:translateTxtProps) {
+export async function translateTxt({ text, language, glossary }: translateTxtProps) {
     try {
 
         const session = await auth()
@@ -448,10 +344,10 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
 
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
-        } 
+        }
         if (existingUser.currencyAmt < claudeCost) {
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
-        } 
+        }
 
         /* const normalizedtext = text.toLowerCase()
         .replace(/[(){}\[\]<>]/g, ' ')  
@@ -460,12 +356,12 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
         /* const words = new Set(normalizedtext.split(/\s+/))
         console.log('Word set:', words) */
         let jsonGlossary
-        let filteredGlossary:GlossaryItem[]
-        let formattedGlossary 
+        let filteredGlossary: GlossaryItem[]
+        let formattedGlossary
         let prompt
         if (glossary) {
             jsonGlossary = JSON.parse(glossary)
-            console.log('OG GLOSSARY - ',jsonGlossary )
+            console.log('OG GLOSSARY - ', jsonGlossary)
             filteredGlossary = jsonGlossary
             /* filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term)) */
             //set with words.has doesnt check partial
@@ -485,58 +381,58 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                 prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
                 console.log('prompt 2 used')
             }
-            
+
         } else {
             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
             console.log('prompt 2 used')
         }
-        
+
 
 
 
 
         const message = await client.messages.create({
-            max_tokens:8192,
+            max_tokens: 8192,
             temperature: 0,
-            tool_choice:{
-                type:"tool",
-                name:"translate_text"
+            tool_choice: {
+                type: "tool",
+                name: "translate_text"
             },
             tools: [
                 {
-                    name:"translate_text",
+                    name: "translate_text",
                     description: "Translate text to the language the user wants",
                     input_schema: {
-                        type:"object",
+                        type: "object",
                         properties: {
                             "text": {
                                 type: "string",
                                 description: "The translated text. It has to be in the language the user wants"
                             },
                             "glossary": {
-                                type:"array",
+                                type: "array",
                                 terms: {
-                                    type:"object",
+                                    type: "object",
                                     properties: {
                                         "term": {
-                                            type:"string",
-                                             description: "term name or people name or skill name in the original text's language"
+                                            type: "string",
+                                            description: "term name or people name or skill name in the original text's language"
                                         },
                                         "translated_term": {
-                                            type:"string",
-                                            description:"the term or name in the translated language"
+                                            type: "string",
+                                            description: "the term or name in the translated language"
                                         },
                                         /* "term_type": {
                                             type:"string",
                                             description:"term | name | skill"
                                         } */
                                     },
-                                    required:["term", "translated_term"]
+                                    required: ["term", "translated_term"]
                                 },
-                                description:"Extract a list of special terms, skills, and people names from the text"
+                                description: "Extract a list of special terms, skills, and people names from the text"
                             }
                         },
-                        required:["text", "glossary"]
+                        required: ["text", "glossary"]
                     }
                 }
             ],
@@ -551,7 +447,7 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
             }],
             model: 'claude-3-5-sonnet-20240620'
         }) as Anthropic.Message
-    
+
         console.log(message)
         existingUser.currencyAmt -= claudeCost
         await existingUser.save()
@@ -577,24 +473,24 @@ export async function translateTxt ({text, language, glossary}:translateTxtProps
                     throw new Error('An unknown server error has occured.')
             }
         } else if (err instanceof Error) {
-            
+
             throw err
         } else {
             console.log('[translateTxt] Hit an unhandled error type')
             throw new Error('Something went wrong. Please try again later.')
         }
-        
+
     }
-    
+
 }
 
 interface TermLookupProps {
     term: string
-    context?:string,
+    context?: string,
     language: string,
 }
 
-export async function TermLookup ({term, context, language}:TermLookupProps) {
+export async function TermLookup({ term, context, language }: TermLookupProps) {
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
@@ -605,22 +501,22 @@ export async function TermLookup ({term, context, language}:TermLookupProps) {
                 responseSchema: {
                     type: SchemaType.ARRAY,
                     items: {
-                        type:SchemaType.OBJECT,
+                        type: SchemaType.OBJECT,
                         properties: {
                             explanation: {
                                 type: SchemaType.STRING,
-                                description:'explanation of the word'
+                                description: 'explanation of the word'
                             },
                             translated_term: {
-                                type:SchemaType.STRING,
-                                description:'Meaning of the word. No brackets'
+                                type: SchemaType.STRING,
+                                description: 'Meaning of the word. No brackets'
                             }
-                           
+
                         }
                     }
                 }
             },
-            
+
         })
 
         const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''}`
