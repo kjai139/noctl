@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateTxt} from "@/app/action";
+import { translateGemini, translateGpt, translateText, translateTxt} from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -166,6 +166,8 @@ export default function MainInputForm() {
                     if (!result) {
                         throw new Error('[Standard Model Response] response blank')
                     }
+
+                    //TO DO : POLL HERE
                     const jsonResult = JSON.parse(result)
                     console.log(jsonResult)
                     if (jsonResult[0].glossary?.terms) {

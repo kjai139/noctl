@@ -142,6 +142,37 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             throw new Error(`You've hit the usage limit per hour. Please try again in ${mins}m ${seconds}s`)
         } */
 
+        let prompt
+
+        if (glossary) {
+            const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
+            const formattedGlossary = `
+                    Glossary -
+                    ${filteredGlossary.map(term => `
+                        Term: ${term.term},
+                        Translation: ${term.translated_term}
+                        `).join('')}
+                    `
+            prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
+        } else {
+            console.log('[Gemini] Prompt 2 used')
+            prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
+        }
+
+
+        //TODO  SAVE TO REDIS HERE AND THEN RETURN JOB ID FOR POLL
+        const params:{
+            model:ModelsType,
+            prompt:string,
+            userId:string
+        } = {
+            model: 'standard',
+            prompt: prompt,
+            userId: session.user.id
+    }
+        const jobId = await translateText(params)
+        return jobId
+
 
     } catch (err) {
         console.error(err)
@@ -149,24 +180,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
     }
 
 
-    let prompt
 
-    if (glossary) {
-        const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
-        const formattedGlossary = `
-                    Glossary -
-                    ${filteredGlossary.map(term => `
-                        Term: ${term.term},
-                        Translation: ${term.translated_term}
-                        `).join('')}
-                    `
-        prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
-    } else {
-        console.log('[Gemini] Prompt 2 used')
-        prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
-    }
-
-    //TODO  SAVE TO REDIS HERE AND THEN RETURN JOB ID FOR POLL
 
 }
 
