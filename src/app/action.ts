@@ -95,8 +95,7 @@ export async function DeletePaymentIntentDB(pId: string) {
     }
 }
 
-export async function translateText({ model, prompt, userId }: {
-    model: ModelsType,
+export async function queueJob({ prompt, userId }: {
     prompt: string,
     userId: string
 
@@ -160,7 +159,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
         }
 
 
-        //TODO  SAVE TO REDIS HERE AND THEN RETURN JOB ID FOR POLL
+        //Making job on redis and starting lambda
         const params:{
             model:ModelsType,
             prompt:string,
@@ -170,7 +169,26 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             prompt: prompt,
             userId: session.user.id
     }
-        const jobId = await translateText(params)
+        const jobId = await queueJob(params)
+
+        const lambdaParams = {
+            prompt: prompt,
+            model: 'standard',
+            id: jobId
+        }
+        if (!process.env.AWS_LAMBDA_URL) {
+            console.error('[Gemini Api] Missing lambda URL')
+            throw new Error('Missing lambda url')
+        }
+        const response = await fetch(process.env.AWS_LAMBDA_URL, {
+            method: 'POST',
+            body: JSON.stringify(lambdaParams) 
+        })
+
+        if (!response.ok) {
+            throw new Error('Something went wrong in lambda')
+        }
+        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`)
         return jobId
 
 
