@@ -171,8 +171,10 @@ export default function MainInputForm() {
 
                     //TO DO : POLL HERE
 
+                    console.log('[Api Lookup] JobId:', jobId)
 
-                    const jsonResult = JSON.parse(result)
+
+                    /* const jsonResult = JSON.parse(result)
                     console.log(jsonResult)
                     if (jsonResult[0].glossary?.terms) {
                         const glossaryResult = jsonResult[0].glossary.terms
@@ -200,7 +202,7 @@ export default function MainInputForm() {
                     } else {
                         setSlot1ResultDisplay(jsonResult[0].translation)
                         setSlot1Txt(jsonResult[0].translation)
-                    }
+                    } */
 
 
 

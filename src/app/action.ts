@@ -114,7 +114,7 @@ export async function queueJob({ prompt, userId }: {
 
     } catch (err) {
         console.error('[translateText] Error', err)
-        throw new Error('translateText Error. Check logs.')
+        throw new Error('Error queueing job. Check logs.')
     }
 
 }
@@ -180,7 +180,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             console.error('[Gemini Api] Missing lambda URL')
             throw new Error('Missing lambda url')
         }
-        const response = await fetch(process.env.AWS_LAMBDA_URL, {
+        /* const response = await fetch(process.env.AWS_LAMBDA_URL, {
             method: 'POST',
             body: JSON.stringify(lambdaParams) 
         })
@@ -188,7 +188,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
         if (!response.ok) {
             throw new Error('Something went wrong in lambda')
         }
-        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`)
+        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`) */
         return jobId
 
 
