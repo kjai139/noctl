@@ -16,6 +16,8 @@ import { z } from "zod"
 import { openAi } from '../lib/openAi'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import OpenAI, { OpenAIError } from "openai"
+import { sqsClient } from '../lib/sqsClient'
+import { ListQueuesCommand, SendMessageCommand } from "@aws-sdk/client-sqs"
 
 
 const client = new Anthropic({
@@ -95,6 +97,27 @@ export async function DeletePaymentIntentDB(pId: string) {
     }
 }
 
+async function sendMessageToSQS({prompt, jobId}:{
+    prompt:string,
+    jobId:string
+}) {
+    try {
+        const params = {
+            QueueUrl: process.env.SQS_URL,
+            MessageBody: JSON.stringify({
+                prompt:prompt,
+                jobId:jobId
+            })
+        }
+        const cmd = new SendMessageCommand(params)
+        const response = await sqsClient.send(cmd)
+        console.log('[sendMessagetoSQS] Message sent successfully to SQS.')
+    } catch (err) {
+        console.error('[sendMessageToSQS] Error:', err)
+        throw new Error('Encountered an error sending message to QSQ')
+    }
+}
+
 export async function queueJob({ prompt, userId }: {
     prompt: string,
     userId: string
@@ -110,6 +133,10 @@ export async function queueJob({ prompt, userId }: {
     try {
         await redis.set(job.id, JSON.stringify(job), { ex: ttl })
         console.log(`[translateText] Job ${job.id} saved.`)
+        await sendMessageToSQS({
+            prompt: prompt,
+            jobId:job.id
+        })
         return job.id
 
     } catch (err) {
@@ -180,7 +207,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             console.error('[Gemini Api] Missing lambda URL')
             throw new Error('Missing lambda url')
         }
-        /* const response = await fetch(process.env.AWS_LAMBDA_URL, {
+        const response = await fetch(process.env.AWS_LAMBDA_URL, {
             method: 'POST',
             body: JSON.stringify(lambdaParams) 
         })
@@ -188,7 +215,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
         if (!response.ok) {
             throw new Error('Something went wrong in lambda')
         }
-        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`) */
+        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`)
         return jobId
 
 
