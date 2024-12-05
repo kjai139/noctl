@@ -97,20 +97,24 @@ export async function DeletePaymentIntentDB(pId: string) {
     }
 }
 
-async function sendMessageToSQS({prompt, jobId}:{
+async function sendMessageToSQS({prompt, jobId, model, userId}:{
     prompt:string,
-    jobId:string
+    jobId:string,
+    model:ModelsType,
+    userId:string
 }) {
     try {
         const params = {
             QueueUrl: process.env.SQS_URL,
             MessageBody: JSON.stringify({
                 prompt:prompt,
-                jobId:jobId
+                jobId:jobId,
+                model:model,
+                userId: userId
             })
         }
         const cmd = new SendMessageCommand(params)
-        const response = await sqsClient.send(cmd)
+        await sqsClient.send(cmd)
         console.log('[sendMessagetoSQS] Message sent successfully to SQS.')
     } catch (err) {
         console.error('[sendMessageToSQS] Error:', err)
@@ -118,26 +122,31 @@ async function sendMessageToSQS({prompt, jobId}:{
     }
 }
 
-export async function queueJob({ prompt, userId }: {
+async function queueJob({ prompt, userId, model }: {
     prompt: string,
-    userId: string
+    userId: string,
+    model:ModelsType
 
 }) {
     const ttl = 3600
-    const job = {
-        id: `jb-${Date.now()}`,
-        userId: userId,
-        prompt: prompt,
-        status: 'pending',
-    }
+    const jobId = `newjob-${Date.now()}`
+    // const job = {
+    //     id: `jb-${Date.now()}`,
+    //     userId: userId,
+    //     prompt: prompt,
+    //     status: 'pending',
+    //     model:model
+    // }
     try {
-        await redis.set(job.id, JSON.stringify(job), { ex: ttl })
-        console.log(`[translateText] Job ${job.id} saved.`)
+        /* await redis.set(job.id, JSON.stringify(job), { ex: ttl })
+        console.log(`[translateText] Job ${job.id} saved.`) */
         await sendMessageToSQS({
             prompt: prompt,
-            jobId:job.id
+            jobId:jobId,
+            model:model,
+            userId: userId
         })
-        return job.id
+        return jobId
 
     } catch (err) {
         console.error('[translateText] Error', err)
@@ -197,25 +206,6 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             userId: session.user.id
     }
         const jobId = await queueJob(params)
-
-        const lambdaParams = {
-            prompt: prompt,
-            model: 'standard',
-            id: jobId
-        }
-        if (!process.env.AWS_LAMBDA_URL) {
-            console.error('[Gemini Api] Missing lambda URL')
-            throw new Error('Missing lambda url')
-        }
-        const response = await fetch(process.env.AWS_LAMBDA_URL, {
-            method: 'POST',
-            body: JSON.stringify(lambdaParams) 
-        })
-
-        if (!response.ok) {
-            throw new Error('Something went wrong in lambda')
-        }
-        console.log(`[translateGemini] jobId ${jobId} successfully invoked in lambda...`)
         return jobId
 
 
