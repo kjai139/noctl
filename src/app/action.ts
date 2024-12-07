@@ -130,16 +130,16 @@ async function queueJob({ prompt, userId, model }: {
 }) {
     const ttl = 3600
     const jobId = `newjob-${Date.now()}`
-    // const job = {
-    //     id: `jb-${Date.now()}`,
-    //     userId: userId,
-    //     prompt: prompt,
-    //     status: 'pending',
-    //     model:model
-    // }
+    const job = {
+        id: `jb-${Date.now()}`,
+        userId: userId,
+        prompt: prompt,
+        status: 'pending',
+        model:model
+    }
     try {
-        /* await redis.set(job.id, JSON.stringify(job), { ex: ttl })
-        console.log(`[translateText] Job ${job.id} saved.`) */
+        await redis.set(job.id, JSON.stringify(job), { ex: ttl })
+        console.log(`[translateText] Pending Job ${job.id} saved.`)
         await sendMessageToSQS({
             prompt: prompt,
             jobId:jobId,
@@ -218,6 +218,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
 
 
 }
+
 
 
 /* export async function translateTxtNoTool ({text, language, glossary}:translateTxtProps) {

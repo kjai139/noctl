@@ -11,17 +11,30 @@ export async function GET (req:NextRequest) {
         const job:string | null = await redis.get(`id:${jobId}`)
         if (!job) {
             return NextResponse.json({
-                message: 'Invalid Job'
+                message: 'Invalid Request'
             }, {
                 status:500
             })
         }
 
         const jobData = JSON.parse(job)
-        console.log('[Job getStatus] JobData:', jobData)
-        return NextResponse.json({
-            jobData: job
-        })
+        if (jobData.status === 'failed') {
+            return NextResponse.json({
+                jobStatus:'failed'
+            })
+        } else if (jobData.status === 'completed') {
+            return NextResponse.json({
+                jobStatus: 'completed',
+                job:job
+            })
+        } else if (jobData.status === 'pending') {
+            return NextResponse.json({
+                jobStatus:'pending',
+            })
+        } else {
+            throw new Error('Unknown job status.')
+        }
+
     } catch (err) {
         console.log('[Job getStatus] Error:', err)
         if (err instanceof Error) {
@@ -32,7 +45,7 @@ export async function GET (req:NextRequest) {
             })
         } else {
             return NextResponse.json({
-                message: `Something went wrong, check logs.`
+                message: `Something went wrong. Please try again later.`
             }, {
                 status: 500
             })

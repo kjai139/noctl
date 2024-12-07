@@ -18,6 +18,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { claudeCost, openAiCost } from "@/lib/modelPrice";
 import { useOutputContext } from "@/app/_contexts/outputContext";
 import { useSession } from "next-auth/react";
+import redis from "@/lib/redis";
 
 
 const tokenLimit = 10000
@@ -56,6 +57,7 @@ export default function MainInputForm() {
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('standard')
     const [errorMsg, setErrorMsg] = useState('')
+    const [isFetching, setIsFetching] = useState(false)
     const {data: session} = useSession()
 
 
@@ -106,7 +108,42 @@ export default function MainInputForm() {
         model: ModelsType
     }
 
+    async function pollRedis ({jobId, txtLength}:{
+        jobId:string,
+        txtLength: number
+    }) {
+        const startTime = Date.now()
+        const maxPollingDuration = 120
+        let pollInterval
 
+        if (txtLength < 150) {
+            pollInterval = 5
+        } else if (txtLength > 500 && txtLength < 1000) {
+            pollInterval = 10
+        } else if (txtLength > 1000) {
+            pollInterval = 20
+        }
+
+        while (true) {
+            const elapsedTime = Date.now() - startTime
+            if (elapsedTime > maxPollingDuration) {
+                console.log('[PollRedis] Poll time exceeded Max time. Exiting...')
+                break
+            }
+
+            try {
+                
+                
+            } catch (err) {
+                return err
+            }
+            
+           
+
+        }
+
+
+    }
 
 
     const apiLookUp = async ({ text, language, model }: apiLookUpProps) => {
@@ -157,6 +194,18 @@ export default function MainInputForm() {
             }
             console.log('[Api Lookup] Params used:', params)
 
+            const txtLength = text.length
+            let pollInterval
+            if (txtLength < 150) {
+                pollInterval = 5
+            } else if (txtLength > 150 && txtLength < 500) {
+                pollInterval = 10
+            } else if (txtLength > 500 && txtLength < 1000) {
+                pollInterval = 20
+            }
+            const startTime = Date.now()
+            const maxPollDuration = 2 * 60 * 1000
+
             if (model === 'standard') {
                 setIsLoading(true)
                 try {
@@ -165,6 +214,20 @@ export default function MainInputForm() {
                     console.log('[Standard Model] Job Id - ', jobId)
                     if (!jobId) {
                         throw new Error('[Standard Model] Missing job Id')
+                    }
+
+                    try {
+                        const response = await fetch(`api/job/getStatus?jobId=${jobId}`)
+                        if (response.ok) {
+                            const data = await response.json()
+                            console.log('[apiLookup] Job retrieved : ', data)
+                            if (data.jobStatus === 'pending') {
+                                
+                            }
+                        }
+
+                    } catch (err) {
+                        console.error('[apiLookup] Error:', err)
                     }
 
 
