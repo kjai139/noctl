@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateTxt} from "@/app/action";
+import { translateGemini, translateGpt, translateTxt } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import { claudeCost, openAiCost } from "@/lib/modelPrice";
 import { useOutputContext } from "@/app/_contexts/outputContext";
 import { useSession } from "next-auth/react";
 import redis from "@/lib/redis";
+import { pollJobStatus } from "@/app/_utils/pollJobStatus";
 
 
 const tokenLimit = 10000
@@ -58,7 +59,7 @@ export default function MainInputForm() {
     const [aiModel, setAiModel] = useState<ModelsType>('standard')
     const [errorMsg, setErrorMsg] = useState('')
     const [isFetching, setIsFetching] = useState(false)
-    const {data: session} = useSession()
+    const { data: session } = useSession()
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -108,42 +109,7 @@ export default function MainInputForm() {
         model: ModelsType
     }
 
-    async function pollRedis ({jobId, txtLength}:{
-        jobId:string,
-        txtLength: number
-    }) {
-        const startTime = Date.now()
-        const maxPollingDuration = 120
-        let pollInterval
-
-        if (txtLength < 150) {
-            pollInterval = 5
-        } else if (txtLength > 500 && txtLength < 1000) {
-            pollInterval = 10
-        } else if (txtLength > 1000) {
-            pollInterval = 20
-        }
-
-        while (true) {
-            const elapsedTime = Date.now() - startTime
-            if (elapsedTime > maxPollingDuration) {
-                console.log('[PollRedis] Poll time exceeded Max time. Exiting...')
-                break
-            }
-
-            try {
-                
-                
-            } catch (err) {
-                return err
-            }
-            
-           
-
-        }
-
-
-    }
+    
 
 
     const apiLookUp = async ({ text, language, model }: apiLookUpProps) => {
@@ -158,9 +124,9 @@ export default function MainInputForm() {
         setSlot2Error('')
         setBetter1Error('')
         setStandardResultError('')
-        
+
         try {
-            let normalizedGlossary  
+            let normalizedGlossary
             let filteredGlossary
             /* filterGlossary only consists of words from the glossary that exists in the query text */
             const normalizedtext = text.toLowerCase()
@@ -195,13 +161,15 @@ export default function MainInputForm() {
             console.log('[Api Lookup] Params used:', params)
 
             const txtLength = text.length
-            let pollInterval
+            let pollInterval = 5
             if (txtLength < 150) {
                 pollInterval = 5
             } else if (txtLength > 150 && txtLength < 500) {
                 pollInterval = 10
             } else if (txtLength > 500 && txtLength < 1000) {
                 pollInterval = 20
+            } else if (txtLength > 1000) {
+                pollInterval = 30
             }
             const startTime = Date.now()
             const maxPollDuration = 2 * 60 * 1000
@@ -215,26 +183,21 @@ export default function MainInputForm() {
                     if (!jobId) {
                         throw new Error('[Standard Model] Missing job Id')
                     }
+                    console.log('[Api Lookup] JobId:', jobId)
+                    const response = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
 
-                    try {
-                        const response = await fetch(`api/job/getStatus?jobId=${jobId}`)
-                        if (response.ok) {
-                            const data = await response.json()
-                            console.log('[apiLookup] Job retrieved : ', data)
-                            if (data.jobStatus === 'pending') {
-                                
-                            }
-                        }
+                    console.log('[apiLookup] poll response:', response)
 
-                    } catch (err) {
-                        console.error('[apiLookup] Error:', err)
-                    }
 
 
 
                     //TO DO : POLL HERE
 
-                    console.log('[Api Lookup] JobId:', jobId)
+
 
 
                     /* const jsonResult = JSON.parse(result)
@@ -283,13 +246,13 @@ export default function MainInputForm() {
 
 
             } else if (model === 'b1') {
-                
+
                 if (userCurrency && userCurrency < claudeCost) {
                     throw new Error('You do not have enough currency to use this model. Please purchase more at the currency tab.')
-                    
+
                 }
                 setIsLoading(true)
-                
+
                 try {
                     setSlot1ModelName('Better-1')
                     const result: any = await translateTxt(params)
@@ -298,7 +261,7 @@ export default function MainInputForm() {
                         if (result[0].type === 'tool_use') {
                             const textResult = result[0].input.text
                             const glossaryResult = result[0].input.glossary
-    
+
                             //add new entries if not dupe - backend should only return normalized results
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
                                 console.log('Normalized Glossary used')
@@ -317,7 +280,7 @@ export default function MainInputForm() {
                                 setGlossary(glossaryResult)
                             }
 
-    
+
                             setSlot1ResultDisplay(textResult)
                             setSlot1Txt(textResult)
                             setUserCurrency((prev) => {
@@ -326,12 +289,12 @@ export default function MainInputForm() {
                                 }
                                 return prev
                             })
-    
-    
+
+
                         }
-    
+
                     }
-                } catch (err:any) {
+                } catch (err: any) {
                     console.error(err)
                     if (err instanceof Error) {
                         throw err
@@ -339,20 +302,20 @@ export default function MainInputForm() {
                         throw new Error('[Better-1] An unknown error has occured, Please try again later')
                     }
                 }
-                
+
             } else if (model === 'sb1') {
                 setSlot1ModelName('Standard')
                 setSlot2ModelName('Better-1')
 
                 if (userCurrency && userCurrency < claudeCost) {
                     throw new Error(`You do not have enough currency. ${userCurrency} / ${claudeCost}`)
-                    
+
                 }
                 setIsLoading(true)
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
                     translateTxt(params)
-                    
+
                 ])
                 //claude
                 if (result2.status === 'fulfilled') {
@@ -403,7 +366,7 @@ export default function MainInputForm() {
                         console.log('[sb1] using standard glossary')
                         if (jsonResult1[0].glossary?.terms) {
                             const glossaryResult = jsonResult1[0].glossary.terms
-    
+
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
                                 console.log('Normalized Glossary used')
                                 const termSet = new Set(normalizedGlossary.map(entry => entry.term))
@@ -428,18 +391,18 @@ export default function MainInputForm() {
                     setSlot1Error(result1.reason.message)
 
                 }
-                
-                
+
+
             } else if (model === 'b2') {
                 setSlot1ModelName('Better-2')
                 console.log('user cur', userCurrency, openAiCost)
-                
+
                 try {
                     if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
                         console.log(openAiCost > userCurrency)
                         throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}).`)
                     }
-                    
+
                     setIsLoading(true)
                     const result = await translateGpt(params)
                     console.log('[translateGpt] ', result)
@@ -503,14 +466,14 @@ export default function MainInputForm() {
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
                     translateGpt(params)
-                    
+
                 ])
                 //openai
                 if (result2.status === 'fulfilled') {
                     const result2Response = result2.value
                     const textResult = result2Response.text
                     const glossaryResult = result2Response.glossary
-                
+
 
                     if (normalizedGlossary && normalizedGlossary.length > 0) {
                         console.log('Normalized Glossary used')
@@ -538,7 +501,7 @@ export default function MainInputForm() {
                         return prev
                     })
 
-                
+
                 } else {
                     console.log('[Sb1] slot2 not fulfilled', result2)
                     setSlot2Error(result2.reason.message)
@@ -554,7 +517,7 @@ export default function MainInputForm() {
                         console.log('[sb1] using standard glossary')
                         if (jsonResult1[0].glossary?.terms) {
                             const glossaryResult = jsonResult1[0].glossary.terms
-    
+
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
                                 console.log('Normalized Glossary used')
                                 const termSet = new Set(normalizedGlossary.map(entry => entry.term))
@@ -572,7 +535,7 @@ export default function MainInputForm() {
                             }
                         }
                     }
-                    
+
                     setSlot1ResultDisplay(jsonResult1[0].translation)
                     setSlot1Txt(jsonResult1[0].translation)
                 } else {
@@ -581,7 +544,7 @@ export default function MainInputForm() {
 
                 }
             } else if (model === 'b12') {
-                
+
                 const totalCost = openAiCost + claudeCost
                 if (userCurrency && userCurrency < totalCost) {
                     setErrorMsg(`You do not have enough currency. ${userCurrency} / ${totalCost}`)
@@ -592,7 +555,7 @@ export default function MainInputForm() {
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateTxt(params),
                     translateGpt(params)
-                    
+
                 ])
                 console.log('[b12] result1', result1)
                 console.log('[b12] result2', result2)
@@ -602,7 +565,7 @@ export default function MainInputForm() {
                     const result2Response = result2.value
                     const textResult = result2Response.text
                     const glossaryResult = result2Response.glossary
-                
+
 
                     if (normalizedGlossary && normalizedGlossary.length > 0) {
                         console.log('[b12] Glossary used in request')
@@ -632,7 +595,7 @@ export default function MainInputForm() {
                     })
                     console.log('[b12] 2:', userCurrency, '-', openAiCost)
 
-                
+
                 } else {
                     console.log('[Sb12] slot2 not fulfilled', result2)
                     setSlot2Error(result2.reason.message)
@@ -663,7 +626,7 @@ export default function MainInputForm() {
                             }
                         }
 
-                        
+
 
                         setSlot1ResultDisplay(textResult)
 
