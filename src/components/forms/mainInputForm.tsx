@@ -161,36 +161,36 @@ export default function MainInputForm() {
             console.log('[Api Lookup] Params used:', params)
 
             const txtLength = text.length
-            let pollInterval = 5
+            let pollInterval = 5000
             if (txtLength < 150) {
-                pollInterval = 5
+                pollInterval = 5000
             } else if (txtLength > 150 && txtLength < 500) {
-                pollInterval = 10
+                pollInterval = 10000
             } else if (txtLength > 500 && txtLength < 1000) {
-                pollInterval = 20
+                pollInterval = 20000
             } else if (txtLength > 1000) {
-                pollInterval = 30
+                pollInterval = 30000
             }
             const startTime = Date.now()
-            const maxPollDuration = 2 * 60 * 1000
 
             if (model === 'standard') {
                 setIsLoading(true)
                 try {
                     setSlot1ModelName('Standard')
                     const jobId = await translateGemini(params)
+                    // const jobId = `testJobId`
                     console.log('[Standard Model] Job Id - ', jobId)
                     if (!jobId) {
                         throw new Error('[Standard Model] Missing job Id')
                     }
                     console.log('[Api Lookup] JobId:', jobId)
-                    const response = await pollJobStatus({
-                        jobId: jobId,
-                        startTime: startTime,
-                        interval: pollInterval,
-                    })
+                    // const response = await pollJobStatus({
+                    //     jobId: jobId,
+                    //     startTime: startTime,
+                    //     interval: pollInterval,
+                    // })
 
-                    console.log('[apiLookup] poll response:', response)
+                    // console.log('[apiLookup] poll response:', response)
 
 
 

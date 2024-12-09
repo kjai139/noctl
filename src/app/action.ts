@@ -129,16 +129,16 @@ async function queueJob({ prompt, userId, model }: {
 
 }) {
     const ttl = 3600
-    const jobId = `newjob-${Date.now()}`
+    const jobId = `jb-${Date.now()}`
     const job = {
-        id: `jb-${Date.now()}`,
+        id: jobId,
         userId: userId,
         prompt: prompt,
         status: 'pending',
         model:model
     }
     try {
-        await redis.set(job.id, JSON.stringify(job), { ex: ttl })
+        await redis.set(jobId, JSON.stringify(job), { ex: ttl })
         console.log(`[translateText] Pending Job ${job.id} saved.`)
         await sendMessageToSQS({
             prompt: prompt,

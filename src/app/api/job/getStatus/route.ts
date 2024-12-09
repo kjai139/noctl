@@ -8,16 +8,19 @@ export async function GET (req:NextRequest) {
 
     console.log('[Job getStatus] Getting job Id ', jobId)
     try {
-        const job:string | null = await redis.get(`id:${jobId}`)
-        if (!job) {
-            return NextResponse.json({
-                message: 'Invalid Request'
-            }, {
-                status:500
-            })
-        }
+        // const job:string | null = await redis.get(`id:${jobId}`)
+        // if (!job) {
+        //     return NextResponse.json({
+        //         message: 'Invalid Request'
+        //     }, {
+        //         status:500
+        //     })
+        // }
 
-        const jobData = JSON.parse(job)
+        // const jobData = JSON.parse(job)
+        const jobData = {
+            status:'pending'
+        }
         if (jobData.status === 'failed') {
             return NextResponse.json({
                 jobStatus:'failed'
@@ -25,7 +28,7 @@ export async function GET (req:NextRequest) {
         } else if (jobData.status === 'completed') {
             return NextResponse.json({
                 jobStatus: 'completed',
-                job:job
+                // job:job
             })
         } else if (jobData.status === 'pending') {
             return NextResponse.json({
