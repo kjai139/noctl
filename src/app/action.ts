@@ -97,19 +97,19 @@ export async function DeletePaymentIntentDB(pId: string) {
     }
 }
 
-async function sendMessageToSQS({prompt, jobId, model, userId}:{
-    prompt:string,
-    jobId:string,
-    model:ModelsType,
-    userId:string
+async function sendMessageToSQS({ prompt, jobId, model, userId }: {
+    prompt: string,
+    jobId: string,
+    model: ModelsType,
+    userId: string
 }) {
     try {
         const params = {
             QueueUrl: process.env.SQS_URL,
             MessageBody: JSON.stringify({
-                prompt:prompt,
-                jobId:jobId,
-                model:model,
+                prompt: prompt,
+                jobId: jobId,
+                model: model,
                 userId: userId
             })
         }
@@ -125,7 +125,7 @@ async function sendMessageToSQS({prompt, jobId, model, userId}:{
 async function queueJob({ prompt, userId, model }: {
     prompt: string,
     userId: string,
-    model:ModelsType
+    model: ModelsType
 
 }) {
     const ttl = 3600
@@ -135,15 +135,15 @@ async function queueJob({ prompt, userId, model }: {
         userId: userId,
         prompt: prompt,
         status: 'pending',
-        model:model
+        model: model
     }
     try {
         await redis.set(jobId, JSON.stringify(job), { ex: ttl })
         console.log(`[translateText] Pending Job ${job.id} saved.`)
         await sendMessageToSQS({
             prompt: prompt,
-            jobId:jobId,
-            model:model,
+            jobId: jobId,
+            model: model,
             userId: userId
         })
         return jobId
@@ -152,6 +152,24 @@ async function queueJob({ prompt, userId, model }: {
         console.error('[translateText] Error', err)
         throw new Error('Error queueing job. Check logs.')
     }
+
+}
+
+function getPrompt({ glossary, language, text }: {
+    glossary: string,
+    text: string,
+    language: string
+}) {
+    const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
+    const formattedGlossary = `
+                    Glossary -
+                    ${filteredGlossary.map(term => `
+                        Term: ${term.term},
+                        Translation: ${term.translated_term}
+                        `).join('')}
+                    `
+    const prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
+    return prompt
 
 }
 
@@ -180,31 +198,26 @@ export async function translateGemini({ text, language, glossary }: translateTxt
         let prompt
 
         if (glossary) {
-            const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
-            const formattedGlossary = `
-                    Glossary -
-                    ${filteredGlossary.map(term => `
-                        Term: ${term.term},
-                        Translation: ${term.translated_term}
-                        `).join('')}
-                    `
-            prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
+            prompt = getPrompt({
+                glossary: glossary,
+                language: language,
+                text: text
+            })
         } else {
             console.log('[Gemini] Prompt 2 used')
             prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
         }
 
-
         //Making job on redis and starting lambda
-        const params:{
-            model:ModelsType,
-            prompt:string,
-            userId:string
+        const params: {
+            model: ModelsType,
+            prompt: string,
+            userId: string
         } = {
             model: 'standard',
             prompt: prompt,
             userId: session.user.id
-    }
+        }
         const jobId = await queueJob(params)
         return jobId
 
@@ -220,59 +233,6 @@ export async function translateGemini({ text, language, glossary }: translateTxt
 }
 
 
-
-/* export async function translateTxtNoTool ({text, language, glossary}:translateTxtProps) {
-    try {
-        let jsonGlossary
-        let filteredGlossary:GlossaryItem[]
-        let formattedGlossary 
-        let prompt
-        if (glossary) {
-            jsonGlossary = JSON.parse(glossary)
-            console.log('OG GLOSSARY - ',jsonGlossary )
-            filteredGlossary = jsonGlossary
-            console.log('filteredlist', filteredGlossary)
-            formattedGlossary = `
-            Glossary -
-            ${filteredGlossary.map(term => `
-                Term: ${term.term},
-                Translation: ${term.translated_term}
-                `).join('')}
-            `
-            console.log('formattedGLoss', formattedGlossary)
-            if (filteredGlossary.length > 0) {
-                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
-                console.log('prompt 1 used', prompt)
-            } else {
-                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
-                console.log('prompt 2 used')
-            }
-            
-        } else {
-            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
-            console.log('prompt 2 used')
-        }
-
-        const message = await client.messages.create({
-            max_tokens:8192,
-            temperature: 0,
-            messages: [{
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: prompt
-                    },
-                ]
-            }],
-            model: 'claude-3-5-sonnet-20241022'
-        })
-
-        return message.content
-    } catch (err) {
-        console.error(err)
-    }
-} */
 
 
 export async function translateGpt({ text, language, glossary }: translateTxtProps) {
@@ -291,69 +251,64 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
         }
 
-
-        let jsonGlossary
-        let filteredGlossary: GlossaryItem[]
-        let formattedGlossary
         let prompt
         if (glossary) {
-            jsonGlossary = JSON.parse(glossary)
-            console.log('[OpenAi] Unedited glossary - ', jsonGlossary)
-            filteredGlossary = jsonGlossary
+            prompt = getPrompt({
+                glossary: glossary,
+                text: text,
+                language: language
+            })
 
-            //set with words.has doesnt check partial
-            console.log('filteredlist', filteredGlossary)
-            formattedGlossary = `
-            Glossary -
-            ${filteredGlossary.map(term => `
-                Term: ${term.term},
-                Translation: ${term.translated_term}
-                `).join('')}
-            `
-            console.log('[OpenAi] formattedGLoss', formattedGlossary)
-            if (filteredGlossary.length > 0) {
-                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} and return me a list of special terms, skills, people names extracted from the text - \n ${text}`
-                console.log('[OpenAi] prompt 1 used', prompt)
-            } else {
-                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, people names from the text - \n ${text}`
-                console.log('[OpenAi] prompt 2 used')
-            }
+            console.log('[OpenAi] prompt 1 used', prompt)
+
+
 
         } else {
             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
             console.log('[OpenAi] prompt 2 used')
         }
-        const glossaryResponse = z.object({
-            term: z.string(),
-            translated_term: z.string()
-        })
-
-        const translatedTxtResponse = z.object({
-            glossary: z.array(glossaryResponse),
-            text: z.string()
-        })
-
-        const completion = await openAi.beta.chat.completions.parse({
-            model: 'gpt-4o-mini-2024-07-18',
-            messages: [
-                {
-                    role: "system",
-                    content: prompt
-                }
-            ],
-            response_format: zodResponseFormat(translatedTxtResponse, "translation_response"),
-            max_tokens: 8192,
-        })
-
-        const translation_response = completion.choices[0].message
-        console.log('[OpenAi] translation response', translation_response)
-        if (translation_response.parsed) {
-            console.log('[OpenAi] parsed', translation_response.parsed)
-            return translation_response.parsed
-        } else if (translation_response.refusal) {
-            console.log('[OpenAi] refusal', translation_response.refusal)
-            throw new Error(translation_response.refusal)
+        const params: {
+            model: ModelsType,
+            prompt: string,
+            userId: string
+        } = {
+            model: 'b2',
+            prompt: prompt,
+            userId: session.user.id
         }
+        const jobId = await queueJob(params)
+        return jobId
+        // const glossaryResponse = z.object({
+        //     term: z.string(),
+        //     translated_term: z.string()
+        // })
+
+        // const translatedTxtResponse = z.object({
+        //     glossary: z.array(glossaryResponse),
+        //     text: z.string()
+        // })
+
+        // const completion = await openAi.beta.chat.completions.parse({
+        //     model: 'gpt-4o-mini-2024-07-18',
+        //     messages: [
+        //         {
+        //             role: "system",
+        //             content: prompt
+        //         }
+        //     ],
+        //     response_format: zodResponseFormat(translatedTxtResponse, "translation_response"),
+        //     max_tokens: 8192,
+        // })
+
+        // const translation_response = completion.choices[0].message
+        // console.log('[OpenAi] translation response', translation_response)
+        // if (translation_response.parsed) {
+        //     console.log('[OpenAi] parsed', translation_response.parsed)
+        //     return translation_response.parsed
+        // } else if (translation_response.refusal) {
+        //     console.log('[OpenAi] refusal', translation_response.refusal)
+        //     throw new Error(translation_response.refusal)
+        // }
 
     } catch (err) {
         console.error('[translateGpt] Encountered an error, ', err)
@@ -410,27 +365,11 @@ export async function translateTxt({ text, language, glossary }: translateTxtPro
         let formattedGlossary
         let prompt
         if (glossary) {
-            jsonGlossary = JSON.parse(glossary)
-            console.log('OG GLOSSARY - ', jsonGlossary)
-            filteredGlossary = jsonGlossary
-            /* filteredGlossary = jsonGlossary.filter((entry:GlossaryItem) => normalizedtext.includes(entry.term)) */
-            //set with words.has doesnt check partial
-            console.log('filteredlist', filteredGlossary)
-            formattedGlossary = `
-            Glossary -
-            ${filteredGlossary.map(term => `
-                Term: ${term.term},
-                Translation: ${term.translated_term}
-                `).join('')}
-            `
-            console.log('formattedGLoss', formattedGlossary)
-            if (filteredGlossary.length > 0) {
-                prompt = `${formattedGlossary} \n. Please use the glossary to translate this text to ${language} - \n ${text} -END OF TEXT. And return me a list of special terms, skills, and people names extracted from the text.`
-                console.log('prompt 1 used', prompt)
-            } else {
-                prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
-                console.log('prompt 2 used')
-            }
+           prompt = getPrompt({
+            glossary:glossary,
+            text:text,
+            language:language
+           })
 
         } else {
             prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
