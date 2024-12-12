@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateTxt } from "@/app/action";
+import { translateGemini, translateGpt, translateClaude } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -109,7 +109,7 @@ export default function MainInputForm() {
         model: ModelsType
     }
 
-    
+
 
 
     const apiLookUp = async ({ text, language, model }: apiLookUpProps) => {
@@ -139,7 +139,6 @@ export default function MainInputForm() {
                         {
                             ...entry,
                             term: entry.term.toLowerCase(),
-
                         }
                     )
                 })
@@ -172,7 +171,7 @@ export default function MainInputForm() {
                 pollInterval = 30000
             }
             const startTime = Date.now()
-
+            //Standard Model
             if (model === 'standard') {
                 setIsLoading(true)
                 try {
@@ -183,27 +182,18 @@ export default function MainInputForm() {
                     if (!jobId) {
                         throw new Error('[Standard Model] Missing job Id')
                     }
-                    console.log('[Api Lookup] JobId:', jobId)
-                    // const response = await pollJobStatus({
-                    //     jobId: jobId,
-                    //     startTime: startTime,
-                    //     interval: pollInterval,
-                    // })
+                    console.log('[Standard Model] JobId:', jobId)
+                    const pollResponse = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
 
-                    // console.log('[apiLookup] poll response:', response)
-
-
-
-
-                    //TO DO : POLL HERE
-
-
-
-
-                    /* const jsonResult = JSON.parse(result)
-                    console.log(jsonResult)
-                    if (jsonResult[0].glossary?.terms) {
-                        const glossaryResult = jsonResult[0].glossary.terms
+                    console.log(`[Standard Model] pollResponse for id ${jobId}`, pollResponse)
+                    const response = JSON.parse(pollResponse.job.response)
+                    console.log(response)
+                    if (response[0].glossary?.terms) {
+                        const glossaryResult = response[0].glossary.terms
 
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
                             console.log('Normalized Glossary used')
@@ -222,13 +212,13 @@ export default function MainInputForm() {
                         }
                     }
 
-                    if (!jsonResult[0].translation && text) {
+                    if (!response[0].translation && text) {
                         setSlot1ResultDisplay(text)
                         setSlot1Txt(text)
                     } else {
-                        setSlot1ResultDisplay(jsonResult[0].translation)
-                        setSlot1Txt(jsonResult[0].translation)
-                    } */
+                        setSlot1ResultDisplay(response[0].translation)
+                        setSlot1Txt(response[0].translation)
+                    }
 
 
 
@@ -255,8 +245,17 @@ export default function MainInputForm() {
 
                 try {
                     setSlot1ModelName('Better-1')
-                    const result: any = await translateTxt(params)
-                    console.log('Api response:', result)
+                    const jobId = await translateClaude(params)
+                    console.log('[B1 Model] Job Id - ', jobId)
+                    if (!jobId) {
+                        throw new Error('[Standard Model] Missing job Id')
+                    }
+                    console.log('[Standard Model] JobId:', jobId)
+                    const pollResponse = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
                     if (result && result[0]) {
                         if (result[0].type === 'tool_use') {
                             const textResult = result[0].input.text
@@ -314,7 +313,7 @@ export default function MainInputForm() {
                 setIsLoading(true)
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
-                    translateTxt(params)
+                    translateClaude(params)
 
                 ])
                 //claude
@@ -553,7 +552,7 @@ export default function MainInputForm() {
                 setSlot1ModelName('Better-1')
                 setSlot2ModelName('Better-2')
                 const [result1, result2]: [any, any] = await Promise.allSettled([
-                    translateTxt(params),
+                    translateClaude(params),
                     translateGpt(params)
 
                 ])

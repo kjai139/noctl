@@ -277,6 +277,9 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             userId: session.user.id
         }
         const jobId = await queueJob(params)
+        existingUser.currencyAmt -= openAiCost
+        await existingUser.save()
+        console.log(`[translateGpt] user currency updated`)
         return jobId
         // const glossaryResponse = z.object({
         //     term: z.string(),
@@ -337,7 +340,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
 }
 
 
-export async function translateTxt({ text, language, glossary }: translateTxtProps) {
+export async function translateClaude({ text, language, glossary }: translateTxtProps) {
     try {
 
         const session = await auth()
@@ -354,15 +357,6 @@ export async function translateTxt({ text, language, glossary }: translateTxtPro
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
         }
 
-        /* const normalizedtext = text.toLowerCase()
-        .replace(/[(){}\[\]<>]/g, ' ')  
-        .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
-        console.log(normalizedtext) */
-        /* const words = new Set(normalizedtext.split(/\s+/))
-        console.log('Word set:', words) */
-        let jsonGlossary
-        let filteredGlossary: GlossaryItem[]
-        let formattedGlossary
         let prompt
         if (glossary) {
            prompt = getPrompt({
@@ -380,70 +374,77 @@ export async function translateTxt({ text, language, glossary }: translateTxtPro
 
 
 
-        const message = await client.messages.create({
-            max_tokens: 8192,
-            temperature: 0,
-            tool_choice: {
-                type: "tool",
-                name: "translate_text"
-            },
-            tools: [
-                {
-                    name: "translate_text",
-                    description: "Translate text to the language the user wants",
-                    input_schema: {
-                        type: "object",
-                        properties: {
-                            "text": {
-                                type: "string",
-                                description: "The translated text. It has to be in the language the user wants"
-                            },
-                            "glossary": {
-                                type: "array",
-                                terms: {
-                                    type: "object",
-                                    properties: {
-                                        "term": {
-                                            type: "string",
-                                            description: "term name or people name or skill name in the original text's language"
-                                        },
-                                        "translated_term": {
-                                            type: "string",
-                                            description: "the term or name in the translated language"
-                                        },
-                                        /* "term_type": {
-                                            type:"string",
-                                            description:"term | name | skill"
-                                        } */
-                                    },
-                                    required: ["term", "translated_term"]
-                                },
-                                description: "Extract a list of special terms, skills, and people names from the text"
-                            }
-                        },
-                        required: ["text", "glossary"]
-                    }
-                }
-            ],
-            messages: [{
-                role: 'user',
-                content: [
-                    {
-                        type: 'text',
-                        text: prompt
-                    },
-                ]
-            }],
-            model: 'claude-3-5-sonnet-20240620'
-        }) as Anthropic.Message
+        // const message = await client.messages.create({
+        //     max_tokens: 8192,
+        //     temperature: 0,
+        //     tool_choice: {
+        //         type: "tool",
+        //         name: "translate_text"
+        //     },
+        //     tools: [
+        //         {
+        //             name: "translate_text",
+        //             description: "Translate text to the language the user wants",
+        //             input_schema: {
+        //                 type: "object",
+        //                 properties: {
+        //                     "text": {
+        //                         type: "string",
+        //                         description: "The translated text. It has to be in the language the user wants"
+        //                     },
+        //                     "glossary": {
+        //                         type: "array",
+        //                         terms: {
+        //                             type: "object",
+        //                             properties: {
+        //                                 "term": {
+        //                                     type: "string",
+        //                                     description: "term name or people name or skill name in the original text's language"
+        //                                 },
+        //                                 "translated_term": {
+        //                                     type: "string",
+        //                                     description: "the term or name in the translated language"
+        //                                 },
+                                        
+        //                             },
+        //                             required: ["term", "translated_term"]
+        //                         },
+        //                         description: "Extract a list of special terms, skills, and people names from the text"
+        //                     }
+        //                 },
+        //                 required: ["text", "glossary"]
+        //             }
+        //         }
+        //     ],
+        //     messages: [{
+        //         role: 'user',
+        //         content: [
+        //             {
+        //                 type: 'text',
+        //                 text: prompt
+        //             },
+        //         ]
+        //     }],
+        //     model: 'claude-3-5-sonnet-20240620'
+        // }) as Anthropic.Message
 
-        console.log(message)
+        // console.log(message)
+        const params: {
+            model: ModelsType,
+            prompt: string,
+            userId: string
+        } = {
+            model: 'b1',
+            prompt: prompt,
+            userId: session.user.id
+        }
+        const jobId = await queueJob(params)
         existingUser.currencyAmt -= claudeCost
         await existingUser.save()
-        console.log(`[TranslateTxt] user currency updated`)
-        return message.content
+        console.log(`[TranslateClaude] user currency updated`)
+        return jobId
     } catch (err) {
-        console.error('[translateTxt] Error', err)
+        console.error('[translateClaude] Error', err)
         if (err instanceof Anthropic.APIError) {
             switch (err.status) {
                 case 400:
@@ -465,7 +466,7 @@ export async function translateTxt({ text, language, glossary }: translateTxtPro
 
             throw err
         } else {
-            console.log('[translateTxt] Hit an unhandled error type')
+            console.log('[translateClaude] Hit an unhandled error type')
             throw new Error('Something went wrong. Please try again later.')
         }
 

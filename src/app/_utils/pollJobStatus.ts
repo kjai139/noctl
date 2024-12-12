@@ -15,7 +15,12 @@ export async function pollJobStatus({ jobId, startTime, interval }: {
     }
     try {
         console.log(`[pollJobStatus] Polling for response... Elapsed time is ${elapsedTime / 1000} seconds`)
-        const response = await fetch(`api/job/getStatus?jobId=${jobId}`)
+        const response = await fetch(`api/job/getStatus?jobId=${jobId}`, {
+            method:'GET',
+            next: {
+                revalidate: 0
+            }
+        })
         if (response.ok) {
             const data = await response.json()
             console.log('[apiLookup] Job retrieved : ', data)
@@ -29,10 +34,10 @@ export async function pollJobStatus({ jobId, startTime, interval }: {
                 })
             } else if (data.jobStatus === 'completed') {
                 console.log(`[pollJobStatus] job status completed, returning response...`)
-                return response
+                return data
             } else if (data.jobStatus === 'failed') {
                 console.log(`[pollJobStatus] job status failed, returning response...`)
-                return response
+                return data
             } else  {
                 console.log('[pollJobStatus] Unhandled jobStatus.')
                 throw new Error('Unhandled jobStatus')
