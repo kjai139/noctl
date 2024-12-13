@@ -256,6 +256,7 @@ export default function MainInputForm() {
                         startTime: startTime,
                         interval: pollInterval,
                     })
+                    const result = JSON.parse(pollResponse.job.response)
                     if (result && result[0]) {
                         if (result[0].type === 'tool_use') {
                             const textResult = result[0].input.text

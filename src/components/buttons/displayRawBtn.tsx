@@ -2,26 +2,25 @@
 import { SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
 import { TbListDetails } from "react-icons/tb";
+import { useWorkState } from "@/app/_contexts/workStateContext";
+import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 
 interface DisplayRawBtnProps {
-    setCurDisplay: any,
-    curRaw: string,
+    setSlotMergedLines: React.Dispatch<SetStateAction<string[]>>,
+    slotRaw: string,
     setIsRawOn: React.Dispatch<SetStateAction<boolean>>
-    curOgTxt: string,
+    slotTxt: string,
     isRawOn:boolean,
 }
 
-export default function DisplayRawBtn ({setCurDisplay, curRaw, setIsRawOn, isRawOn, curOgTxt}:DisplayRawBtnProps) {
+export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTxt}:DisplayRawBtnProps) {
 
-    
+    const { clipboardTxt, setClipboardTxt} = useClipboardContext()
 
-    const toggleRaw = () => {
-        /* console.log('[Toggle Raw] curRaw : ', curRaw)
-        console.log('[Toggle Raw] curOgTxt: ', curOgTxt) */
-        if (!isRawOn) {
-            /* const normalizedRaw = curRaw.replace(/\n+/g, '\n').trim()
+    const setRawOn = () => {
+        const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
             const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
-            const normalizedTxt = curOgTxt.replace(/\n+/g, '\n').trim()
+            const normalizedTxt = slotTxt.replace(/\n+/g, '\n').trim()
             const resultLines = normalizedTxt.split('\n')
 
             const maxLines = Math.max(rawlines.length, resultLines.length)
@@ -36,12 +35,23 @@ export default function DisplayRawBtn ({setCurDisplay, curRaw, setIsRawOn, isRaw
 
             }
 
-            console.log('RAW ARRAY NORMALIZED:', normalizedRaw)
-            console.log('RAW TEXT NORMALIZED', normalizedTxt)
+            const mergedTxt = mergedLines.join('\n')
+            setClipboardTxt(mergedTxt)
 
-            const result = mergedLines.join('\n')
-            setCurDisplay(result) */
+            console.log('[renderText] mergedLines', mergedLines)
+            setSlotMergedLines(mergedLines)
             setIsRawOn(true)
+
+            
+
+    }
+
+    const toggleRaw = () => {
+        /* console.log('[Toggle Raw] curRaw : ', curRaw)
+        console.log('[Toggle Raw] curOgTxt: ', curOgTxt) */
+        if (!isRawOn) {
+        
+            setRawOn()
         } else if (isRawOn) {
             /* setCurDisplay(curOgTxt) */
             setIsRawOn(false)

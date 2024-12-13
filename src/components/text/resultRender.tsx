@@ -8,7 +8,7 @@ import ErrorResult from "./errorResult"
 
 export default function ResultRender() {
 
-    const { slot1ResultDisplay, slot1Txt, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
+    const { slot1ResultDisplay, setSlot1MergedLines, slot1MergedLines, slot1Txt, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -72,7 +72,9 @@ export default function ResultRender() {
                                         
                                         {
                                             slot1ResultDisplay ?
-                                                <ResultWrap 
+                                                <ResultWrap
+                                                slotMergedLines={slot1MergedLines} 
+                                                setSlotMergedLines={setSlot1MergedLines}
                                                 setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot1ResultDisplay}
                                                 slotModelName={slot1ModelName}
                                                 slotTxt={slot1Txt}
@@ -92,7 +94,9 @@ export default function ResultRender() {
                                         }
                                         {
                                             slot2ResultDisplay ?
-                                            <ResultWrap 
+                                            <ResultWrap
+                                            slotMergedLines={slot1MergedLines}
+                                            setSlotMergedLines={setSlot1MergedLines} 
                                             setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot2ResultDisplay}
                                             slotModelName={slot2ModelName}
                                             slotTxt={slot2Txt}
