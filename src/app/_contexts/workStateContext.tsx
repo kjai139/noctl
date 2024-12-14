@@ -35,7 +35,10 @@ interface workStateContextType {
     slot1Error:string,
     setSlot1Error: React.Dispatch<React.SetStateAction<string>>;
 
-    //slot2 alt 
+    //slot2
+    slot2MergedLines: string[],
+    setSlot2MergedLines: React.Dispatch<React.SetStateAction<string[]>>;
+    
     slot2ResultDisplay: string,
     setSlot2ResultDisplay: React.Dispatch<React.SetStateAction<string>>;
 
@@ -90,6 +93,8 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
     const [slot1Error, setSlot1Error] = useState('')
     const [isSlot1RawOn, setIsSlot1RawOn] = useState(false)
 
+
+    const [slot2MergedLines, setSlot2MergedLines] = useState<string[]>([])
     const [slot2ResultDisplay, setSlot2ResultDisplay] = useState('')
     const [slot2Raw, setSlot2Raw] = useState('')
     const [slot2Txt, setSlot2Txt] = useState('')
@@ -110,7 +115,7 @@ export function WorkStateProvider ({children}: {children: React.ReactNode}) {
 
 
     return (
-        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, slot1MergedLines, setSlot1MergedLines, slot1ResultDisplay, setSlot1ResultDisplay, slot1Txt, setSlot1Txt, isSlot1RawOn, setIsSlot1RawOn, isSlot2RawOn, setIsSlot2RawOn, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot1Raw, setSlot1Raw, slot2Txt, setSlot2Txt, slot2Raw, setSlot2Raw, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError, setSlot1ModelName, slot1ModelName, setSlot2ModelName, slot2ModelName, setSlot1Error, slot1Error, setSlot2Error, slot2Error}}>
+        <workStateContext.Provider value={{glossary, setGlossary, user, setUser, slot1MergedLines, setSlot1MergedLines, slot2MergedLines, setSlot2MergedLines, slot1ResultDisplay, setSlot1ResultDisplay, slot1Txt, setSlot1Txt, isSlot1RawOn, setIsSlot1RawOn, isSlot2RawOn, setIsSlot2RawOn, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot1Raw, setSlot1Raw, slot2Txt, setSlot2Txt, slot2Raw, setSlot2Raw, userCurrency, setUserCurrency, better1Error, setBetter1Error, standardResultError, setStandardResultError, setSlot1ModelName, slot1ModelName, setSlot2ModelName, slot2ModelName, setSlot1Error, slot1Error, setSlot2Error, slot2Error}}>
             {children}
         </workStateContext.Provider>
     )
