@@ -195,8 +195,8 @@ export default function MainInputForm() {
                     if (response[0].glossary?.terms) {
                         const glossaryResult = response[0].glossary.terms
 
+                        //normalized glossary is user's glossary
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            console.log('Normalized Glossary used')
                             const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                             glossaryResult.forEach((newentry: GlossaryItem) => {
                                 if (!termSet.has(newentry.term.toLowerCase())) {
@@ -404,15 +404,23 @@ export default function MainInputForm() {
                     }
 
                     setIsLoading(true)
-                    const result = await translateGpt(params)
-                    console.log('[translateGpt] ', result)
+                    const jobId = await translateGpt(params)
+                    if (!jobId) {
+                        throw new Error('[Standard Model] Missing job Id')
+                    }
+                    console.log('[b2 Model] JobId:', jobId)
+                    const pollResponse = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
+                    const result = JSON.parse(pollResponse.job.response)
 
                     if (result) {
 
                         const textResult = result.text
                         const glossaryResult = result.glossary
 
-                        //add new entries if not dupe - backend should only return normalized results
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
                             console.log('Normalized Glossary used')
                             const termSet = new Set(normalizedGlossary.map(entry => entry.term))
@@ -463,6 +471,53 @@ export default function MainInputForm() {
                     throw new Error(`You do not have enough currency. ${userCurrency} / ${openAiCost}`)
                 }
                 setIsLoading(true)
+               
+
+                const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
+                    translateGemini(params),
+                    translateGpt(params)
+
+                ])
+
+                if (jobOneId.status === 'fulfilled') {
+                    if (jobTwoId.status === 'fulfilled') {
+                        const [jobOneResult, jobTwoResult] = await Promise.allSettled([
+                            pollJobStatus({
+                                jobId: jobOneId,
+                                startTime: startTime,
+                                interval: pollInterval,
+                            }),
+                            pollJobStatus({
+                                jobId: jobTwoId,
+                                startTime: startTime,
+                                interval: pollInterval,
+                            })
+
+                        ])
+
+                        if (jobTwoResult.status === 'fulfilled') {
+                            const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
+                            console.log('[Sb2] job2Response', jobTwoResponse)
+                        } else {
+                            if (jobOneResult.status === 'fulfilled') {
+                                const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                                console.log('[Sb2] jobOneResponse', jobOneResponse)
+                                
+                            } else {
+                                setSlot1Error(jobOneResult.reason)
+                            }
+                        }
+                    } else {
+                        console.log('[Sb1] jobTwoId / Gpt not fulfilled', jobTwoId)
+                        setSlot2Error(jobTwoId.reason.message)
+                    }
+                    
+
+                }
+
+
+
+
                 const [result1, result2]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
                     translateGpt(params)
