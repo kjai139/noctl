@@ -471,7 +471,7 @@ export default function MainInputForm() {
                     throw new Error(`You do not have enough currency. ${userCurrency} / ${openAiCost}`)
                 }
                 setIsLoading(true)
-               
+
 
                 const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
@@ -479,40 +479,38 @@ export default function MainInputForm() {
 
                 ])
 
-                if (jobOneId.status === 'fulfilled') {
-                    if (jobTwoId.status === 'fulfilled') {
-                        const [jobOneResult, jobTwoResult] = await Promise.allSettled([
-                            pollJobStatus({
-                                jobId: jobOneId,
-                                startTime: startTime,
-                                interval: pollInterval,
-                            }),
-                            pollJobStatus({
-                                jobId: jobTwoId,
-                                startTime: startTime,
-                                interval: pollInterval,
-                            })
+                if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
+                    throw new Error('Encountered a server error. Please try again later.')
 
-                        ])
+    
 
-                        if (jobTwoResult.status === 'fulfilled') {
-                            const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
-                            console.log('[Sb2] job2Response', jobTwoResponse)
-                        } else {
-                            if (jobOneResult.status === 'fulfilled') {
-                                const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
-                                console.log('[Sb2] jobOneResponse', jobOneResponse)
-                                
-                            } else {
-                                setSlot1Error(jobOneResult.reason)
-                            }
-                        }
+                } else {
+                    const [jobOneResult, jobTwoResult] = await Promise.allSettled([
+                        pollJobStatus({
+                            jobId: jobOneId.value,
+                            startTime: startTime,
+                            interval: pollInterval,
+                        }),
+                        pollJobStatus({
+                            jobId: jobTwoId.value,
+                            startTime: startTime,
+                            interval: pollInterval,
+                        })
+
+                    ])
+
+                    if (jobTwoResult.status === 'fulfilled') {
+                        const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
+                        console.log('[Sb2] job2Response', jobTwoResponse)
                     } else {
-                        console.log('[Sb1] jobTwoId / Gpt not fulfilled', jobTwoId)
-                        setSlot2Error(jobTwoId.reason.message)
-                    }
-                    
+                        if (jobOneResult.status === 'fulfilled') {
+                            const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                            console.log('[Sb2] jobOneResponse', jobOneResponse)
 
+                        } else {
+                            setSlot1Error(jobOneResult.reason)
+                        }
+                    }
                 }
 
 
