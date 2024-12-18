@@ -482,7 +482,7 @@ export default function MainInputForm() {
                 if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
                     throw new Error('Encountered a server error. Please try again later.')
 
-    
+
 
                 } else {
                     const [jobOneResult, jobTwoResult] = await Promise.allSettled([
@@ -502,14 +502,63 @@ export default function MainInputForm() {
                     if (jobTwoResult.status === 'fulfilled') {
                         const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
                         console.log('[Sb2] job2Response', jobTwoResponse)
-                    } else {
-                        if (jobOneResult.status === 'fulfilled') {
-                            const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
-                            console.log('[Sb2] jobOneResponse', jobOneResponse)
 
+                        const result2Response = jobTwoResult.value
+                        const textResult = result2Response.text
+                        const glossaryResult = result2Response.glossary
+
+
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry: GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())) {
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
                         } else {
-                            setSlot1Error(jobOneResult.reason)
+                            setGlossary(glossaryResult)
                         }
+                    } else {
+                        console.log('[jobTwo] status reejected. Reason: ', jobTwoResult.reason)
+                        setSlot2Error(jobTwoResult.reason)
+                    }
+
+
+                    if (jobOneResult.status === 'fulfilled') {
+                        const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                        console.log('[Sb2] jobOneResponse', jobOneResponse)
+                        if (jobTwoResult.status !== 'fulfilled') {
+                            //todo
+                            const result1Response = jobOneResult.value
+                            const textResult = result2Response.text
+                            const glossaryResult = result2Response.glossary
+
+
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('Normalized Glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
+                            }
+                        }
+
+                    } else {
+                        console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
+                        setSlot1Error(jobOneResult.reason)
                     }
                 }
 
@@ -523,26 +572,7 @@ export default function MainInputForm() {
                 ])
                 //openai
                 if (result2.status === 'fulfilled') {
-                    const result2Response = result2.value
-                    const textResult = result2Response.text
-                    const glossaryResult = result2Response.glossary
 
-
-                    if (normalizedGlossary && normalizedGlossary.length > 0) {
-                        console.log('Normalized Glossary used')
-                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                        glossaryResult.forEach((newentry: GlossaryItem) => {
-                            if (!termSet.has(newentry.term.toLowerCase())) {
-                                termSet.add(newentry.term)
-                                normalizedGlossary.unshift(newentry)
-                            } else {
-                                console.log(`Entry ${newentry.term} already exists.`)
-                            }
-                        })
-                        setGlossary(normalizedGlossary)
-                    } else {
-                        setGlossary(glossaryResult)
-                    }
 
                     setSlot2ResultDisplay(textResult)
 
