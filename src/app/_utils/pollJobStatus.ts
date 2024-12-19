@@ -14,7 +14,9 @@ export async function pollJobStatus({ jobId, startTime, interval }: {
         throw new Error('Server timed out. Please try again later.')
     }
     try {
-        console.log(`[pollJobStatus] Polling for response... Elapsed time is ${elapsedTime / 1000} seconds`)
+        console.log(`[pollJobStatus] Polling for response every ${interval}s... Elapsed time is ${elapsedTime / 1000} seconds`)
+        await delay(interval)
+        console.log(`Polling...`)
         const response = await fetch(`api/job/getStatus?jobId=${jobId}`, {
             method:'GET',
             next: {

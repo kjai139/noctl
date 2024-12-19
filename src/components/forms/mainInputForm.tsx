@@ -503,13 +503,12 @@ export default function MainInputForm() {
                         const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
                         console.log('[Sb2] job2Response', jobTwoResponse)
 
-                        const result2Response = jobTwoResult.value
-                        const textResult = result2Response.text
-                        const glossaryResult = result2Response.glossary
+                        const textResult = jobTwoResponse.text
+                        const glossaryResult = jobTwoResponse.glossary
 
 
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            console.log('Normalized Glossary used')
+                            console.log('jobTwo glossary used')
                             const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                             glossaryResult.forEach((newentry: GlossaryItem) => {
                                 if (!termSet.has(newentry.term.toLowerCase())) {
@@ -523,24 +522,34 @@ export default function MainInputForm() {
                         } else {
                             setGlossary(glossaryResult)
                         }
+                        setSlot2ResultDisplay(textResult)
+                        setSlot2Txt(textResult)
+                        setUserCurrency((prev) => {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - openAiCost
+                            }
+                            return prev
+                        })
+
+                        
                     } else {
                         console.log('[jobTwo] status reejected. Reason: ', jobTwoResult.reason)
                         setSlot2Error(jobTwoResult.reason)
                     }
 
-
                     if (jobOneResult.status === 'fulfilled') {
                         const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
                         console.log('[Sb2] jobOneResponse', jobOneResponse)
+                        const textResult = jobOneResponse[0].translation
                         if (jobTwoResult.status !== 'fulfilled') {
-                            //todo
-                            const result1Response = jobOneResult.value
-                            const textResult = result2Response.text
-                            const glossaryResult = result2Response.glossary
+                            
+                            
+                           
+                            const glossaryResult = jobOneResponse[0].glossary
 
 
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                console.log('Normalized Glossary used')
+                                console.log('jobOne glossary used')
                                 const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                                 glossaryResult.forEach((newentry: GlossaryItem) => {
                                     if (!termSet.has(newentry.term.toLowerCase())) {
@@ -554,78 +563,25 @@ export default function MainInputForm() {
                             } else {
                                 setGlossary(glossaryResult)
                             }
+                            
                         }
+                        setSlot1ResultDisplay(textResult)
+                        setSlot1Txt(textResult)
+                        
 
                     } else {
                         console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
                         setSlot1Error(jobOneResult.reason)
                     }
+
+
+                    
                 }
 
 
 
 
-                const [result1, result2]: [any, any] = await Promise.allSettled([
-                    translateGemini(params),
-                    translateGpt(params)
-
-                ])
-                //openai
-                if (result2.status === 'fulfilled') {
-
-
-                    setSlot2ResultDisplay(textResult)
-
-                    setSlot2Txt(textResult)
-                    setUserCurrency((prev) => {
-                        if (prev !== null && prev !== undefined) {
-                            return prev - openAiCost
-                        }
-                        return prev
-                    })
-
-
-                } else {
-                    console.log('[Sb1] slot2 not fulfilled', result2)
-                    setSlot2Error(result2.reason.message)
-
-                }
-                // gemini
-                if (result1.status === 'fulfilled') {
-                    console.log('[Sb1] Slot 1', result1)
-                    const jsonResult1 = JSON.parse(result1.value)
-                    console.log(jsonResult1)
-                    //use glossary if b1 hits error
-                    if (result2.status !== 'fulfilled') {
-                        console.log('[sb1] using standard glossary')
-                        if (jsonResult1[0].glossary?.terms) {
-                            const glossaryResult = jsonResult1[0].glossary.terms
-
-                            if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                console.log('Normalized Glossary used')
-                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                glossaryResult.forEach((newentry: GlossaryItem) => {
-                                    if (!termSet.has(newentry.term.toLowerCase())) {
-                                        termSet.add(newentry.term)
-                                        normalizedGlossary.unshift(newentry)
-                                    } else {
-                                        console.log(`Entry ${newentry.term} already exists.`)
-                                    }
-                                })
-                                setGlossary(normalizedGlossary)
-                            } else {
-                                setGlossary(glossaryResult)
-                            }
-                        }
-                    }
-
-                    setSlot1ResultDisplay(jsonResult1[0].translation)
-                    setSlot1Txt(jsonResult1[0].translation)
-                } else {
-                    console.log('[Sb1] slot1 not fulfilled', result1)
-                    setSlot1Error(result1.reason.message)
-
-                }
+                
             } else if (model === 'b12') {
 
                 const totalCost = openAiCost + claudeCost

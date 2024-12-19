@@ -254,7 +254,7 @@ export default function GlossaryTable () {
 
         <div className="flex gap-4 ml-auto px-2">
 
-          {glossary.length > 0 ?
+          {glossary && glossary.length > 0 ?
             <>
               <Button variant={'glossary'} className="gap-2" onClick={resetGlossary}>
                 <RiDeleteBin2Line></RiDeleteBin2Line>
