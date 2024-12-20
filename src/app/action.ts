@@ -205,7 +205,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text - \n ${text}`
+            prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text, only return me the text otherwise. - \n ${text}.`
         }
 
         //Making job on redis and starting lambda
