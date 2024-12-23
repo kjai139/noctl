@@ -7,6 +7,7 @@ import { Separator } from "../ui/separator"
 
 interface AiModelSelectProps {
     setModel: React.Dispatch<SetStateAction<ModelsType>>
+    isDisabled: boolean,
 }
 
 const models = [
@@ -45,7 +46,7 @@ const duoModels = [
 
 ]
 
-export default function AiModelSelect({ setModel }: AiModelSelectProps) {
+export default function AiModelSelect({ setModel, isDisabled }: AiModelSelectProps) {
 
     
 
@@ -56,7 +57,7 @@ export default function AiModelSelect({ setModel }: AiModelSelectProps) {
     return (
         <div className="flex flex-col gap-2">
            
-            <Select onValueChange={handleValueChange} defaultValue={'standard'}>
+            <Select disabled={isDisabled} onValueChange={handleValueChange} defaultValue={'standard'}>
 
                 <SelectTrigger id="lang-select" className="border-none shadow-none hover:shadow">
                     <SelectValue placeholder="Select Model">

@@ -9,10 +9,11 @@ import { Button } from "../ui/button";
 interface ChunkCarouselProps {
     setTextArea: (content:string) => void,
     setSelectedChunk: React.Dispatch<SetStateAction<number | null>>,
-    selectedChunk: number | null
+    selectedChunk: number | null,
+    isDisabled: boolean,
 }
 
-export default function ChunkCarousel ({setTextArea, setSelectedChunk, selectedChunk}:ChunkCarouselProps) {
+export default function ChunkCarousel ({setTextArea, setSelectedChunk, selectedChunk, isDisabled}:ChunkCarouselProps) {
 
     const { chunks } = useWorkState()
 
@@ -37,7 +38,7 @@ export default function ChunkCarousel ({setTextArea, setSelectedChunk, selectedC
             {chunks.length > 0 && chunks.map((chunk, idx) => {
                 return (
                     <div key={`caro-${idx}`}>
-                        <Button disabled={selectedChunk === idx} type="button" className={`w-full ${selectedChunk === idx ? 'selected' : null}`} variant={'outline'} onClick={() => setSelectedChunk(idx)}>
+                        <Button disabled={selectedChunk === idx || isDisabled} type="button" className={`w-full ${selectedChunk === idx ? 'selected' : null}`} variant={'outline'} onClick={() => setSelectedChunk(idx)}>
                             {idx + 1}
                         </Button>
                     </div>

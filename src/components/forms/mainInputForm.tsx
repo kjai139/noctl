@@ -161,6 +161,7 @@ export default function MainInputForm() {
 
             const txtLength = text.length
             let pollInterval = 5000
+            // 1sec is 1k
             if (txtLength < 150) {
                 pollInterval = 5000
             } else if (txtLength > 150 && txtLength < 500) {
@@ -841,7 +842,7 @@ export default function MainInputForm() {
 
 
                         {/* cara */}
-                        <ChunkCarousel setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
+                        <ChunkCarousel isDisabled={isLoading} setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
 
                     </div>
                     <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
@@ -867,7 +868,7 @@ export default function MainInputForm() {
 
                         </FormField>
                         <div className="justify-end flex gap-2 items-center p-2 pb-1">
-                            <AiModelSelect setModel={setAiModel}></AiModelSelect>
+                            <AiModelSelect setModel={setAiModel} isDisabled={isLoading}></AiModelSelect>
                             <div className="text-destructive p-0 flex gap-2 items-center">
                                 {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}
                                 {/* {form.formState.errors.language ? form.formState.errors.language.message : null} */}
