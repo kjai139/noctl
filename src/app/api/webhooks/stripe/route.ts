@@ -9,7 +9,8 @@ import userModel from "@/app/_models/userModel";
 export async function POST(req: NextRequest) {
     const body = await req.text()
     const sig = req.headers.get('stripe-signature')
-    const ngrokSecret = 'whsec_8D8TLuk9MTqS6dnsqVP7HphHnbx0i6KJ'
+    const ngrokSecret = ''
+    //ngrok no env
     const endpointSecret = process.env.STRIPE_WEBHOOK_LOCAL_SECRET
     let event: Stripe.Event
     try {
