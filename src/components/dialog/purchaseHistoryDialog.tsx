@@ -14,7 +14,7 @@ interface PurchaseHistoryDialogProps {
 
 
 
-export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: PurchaseHistoryDialogProps) {
+export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: PurchaseHistoryDialogProps) {
 
     const [errorMsg, setErrorMsg] = useState('')
     const [transArr, setTransArr] = useState<[] | null>()
@@ -48,7 +48,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
         }
     }
 
-    const verifyPiStatus = async (pId:string) => {
+    const verifyPiStatus = async (pId: string) => {
         try {
             setIsVerifying(true)
             const response = await fetch(`/api/purchase/verify?pId=${pId}`)
@@ -67,7 +67,7 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
         if (isDialogOpen) {
             fetchPhistory()
         }
-        
+
     }, [isDialogOpen])
 
 
@@ -85,58 +85,55 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                 {/* <Separator></Separator> */}
                 {
                     isLoading ?
-                    <div className="flex justify-center items-center min-h-[330px] w-full z-10 spin-bd">
-                    <div className="spinner">
+                        <div className="flex justify-center items-center min-h-[330px] w-full z-10 spin-bd">
+                            <div className="spinner">
 
-                    </div>
-                    </div> : null
+                            </div>
+                        </div> : null
                 }
                 {
-                    errorMsg && !isLoading ? 
-                    <div>
-                        {errorMsg}
-                    </div> : null
+                    errorMsg && !isLoading ?
+                        <div>
+                            {errorMsg}
+                        </div> : null
                 }
-                {   !errorMsg && !isLoading ?
-                <div className="h-auto md:h-[330px]">
-                    <Table>
-                        {transArr && transArr.length > 0 ?
-                        <TableCaption className="my-4">
-                            Any successful payments that are showing up as "pending" or "incomplete" should resolve itself within the next few hours, but feel free to contact support with that payment ID for assistance.
-                        </TableCaption> : null}
-                        <TableHeader className="hidden md:table-header-group">
-                            <TableRow>
-                                <TableHead>Item</TableHead>
-                                <TableHead>Payment Id</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Purchase Date</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {
-                                transArr && transArr.length > 0 && transArr.map((trans:TransactionObjModel, idx) => {
-                                    let formatAmt = (trans.amount / 100).toFixed(2)
-                                    let date = new Date(trans.createdAt)
-                                    let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+                {!errorMsg && !isLoading ?
+                    <div className="h-auto md:h-[330px] flex flex-col justify-between">
+                        <Table>
+                            
+                            <TableHeader className="hidden md:table-header-group">
+                                <TableRow>
+                                    <TableHead>Item</TableHead>
+                                    <TableHead>Payment Id</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Purchase Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {
+                                    transArr && transArr.length > 0 && transArr.map((trans: TransactionObjModel, idx) => {
+                                        let formatAmt = (trans.amount / 100).toFixed(2)
+                                        let date = new Date(trans.createdAt)
+                                        let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-                                    return (
-                                        <TableRow key={`trans-${idx}`} className="flex flex-col md:table-row">
-                                            <TableCell>
-                                                {trans.productName}
+                                        return (
+                                            <TableRow key={`trans-${idx}`} className="flex flex-col md:table-row">
+                                                <TableCell>
+                                                    {trans.productName}
 
-                                            </TableCell>
-                                            <TableCell className="w-[100px] md:w-auto">
-                                                {trans.paymentId}
-                                            </TableCell>
-                                            <TableCell>
-                                                ${formatAmt}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatDate}
-                                            </TableCell>
-                                            <TableCell>
-                                                {/* {trans.status === 'pending' && !trans.statusVerified || trans.status === 'incomplete' && !trans.statusVerified ?
+                                                </TableCell>
+                                                <TableCell className="w-[100px] md:w-auto text-muted-foreground">
+                                                    {trans.paymentId}
+                                                </TableCell>
+                                                <TableCell>
+                                                    ${formatAmt}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatDate}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {/* {trans.status === 'pending' && !trans.statusVerified || trans.status === 'incomplete' && !trans.statusVerified ?
                                                 <span className="flex justify-between items-center gap-2">
                                                     <span>
                                                     {trans.status}
@@ -149,31 +146,37 @@ export default function PurchaseHistoryDialog ({isDialogOpen, onOpenChange}: Pur
                                                 {trans.status}
                                                 </span>
                                                 } */}
-                                                <span>
-                                                    {trans.status}
-                                                </span>
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })
-                            }
-                            
+                                                    <span>
+                                                        {trans.status}
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })
+                                }
 
-                        </TableBody>
-                        
-                    </Table>
-                    {
-                                transArr && transArr.length === 0 &&
-                                <div className="pt-4 text-muted-foreground">
-                                    You have not made any purchases.
 
-                                </div>
+                            </TableBody>
+
+                        </Table>
+                        {
+                            transArr && transArr.length === 0 &&
+                            <div className="pt-4 text-muted-foreground">
+                                You have not made any purchases.
+
+                            </div>
+                        }
+                        {
+                            transArr && transArr.length > 0 &&
+                            <span className="text-muted-foreground text-sm text-center">
+                                Any "pending" payments should resolve itself within the next few hours, but feel free to contact support with that payment ID for assistance.
+                            </span>
                         }
                     </div>
                     : null
                 }
-                
-                
+
+
             </DialogContent>
         </Dialog>
     )

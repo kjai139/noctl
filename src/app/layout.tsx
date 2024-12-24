@@ -20,8 +20,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <AppSidebar></AppSidebar>
-        {children}
+          
+          {children}
         </Providers>
       </body>
     </html>

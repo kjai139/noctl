@@ -6,7 +6,7 @@ import { MdLogout } from "react-icons/md";
 export default function GoogleSignOutBtn () {
 
     return (
-        <Button className="flex gap-2 border-none shadow-none w-full" variant={'outline'} onClick={() => signOut()}>
+        <Button className="flex gap-2 border-none shadow-none w-full justify-start" variant={'outline'} onClick={() => signOut()}>
             <MdLogout></MdLogout>
             <span>Logout</span>
         </Button>

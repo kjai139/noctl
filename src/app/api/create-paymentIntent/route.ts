@@ -73,7 +73,8 @@ export async function POST(request:NextRequest) {
             currency: currency,
             metadata: {
                 userId: item.userId
-            }
+            },
+            payment_method_types: ['card', 'link']
         })
        console.log('ITEM ******', item)
        console.log('PRODUCT*******', product)

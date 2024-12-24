@@ -9,10 +9,11 @@ import userModel from "@/app/_models/userModel";
 export async function POST(req: NextRequest) {
     const body = await req.text()
     const sig = req.headers.get('stripe-signature')
-
+    const ngrokSecret = 'whsec_8D8TLuk9MTqS6dnsqVP7HphHnbx0i6KJ'
+    const endpointSecret = process.env.STRIPE_WEBHOOK_LOCAL_SECRET
     let event: Stripe.Event
     try {
-        event = stripe.webhooks.constructEvent(body, sig as string, process.env.STRIPE_WEBHOOK_LOCAL_SECRET as string)
+        event = stripe.webhooks.constructEvent(body, sig as string, ngrokSecret as string)
         
         console.log('[Stripe] Listening to Webhook events')
     } catch (err) {

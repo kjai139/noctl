@@ -64,8 +64,8 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
 
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuLabel>
-                        {`Logged in as ${session.user.email}`}
+                    <DropdownMenuLabel className="text-muted-foreground">
+                        {`${session.user.email}`}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator></DropdownMenuSeparator>
                     <DropdownMenuGroup>

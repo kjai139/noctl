@@ -151,11 +151,11 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                     <div className="flex flex-col gap-8 items-center p-10">
                         <SuccessAnimatedIcon></SuccessAnimatedIcon>
                         <div className="flex flex-col gap-4">
-                            <span className="text-center flex flex-col">
-                                <span>
+                            <span className="text-center flex flex-col gap-2">
+                                <span className="font-semibold">
                                 Payment Successful
                                 </span>
-                                <span>
+                                <span className="text-muted-foreground text-sm">
                                 {`Payment ID: ${product.pId}`}
                                 </span>  
                             </span>
@@ -191,7 +191,7 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                     <div className="min-h-[230px] relative">
                         {
                             isLoading && !paymentFailed && !paymentSuccess ?
-                                <div className="flex justify-center items-center min-h-[230px] absolute w-full z-10 spin-bd">
+                                <div className="flex justify-center items-center min-h-[230px] absolute w-full z-10 spin-bd h-full">
                                     <div className="spinner">
 
                                     </div>

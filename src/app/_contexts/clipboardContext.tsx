@@ -4,8 +4,9 @@ import React, { createContext, SetStateAction, useContext, useState } from "reac
 
 
 
+
 interface clipboardContexType {
-    clipboardTxt: LanguagesType,
+    clipboardTxt: string,
     setClipboardTxt: React.Dispatch<SetStateAction<string>>
 }
 
