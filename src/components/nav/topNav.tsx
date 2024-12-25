@@ -5,42 +5,15 @@ import stripeInstance from '../../lib/stripe'
 import ModelsDialog from "../dialog/modelsDialog";
 import siteLogo from '../../../public/mmtlicon.png'
 import Image from "next/image";
+import { type Session } from "next-auth";
 
-async function getProductList () {
-    try {
-        const products = await stripeInstance.products.list({
-            expand:['data.default_price']
-        })
-
-        if (products) {
-            return products
-        } else {
-            return null
-        }
-    } catch (err) {
-        console.error('Error getting products', err)
-        return null
-    }
+interface TopNavProps {
+    products: any,
+    session: Session | null
 }
 
-export default async function TopNav() {
-    const products = await getProductList()
-    console.log('Products from stripe:', products)
-    let plainProducts
-    if (products && products.data) {
-        plainProducts = products.data.map((node) => {
-            return {
-                id:node.id,
-                defaultPrice: node.default_price,
-                images: node.images,
-                name:node.name,
-                description: node.description
-            }
-
-        })
-    }
-    console.log('plainproducts', plainProducts)
-    const session = await auth()
+export default async function TopNav({ products, session}:TopNavProps) {
+    
 
     return (
         <nav className="flex w-full shadow p-4 justify-center items-center">
@@ -61,7 +34,7 @@ export default async function TopNav() {
                 </div>
                 
                 <div className="flex gap-8 items-center">
-                    <CurrencyDisplay products={plainProducts} session={session}></CurrencyDisplay>
+                    <CurrencyDisplay products={products} session={session}></CurrencyDisplay>
                     <SignInBtn session={session}></SignInBtn>
 
                 </div>
