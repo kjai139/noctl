@@ -6,6 +6,8 @@ import { BgExpandBtn, SidebarExpandBtn } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar/appSidebar";
 import stripeInstance from "@/lib/stripe";
 import { auth } from "../../auth";
+import { Suspense } from "react";
+import Loading from "./loading.";
 
 async function getProductList () {
   try {
@@ -24,7 +26,7 @@ async function getProductList () {
   }
 }
 
-export default async function Home() {
+async function Home() {
   const products = await getProductList()
       console.log('Products from stripe:', products)
       let plainProducts
@@ -60,4 +62,17 @@ export default async function Home() {
     </div>
     </>
   );
+}
+
+
+export default function Page() {
+  return (
+    <>
+      <Suspense fallback={<Loading></Loading>}>
+        <Home>
+
+        </Home>
+      </Suspense>
+    </>
+  )
 }

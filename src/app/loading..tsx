@@ -3,7 +3,7 @@ export default function Loading() {
 
     return (
         <div>
-            Loading...
+            Loading serverside...
         </div>
     )
 }

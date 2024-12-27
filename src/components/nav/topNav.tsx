@@ -1,7 +1,6 @@
-import { auth } from "../../../auth";
+
 import SignInBtn from "../buttons/signInBtn";
 import CurrencyDisplay from "../dropdown/currencyDisplay";
-import stripeInstance from '../../lib/stripe'
 import ModelsDialog from "../dialog/modelsDialog";
 import siteLogo from '../../../public/mmtlicon.png'
 import Image from "next/image";
