@@ -312,6 +312,10 @@ body {
       background-color: rgba(255, 255, 255, 0.7);
 }
 
+.icon-load {
+      animation: pulse 1.5s infinite;
+}
+
 
 @supports (animation: grow .5s cubic-bezier(.25, .25, .25, 1) forwards) {
       .tick {
@@ -349,6 +353,18 @@ body {
  @keyframes draw {
      0%, 100% { stroke-opacity: 1; }
      100% { stroke-dashoffset: 0; }
+ }
+
+ @keyframes pulse {
+      0% {
+            opacity: 1;
+      }
+      50% {
+            opacity: 0.5;
+      }
+      100% {
+            opacity:1;
+      }
  }
  
  @layer base {
