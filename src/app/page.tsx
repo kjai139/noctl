@@ -2,7 +2,7 @@ import MainInputForm from "@/components/forms/mainInputForm";
 import TopNav from "@/components/nav/topNav";
 import TopNavInfo from "@/components/nav/topNavInfo";
 import ResultRender from "@/components/text/resultRender";
-import { BgExpandBtn, SidebarExpandBtn } from "@/components/ui/sidebar";
+import { BgExpandBtn, SidebarExpandBtn } from "@/components/ui/experiemntSidebar";
 import AppSidebar from "@/components/sidebar/appSidebar";
 import stripeInstance from "@/lib/stripe";
 import { auth } from "../../auth";
@@ -57,7 +57,7 @@ async function Home() {
           </div>
         </main>
         <div>
-          <SidebarExpandBtn className="rounded-full h-auto w-auto p-4"></SidebarExpandBtn>
+          {/* <SidebarExpandBtn className="rounded-full h-auto w-auto p-4"></SidebarExpandBtn> */}
         </div>
       </div>
     </>

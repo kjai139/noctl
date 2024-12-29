@@ -3,9 +3,9 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile, useIsSmallScreen } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,7 +21,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH = "24rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -32,8 +32,16 @@ type SidebarContext = {
   setOpen: (open: boolean) => void
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
-  isMobile: boolean
-  toggleSidebar: () => void
+  isMobile: boolean,
+  isSmallScreen: boolean,
+  toggleSidebar: () => void,
+  expandState: "e" | "c",
+  setExpandState: React.Dispatch<React.SetStateAction<'c' | 'e'>>,
+  toggleExpand: () => void,
+  isAnimating: boolean,
+  setIsAnimating: React.Dispatch<React.SetStateAction<boolean>>,
+  showButton: boolean,
+  setShowButton: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -68,23 +76,27 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
+    const isSmallScreen = useIsSmallScreen()
     const [openMobile, setOpenMobile] = React.useState(false)
-
+    const [expandState, setExpandState] = React.useState<'c' | 'e'>('e')
+    const [isAnimating, setIsAnimating] = React.useState(false)
+    const [showButton, setShowButton] = React.useState(false)
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
-        const openState = typeof value === "function" ? value(open) : value
         if (setOpenProp) {
-          setOpenProp(openState)
-        } else {
-          _setOpen(openState)
+          return setOpenProp?.(
+            typeof value === "function" ? value(open) : value
+          )
         }
 
+        _setOpen(value)
+
         // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
       [setOpenProp, open]
     )
@@ -95,6 +107,28 @@ const SidebarProvider = React.forwardRef<
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open)
     }, [isMobile, setOpen, setOpenMobile])
+
+    //custom expand
+    const toggleExpand = React.useCallback(() => {
+      if (expandState === 'e') {
+        setIsAnimating(true)
+        setShowButton(false)
+        setExpandState('c')
+        console.log('Show button off expand c')
+      } else if (expandState === 'c') {
+        setIsAnimating(true)
+        setShowButton(false)
+        setExpandState('e')
+        console.log('Showbutton off expand e')
+      }
+    }, [expandState])
+    //useeffect to reset sidebar state
+    React.useEffect(() => {
+
+      setExpandState('e')
+      console.log('Expand state reset on small screen')
+
+    }, [isSmallScreen])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -125,8 +159,16 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        expandState,
+        setExpandState,
+        toggleExpand,
+        isAnimating,
+        setIsAnimating,
+        showButton,
+        setShowButton,
+        isSmallScreen
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isAnimating, expandState, setIsAnimating, toggleExpand, showButton, setShowButton, isSmallScreen]
     )
 
     return (
@@ -141,7 +183,10 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              `group/sidebar-wrapper flex-col md:flex-row flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar`,
+              {
+                "overflow-hidden": isAnimating
+              },
               className
             )}
             ref={ref}
@@ -175,7 +220,10 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, expandState, isAnimating, setIsAnimating, setShowButton } = useSidebar()
+
+    const internalRef = React.useRef<null | HTMLDivElement>(null)
+    React.useImperativeHandle(ref, () => internalRef.current ?? {} as HTMLDivElement)
 
     if (collapsible === "none") {
       return (
@@ -192,7 +240,49 @@ const Sidebar = React.forwardRef<
       )
     }
 
-    if (isMobile) {
+    React.useEffect(() => {
+      console.log('INTERNAL REF:', internalRef.current)
+      const ele = internalRef.current
+      const handleTransitionEnd = () => {
+        setIsAnimating(false)
+        setShowButton(true)
+        console.log('Transition finished')
+
+      }
+
+      if (!ele) {
+        return
+      }
+
+      console.log('USe effect ran from expandstate change')
+
+      ele.addEventListener('transitionend', handleTransitionEnd)
+
+      return () => {
+        ele.removeEventListener('transitionend', handleTransitionEnd)
+      }
+    }, [expandState, setShowButton])
+
+    /* React.useEffect(() => {
+      let timeout:ReturnType<typeof setTimeout>
+      if (expandState  === 'c') {
+        timeout = setTimeout(() => setIsAnimating(false), 500)
+      } else if (expandState === 'e') {
+      
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        })
+        timeout = setTimeout(() => {
+          setIsAnimating(false)
+          
+        }, 500)
+      }
+
+      return () => clearTimeout(timeout)
+    }, [expandState]) */
+
+    /* if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
@@ -210,21 +300,24 @@ const Sidebar = React.forwardRef<
           </SheetContent>
         </Sheet>
       )
-    }
+    } */
 
     return (
       <div
-        ref={ref}
-        className="group peer hidden md:block text-sidebar-foreground"
+        ref={internalRef}
+        className={`group peer absolute g-sidebar md:max-w-[380px] md:block ${expandState === 'e' ? 'open' : null} ${expandState === 'c' ? 'closed' : null}`}
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        data-gstate={expandState}
       >
+
         {/* This is what handles the sidebar gap on desktop */}
+        {/* EDITING for mobile */}
         <div
           className={cn(
-            "duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
+            "duration-200 relative h-auto w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
@@ -234,7 +327,7 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
+            "duration-200 relative inset-y-0 z-10 h-auto w-full transition-[left,right,width] ease-linear md:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -248,7 +341,7 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            className="flex md:h-[100svh] h-[100svh] w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
           >
             {children}
           </div>
@@ -300,7 +393,7 @@ const SidebarRail = React.forwardRef<
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
+        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 lg:flex",
         "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",
         "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
         "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar",
@@ -364,6 +457,69 @@ const SidebarHeader = React.forwardRef<
   )
 })
 SidebarHeader.displayName = "SidebarHeader"
+
+const SidebarExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
+
+  const { toggleExpand, expandState, showButton } = useSidebar()
+  const iconSize = 30
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button ref={ref} variant={'ghost'} size={'icon'} className={`${className} ${expandState === 'e' ? 'hidden' : null}`} onClick={(event) => {
+            onClick?.(event)
+            toggleExpand()
+          }} {...props}>
+            {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{expandState === 'e' ? 'Hide glossary' : 'Open Glossary'}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+})
+
+SidebarExpandBtn.displayName = 'SidebarExpandBtn'
+
+const BgExpandBtn = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>(({ className, onClick, ...props }, ref) => {
+
+  const { toggleExpand, expandState, showButton, isSmallScreen } = useSidebar()
+  const iconSize = 26
+  React.useEffect(() => {
+    console.log('SHOW BUTTON:', showButton)
+  }, [showButton])
+
+  return (
+    <>
+      {/* {
+      isSmallScreen ? 
+      <Button ref={ref} variant={'ghost'} size={'icon'} className={`hover:bg-heroBg hover:text-inherit ${className} ${!showButton ? 'hidden' : null} ${showButton && expandState === 'c' ? 'gloss-b-e' : null}`} onClick={(event) => {
+        onClick?.(event)
+        toggleExpand()
+      }} {...props}>
+         {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
+      </Button>
+      : null
+    } */}
+
+      <Button ref={ref} variant={'ghost'} size={'icon'} className={`hover:bg-heroBg hover:text-inherit ${className}`} onClick={(event) => {
+        onClick?.(event)
+        toggleExpand()
+      }} {...props}>
+        {expandState === 'e' ? <PanelLeftClose size={iconSize}></PanelLeftClose> : <PanelLeftOpen size={iconSize}></PanelLeftOpen>}
+      </Button>
+
+
+
+
+    </>
+  )
+})
+
+BgExpandBtn.displayName = 'BgExpandBtn'
 
 const SidebarFooter = React.forwardRef<
   HTMLDivElement,
@@ -614,7 +770,7 @@ const SidebarMenuAction = React.forwardRef<
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
+        "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className
       )}
       {...props}
@@ -759,5 +915,7 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarExpandBtn,
+  BgExpandBtn,
   useSidebar,
 }
