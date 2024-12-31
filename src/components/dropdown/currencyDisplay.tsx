@@ -156,7 +156,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         <>
         
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-            <TooltipProvider>
+            
                 <Tooltip>
                     <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
@@ -171,7 +171,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                         <p>Currency tab</p>
                     </TooltipContent>
             </Tooltip>
-            </TooltipProvider>
+            
             <DropdownMenuContent>
                 <DropdownMenuLabel>
                     My Balance

@@ -220,7 +220,7 @@ export default function GlossaryTable () {
                 </TableCell>
 
                 <TableCell className="flex gap-4">
-                  <TooltipProvider>
+                  
                     <Tooltip>
                       <TooltipTrigger>
                   <Input type="text" maxLength={30} value={node.translated_term} onChange={(e) => handleInputchange(e.target.value, idx)}>
@@ -230,7 +230,7 @@ export default function GlossaryTable () {
                   <span>{node.translated_term}</span>
                   </TooltipContent>
                   </Tooltip>
-                  </TooltipProvider>
+                  
                   <div className="flex items-center">
 
 

@@ -6,6 +6,7 @@ import OutputLanguageProvider from "./_contexts/outputContext"
 import { SessionProvider } from "next-auth/react"
 import ClipboardeProvider from "./_contexts/clipboardContext"
 import { SidebarProvider } from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 export function Providers({ children }: { children: React.ReactNode }) {
 
@@ -14,11 +15,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <SessionProvider>
                 <WorkStateProvider>
                     <ClipboardeProvider>
+                        <TooltipProvider>
                         <SidebarProvider>
                             <OutputLanguageProvider>
                                 {children}
                             </OutputLanguageProvider>
                         </SidebarProvider>
+                        </TooltipProvider>
                     </ClipboardeProvider>
                 </WorkStateProvider>
             </SessionProvider>

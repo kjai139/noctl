@@ -1,3 +1,4 @@
+import GlossSidebarBtn from "../buttons/glossSidebarBtn";
 import GlossaryTable from "../tables/glossaryTable";
 import { Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarFooter, SidebarTrigger } from "../ui/sidebar";
 
@@ -11,9 +12,9 @@ export default function AppSidebar () {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel className="items-center justify-between">
-                        Glossary tab
                         
-                        <SidebarTrigger></SidebarTrigger>
+                        <GlossSidebarBtn></GlossSidebarBtn>
+                        Glossary tab
                        
                     </SidebarGroupLabel>
                     <SidebarGroupContent>

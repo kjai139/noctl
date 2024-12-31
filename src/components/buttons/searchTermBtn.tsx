@@ -115,7 +115,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
 
     return (
-        <TooltipProvider>
+        <>
         <Tooltip>
             <TooltipTrigger asChild>
                 
@@ -183,6 +183,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             </div>
         </DialogContent>
         </Dialog>
-        </TooltipProvider>
+        </>
+        
     )
 }

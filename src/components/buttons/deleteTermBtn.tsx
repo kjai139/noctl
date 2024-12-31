@@ -9,7 +9,7 @@ export default function DeleteTermBtn ({onClick}:DeleteTermBtnProps) {
 
 
     return (
-        <TooltipProvider>
+        
         <Tooltip>
             <TooltipTrigger asChild>
                 
@@ -23,7 +23,7 @@ export default function DeleteTermBtn ({onClick}:DeleteTermBtnProps) {
             <p>Delete entry</p>
             </TooltipContent>
         </Tooltip>
-        </TooltipProvider>
+        
         
     )
 }

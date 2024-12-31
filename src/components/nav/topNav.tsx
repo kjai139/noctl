@@ -18,7 +18,7 @@ export default async function TopNav({ products, session}:TopNavProps) {
 
     return (
         <nav className="flex w-full shadow p-4 justify-center items-center">
-            <div className="mw w-full flex gap-2 sm:gap-8 justify-between items-center">
+            <div className="w-full flex gap-2 sm:gap-8 justify-between items-center px-8">
                 <div className="flex items-center gap-2">
                 <NavsideBarButton></NavsideBarButton>
                 <Image src={siteLogo} height={30} width={30} alt="Site logo">
