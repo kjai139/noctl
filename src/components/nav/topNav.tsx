@@ -5,7 +5,6 @@ import ModelsDialog from "../dialog/modelsDialog";
 import siteLogo from '../../../public/mmtlicon.png'
 import Image from "next/image";
 import { type Session } from "next-auth";
-import { SidebarTrigger } from "../ui/sidebar";
 import NavsideBarButton from "../buttons/navSidebarBtn";
 
 interface TopNavProps {
@@ -17,8 +16,8 @@ export default async function TopNav({ products, session}:TopNavProps) {
     
 
     return (
-        <nav className="flex w-full shadow p-4 justify-center items-center">
-            <div className="w-full flex gap-2 sm:gap-8 justify-between items-center px-8">
+        <nav className="flex w-full shadow p-4 justify-center items-center sticky left-0 top-0 bg-background">
+            <div className="w-full flex gap-2 sm:gap-8 justify-between items-center">
                 <div className="flex items-center gap-2">
                 <NavsideBarButton></NavsideBarButton>
                 <Image src={siteLogo} height={30} width={30} alt="Site logo">

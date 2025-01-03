@@ -16,11 +16,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <WorkStateProvider>
                     <ClipboardeProvider>
                         <TooltipProvider>
-                        <SidebarProvider>
+                        
                             <OutputLanguageProvider>
+                            <SidebarProvider>
                                 {children}
+                                </SidebarProvider>
                             </OutputLanguageProvider>
-                        </SidebarProvider>
+                        
                         </TooltipProvider>
                     </ClipboardeProvider>
                 </WorkStateProvider>

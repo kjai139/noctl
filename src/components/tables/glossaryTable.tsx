@@ -51,7 +51,7 @@ const glossary1:GlossaryItem[] = [
 
 export default function GlossaryTable () {
 
-   const { glossary, setGlossary } = useWorkState()
+   const { glossary, setGlossary, isLoading } = useWorkState()
 
     
 
@@ -59,6 +59,7 @@ export default function GlossaryTable () {
     const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
     const [errorMsg, setErrorMsg] = useState('')
     const [lang, setLang] = useState<LanguagesType>('English')
+
 
     const handleInputchange = (newDef:string, id:number) => {
         const updatedData = glossary.map((node, idx) => {
@@ -169,7 +170,7 @@ export default function GlossaryTable () {
               <label htmlFor="file-upload" className="cTwoBtn text-primary-foreground shadow h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
                 <FaFileUpload></FaFileUpload><span>Upload</span>
               </label>
-              <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange}></Input>
+              <Input className="hidden" id="file-upload" type="file" accept=".json" onChange={handleUploadChange} disabled={isLoading}></Input>
               
             </div>
           </div>
