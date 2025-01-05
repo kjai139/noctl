@@ -33,7 +33,7 @@ export default async function TopNav({ products, session}:TopNavProps) {
                     </div>
                 </div>
                 
-                <div className="flex gap-8 items-center">
+                <div className="flex sm:gap-8 items-center">
                     <CurrencyDisplay products={products} session={session}></CurrencyDisplay>
                     <SignInBtn session={session}></SignInBtn>
 

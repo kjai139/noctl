@@ -211,6 +211,18 @@ body {
       }
 }
 
+.nv-cont {
+      container-type: inline-size;
+      container-name: navinfo;
+      width:100%;
+}
+
+@container navinfo (max-width:650px) {
+      .nv-item {
+            flex-direction: column;
+      }
+}
+
 @keyframes l17 {
    0% {text-shadow: 
         calc( 0*var(--w)) -1.2em #000,calc(-1*var(--w)) -1.2em #000,calc(-2*var(--w)) -1.2em #000,calc(-3*var(--w)) -1.2em #000,calc(-4*var(--w)) -1.2em #000, 
@@ -393,6 +405,12 @@ body {
  
 @media (max-width: 1100px){
       .r-cont {
+            flex-direction: column;
+      }
+}
+
+@media (max-width:650px) {
+      .nv-item {
             flex-direction: column;
       }
 }

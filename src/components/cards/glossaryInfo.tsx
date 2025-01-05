@@ -4,7 +4,7 @@ import { IoAlertCircleOutline } from "react-icons/io5"
 
 const notifications = [
     {
-      text:'New terms from subsequent translation request will continue to add onto the current glossary'
+      text:'New terms from subsequent translation request will be added onto the current glossary'
     },
     {
       text:'The glossary file must be in proper .json format'
@@ -20,7 +20,7 @@ export default function GlossaryInfo () {
                 <div>
                     <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
                 </div>
-                <p>The glossary is used to keep terms and names consistent when translating things like novels. An editable glossary will be auto-generated after each successful prompt when appropirate. Edit as needed and you can also save it for future use.</p>
+                <p>The glossary is used to keep the translation of terms and names consistent when working with novels. An editable glossary will be auto-generated after each successful translation request when appropirate. Edit as needed and you can also save it for future use.</p>
             </div>
             <ul className="flex flex-col gap-2">
                 {notifications && notifications.map((node, idx) => {

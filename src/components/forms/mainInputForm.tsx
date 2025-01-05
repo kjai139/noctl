@@ -837,7 +837,7 @@ export default function MainInputForm() {
                     <FaArrowRightArrowLeft size={24}></FaArrowRightArrowLeft>
                 </div> */}
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col w-full sm:w-auto">
+                <form onSubmit={form.handleSubmit(onSubmitTest)} className="flex gap-4 flex-col w-full flex-1 max-w-[680px]">
                     <div className="flex gap-4 mx-2">
 
 
@@ -855,7 +855,7 @@ export default function MainInputForm() {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
-                                        }} placeholder="Enter or paste your text here..." {...field} className="sm:min-w-[600px] max-h-[300px] lg:min-w-[680px] border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                        }} placeholder="Enter or paste your text here..." {...field} className="max-h-[300px] w-full border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
 
                                         </Textarea>
 

@@ -193,6 +193,7 @@ const Sidebar = React.forwardRef<
     }
 
     if (isMobile) {
+      //768
       console.log('[Sidebar] is mobile')
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>

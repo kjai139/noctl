@@ -7,12 +7,12 @@ import { PanelLeftClose } from "lucide-react"
 
 export default function GlossSidebarBtn () {
 
-    const { toggleSidebar } = useSidebar()
+    const { toggleSidebar, state } = useSidebar()
 
     return (
         
         <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger asChild disabled={state === 'collapsed'}>
             <Button size={'icon'} variant={'ghost'} onClick={toggleSidebar}>
                 <PanelLeftClose></PanelLeftClose>
             </Button>
