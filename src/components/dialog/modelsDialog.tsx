@@ -9,13 +9,13 @@ const models = [
     {
         name:"Standard",
         accuracy: 3.5,
-        info: "Much better than Google Translate & DeepL. Occasional POV errors in dialogues.",
-        pricing: "Free"
+        info: "Much better than Google Translate & DeepL. Occasional speaker attribution errors.",
+        pricing: "Free, 1 request every 10 min"
     },
     {
         name:"Better-1",
         accuracy: 4.5,
-        info: "Higher reading comprehension, less POV errors, and higher accuracy compared to the 'Standard' model.",
+        info: "Higher reading comprehension, less attribution errors, and more accurate compared to the 'Standard' model.",
         pricing: "100 requests @ $5 USD"
     },
     {
@@ -27,8 +27,8 @@ const models = [
     {
         name:"Duo modes",
         accuracy: 4.5,
-        info: "Uses 2 models at the same time for comparison.",
-        pricing:'Uses the total cost of the two models.'
+        info: "Uses 2 models at the same time for comparison purposes.",
+        pricing:'The total cost of the two chosen models.'
     },
 
 ]
