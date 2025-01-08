@@ -1,4 +1,4 @@
 
 
-export const claudeCost = 10
-export const openAiCost = 10
+export const claudeCost = 1
+export const openAiCost = 1

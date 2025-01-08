@@ -18,21 +18,24 @@ export async function GET (req:NextRequest) {
 
     try {
         await connectToMongoose()
-        const existingUser = await userModel.find({
+        const existingUser = await userModel.findOne({
             email:email
         })
         if (!existingUser) {
             const newUser = new userModel({
                 email:email,
 
+
             })
             await newUser.save()
+            console.log('[/api/user/get] new user created:', newUser._id)
             return NextResponse.json({
                 userId: newUser._id
             })
         } 
+        console.log('[api/user/get] Existing user found:', existingUser._id)
         return NextResponse.json({
-            userId: existingUser[0]._id
+            userId: existingUser._id
         })
 
         

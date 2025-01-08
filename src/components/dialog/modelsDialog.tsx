@@ -1,9 +1,6 @@
+import StarsIcons from "../icons/stars";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { IoIosStarOutline } from "react-icons/io";
-import { IoIosStarHalf } from "react-icons/io";
-import { IoIosStar } from "react-icons/io";
-import StarsIcons from "../icons/stars";
 
 const models = [
     {
