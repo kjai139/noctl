@@ -16,7 +16,7 @@ export default async function TopNav({ products, session}:TopNavProps) {
     
 
     return (
-        <nav className="flex w-full shadow p-4 justify-center items-center sticky left-0 top-0 bg-background">
+        <nav className="flex w-full z-10 shadow p-4 justify-center items-center sticky left-0 top-0 bg-background">
             <div className="w-full flex gap-2 sm:gap-8 justify-between items-center">
                 <div className="flex items-center gap-2">
                 <NavsideBarButton></NavsideBarButton>
