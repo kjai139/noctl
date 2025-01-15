@@ -33,7 +33,8 @@ type SidebarContext = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
-  toggleSidebar: () => void
+  toggleSidebar: () => void,
+  mobileFocusRef: React.RefObject<HTMLButtonElement>
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -69,6 +70,7 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
+    const mobileFocusRef = React.useRef<HTMLButtonElement>(null)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
@@ -91,6 +93,7 @@ const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
+     
       return isMobile
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open)
@@ -125,6 +128,7 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        mobileFocusRef,
       }),
       [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
     )
@@ -175,7 +179,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, mobileFocusRef } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -195,10 +199,18 @@ const Sidebar = React.forwardRef<
     if (isMobile) {
       //768
       console.log('[Sidebar] is mobile')
+
+      const focusEle = (e:any) => {
+        e.preventDefault()
+        if (mobileFocusRef.current) {
+          mobileFocusRef.current.focus()
+          console.log('Focusing...' ,mobileFocusRef.current)
+        }
+      }
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
-          onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={focusEle}
             data-sidebar="sidebar"
             data-mobile="true"
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"

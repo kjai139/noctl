@@ -7,6 +7,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { SetStateAction, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
+import { useSidebar } from "../ui/sidebar";
 
 interface AddGlossaryEntryBtnProps {
     glossary: GlossaryItem[],
@@ -23,6 +24,8 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
     const [defInput, setDefInput] = useState('')
     const [termType, setTermType] = useState('')
     const [isOpen, setIsOpen] = useState(false)
+
+    const { mobileFocusRef } = useSidebar() 
 
     const handleInputChange = (e:any) => {
         setTermInput(e.target.value)
@@ -85,7 +88,7 @@ export default function AddGlossEntryBtn ({glossary, setGlossary}:AddGlossaryEnt
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-            <Button variant={'ghost'}>
+            <Button variant={'ghost'} ref={mobileFocusRef}>
                 <div className="flex items-center">
                     <IoIosAdd size={30}></IoIosAdd>
                     <span>Add Term</span>
