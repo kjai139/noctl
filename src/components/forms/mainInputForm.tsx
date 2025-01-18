@@ -126,6 +126,9 @@ export default function MainInputForm() {
         setStandardResultError('')
 
         try {
+            if (!navigator.onLine) {
+                throw new Error('You are offline. Please check your connection and try again.')
+            }
             let normalizedGlossary
             let filteredGlossary
             /* filterGlossary only consists of words from the glossary that exists in the query text */
@@ -746,15 +749,19 @@ export default function MainInputForm() {
             setIsLoading(false)
         } catch (err: any) {
             console.error(err)
-            if (!navigator.onLine) {
-                setErrorMsg("You're offline. Please check your connection.")
-            } else {
-                if (err.message) {
-                    setErrorMsg(err.message)
+            
+            if (err.message) {
+                if (err.message === 'Failed to fetch') {
+                    setErrorMsg('Network Error. The server might be unreachable or your internet connection may be unstable.')
                 } else {
-                    setErrorMsg('Encountered an unknown server error. If problem persists, try again later.')
+                    setErrorMsg(err.message)
                 }
+                
+            } else {
+                setErrorMsg('Encountered an unknown server error. If problem persists, try again later.')
             }
+            
+            
             setIsLoading(false)
 
 
