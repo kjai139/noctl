@@ -1,6 +1,5 @@
 import { SetStateAction } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
-import { Label } from "../ui/label"
 import { ModelsType } from "@/app/_types/glossaryType"
 import { Separator } from "../ui/separator"
 
@@ -12,7 +11,7 @@ interface AiModelSelectProps {
 
 const models = [
     {
-        name: 'Standard',
+        name: 'Free',
         model: 'standard'
     },
     {
@@ -32,11 +31,11 @@ const models = [
 
 const duoModels = [
     {
-        name: 'Standard / Better-1',
+        name: 'Free / Better-1',
         model: 'sb1'
     },
     {
-        name: 'Standard / Better-2',
+        name: 'Free / Better-2',
         model: 'sb2'
     },
     {

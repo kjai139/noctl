@@ -32,7 +32,7 @@ interface translateTxtProps {
 
 const geminiRatelimit = new Ratelimit({
     redis: redis,
-    limiter: Ratelimit.slidingWindow(1, '10m')
+    limiter: Ratelimit.slidingWindow(3, '10m')
 })
 
 export async function createTransactionEntry(product: CheckoutProduct) {
@@ -192,7 +192,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             const mins = Math.floor(remainingTime / 60000)
             const seconds = Math.floor((remainingTime / 60000) / 1000)
             console.log(reset, remainingTime, mins, seconds)
-            throw new Error(`You've hit the usage limit per hour. Please try again in ${mins}m ${seconds}s`)
+            throw new Error(`You've hit the usage limit. Please try again in ${mins}m ${seconds}s`)
         } */
 
         let prompt

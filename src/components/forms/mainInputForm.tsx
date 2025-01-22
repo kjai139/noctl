@@ -179,7 +179,7 @@ export default function MainInputForm() {
             if (model === 'standard') {
                 setIsLoading(true)
                 try {
-                    setSlot1ModelName('Standard')
+                    setSlot1ModelName('Free')
                     const jobId = await translateGemini(params)
                     // const jobId = `testJobId`
                     console.log('[Standard Model] Job Id - ', jobId)
@@ -308,7 +308,7 @@ export default function MainInputForm() {
                 }
 
             } else if (model === 'sb1') {
-                setSlot1ModelName('Standard')
+                setSlot1ModelName('Free')
                 setSlot2ModelName('Better-1')
 
                 if (userCurrency && userCurrency < claudeCost) {
@@ -390,32 +390,39 @@ export default function MainInputForm() {
                     }
 
                     if (jobOneResult.status === 'fulfilled') {
-                        const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
-                        console.log('[Sb2] jobOneResponse', jobOneResponse)
-                        const textResult = jobOneResponse[0].translation
-                        if (jobTwoResult.status !== 'fulfilled') {
+                        if (jobOneResult.value.jobStatus === 'failed') {
+                            const jobErrorMsg = jobOneResult.value.job.response
+                            console.log('[jobOne] job status failed. Reason: ', jobErrorMsg)
+                            setSlot1Error(jobErrorMsg)
+                        } else if (jobOneResult.value.jobStatus === 'completed') {
+                            const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                            console.log('[Sb1] jobOneResponse', jobOneResponse)
+                            const textResult = jobOneResponse[0].translation
+                            if (jobTwoResult.status !== 'fulfilled') {
 
-                            const glossaryResult = jobOneResponse[0].glossary
+                                const glossaryResult = jobOneResponse[0].glossary
 
-                            if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                console.log('jobOne glossary used')
-                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                glossaryResult.forEach((newentry: GlossaryItem) => {
-                                    if (!termSet.has(newentry.term.toLowerCase())) {
-                                        termSet.add(newentry.term)
-                                        normalizedGlossary.unshift(newentry)
-                                    } else {
-                                        console.log(`Entry ${newentry.term} already exists.`)
-                                    }
-                                })
-                                setGlossary(normalizedGlossary)
-                            } else {
-                                setGlossary(glossaryResult)
+                                if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                    console.log('jobOne glossary used')
+                                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                    glossaryResult.forEach((newentry: GlossaryItem) => {
+                                        if (!termSet.has(newentry.term.toLowerCase())) {
+                                            termSet.add(newentry.term)
+                                            normalizedGlossary.unshift(newentry)
+                                        } else {
+                                            console.log(`Entry ${newentry.term} already exists.`)
+                                        }
+                                    })
+                                    setGlossary(normalizedGlossary)
+                                } else {
+                                    setGlossary(glossaryResult)
+                                }
+
                             }
-
+                            setSlot1ResultDisplay(textResult)
+                            setSlot1Txt(textResult)
                         }
-                        setSlot1ResultDisplay(textResult)
-                        setSlot1Txt(textResult)
+
 
 
                     } else {
@@ -499,7 +506,7 @@ export default function MainInputForm() {
                 }
 
             } else if (model === 'sb2') {
-                setSlot1ModelName('Standard')
+                setSlot1ModelName('Free')
                 setSlot2ModelName('Better-2')
 
                 if (userCurrency && userCurrency < openAiCost) {
@@ -749,19 +756,19 @@ export default function MainInputForm() {
             setIsLoading(false)
         } catch (err: any) {
             console.error(err)
-            
+
             if (err.message) {
                 if (err.message === 'Failed to fetch') {
                     setErrorMsg('Network Error. The server might be unreachable or your internet connection may be unstable.')
                 } else {
                     setErrorMsg(err.message)
                 }
-                
+
             } else {
                 setErrorMsg('Encountered an unknown server error. If problem persists, try again later.')
             }
-            
-            
+
+
             setIsLoading(false)
 
 

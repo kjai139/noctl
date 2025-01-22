@@ -30,7 +30,8 @@ export async function GET (req:NextRequest) {
         const jobData = job
         if (jobData.status === 'failed') {
             return NextResponse.json({
-                jobStatus:'failed'
+                jobStatus:'failed',
+                job:job
             })
         } else if (jobData.status === 'completed') {
             return NextResponse.json({
