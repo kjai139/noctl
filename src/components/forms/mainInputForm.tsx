@@ -343,44 +343,50 @@ export default function MainInputForm() {
                     ])
 
                     if (jobTwoResult.status === 'fulfilled') {
-                        const result = JSON.parse(jobTwoResult.value.job.response)
-                        if (result && result[0]) {
-                            if (result[0].type === 'tool_use') {
-                                const textResult = result[0].input.text
-                                const glossaryResult = result[0].input.glossary
+                        if (jobTwoResult.value.jobStatus === 'failed') {
+                            const jobErrorMsg = jobTwoResult.value.job.response
+                            setSlot2Error(jobErrorMsg)
+                        } else if (jobTwoResult.value.jobStatus === 'completed') {
+                            const result = JSON.parse(jobTwoResult.value.job.response)
+                            if (result && result[0]) {
+                                if (result[0].type === 'tool_use') {
+                                    const textResult = result[0].input.text
+                                    const glossaryResult = result[0].input.glossary
 
 
-                                if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                    console.log('Normalized Glossary used')
-                                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                    glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                        console.log('Normalized Glossary used')
+                                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                        glossaryResult.forEach((newentry: GlossaryItem) => {
 
-                                        if (!termSet.has(newentry.term.toLowerCase())) {
-                                            termSet.add(newentry.term)
-                                            normalizedGlossary.unshift(newentry)
-                                        } else {
-                                            console.log(`Entry ${newentry.term} already exists.`)
+                                            if (!termSet.has(newentry.term.toLowerCase())) {
+                                                termSet.add(newentry.term)
+                                                normalizedGlossary.unshift(newentry)
+                                            } else {
+                                                console.log(`Entry ${newentry.term} already exists.`)
+                                            }
+                                        })
+                                        setGlossary(normalizedGlossary)
+                                    } else {
+                                        setGlossary(glossaryResult)
+                                    }
+
+
+                                    setSlot2ResultDisplay(textResult)
+                                    setSlot2Txt(textResult)
+                                    setUserCurrency((prev) => {
+                                        if (prev !== null && prev !== undefined) {
+                                            return prev - claudeCost
                                         }
+                                        return prev
                                     })
-                                    setGlossary(normalizedGlossary)
-                                } else {
-                                    setGlossary(glossaryResult)
+
+
                                 }
 
-
-                                setSlot2ResultDisplay(textResult)
-                                setSlot2Txt(textResult)
-                                setUserCurrency((prev) => {
-                                    if (prev !== null && prev !== undefined) {
-                                        return prev - claudeCost
-                                    }
-                                    return prev
-                                })
-
-
                             }
-
                         }
+
 
 
 

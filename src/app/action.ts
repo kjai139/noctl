@@ -149,8 +149,8 @@ async function queueJob({ prompt, userId, model }: {
         return jobId
 
     } catch (err) {
-        console.error('[translateText] Error', err)
-        throw new Error('Error queueing job. Check logs.')
+        console.error('[translateText] Encountered an error queueing job', err)
+        throw new Error('Encountered a server error. Please try again later.')
     }
 
 }
