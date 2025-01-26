@@ -252,7 +252,8 @@ export default function MainInputForm() {
                     const jobId = await translateClaude(params)
                     console.log('[B1 Model] Job Id - ', jobId)
                     if (!jobId) {
-                        throw new Error('[Standard Model] Missing job Id')
+                        console.error('[B-1] Missing job Id')
+                        throw new Error('Something went wrong -_-, please try again later.')
                     }
                     console.log('[Standard Model] JobId:', jobId)
                     const pollResponse = await pollJobStatus({
@@ -303,7 +304,78 @@ export default function MainInputForm() {
                     if (err instanceof Error) {
                         throw err
                     } else {
-                        throw new Error('[Better-1] An unknown error has occured, Please try again later')
+                        console.error('[B1] Unhandled error occured :', err)
+                        throw new Error('Something went wrong -_-, please try again later.')
+                    }
+                }
+
+            } else if (model === 'b2') {
+                setSlot1ModelName('Better-2')
+                console.log('user cur', userCurrency, openAiCost)
+
+                try {
+                    if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
+                        console.log(openAiCost > userCurrency)
+                        throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}).`)
+                    }
+
+                    setIsLoading(true)
+                    const jobId = await translateGpt(params)
+                    if (!jobId) {
+                        throw new Error('[Standard Model] Missing job Id')
+                    }
+                    console.log('[b2 Model] JobId:', jobId)
+                    const pollResponse = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
+                    const result = JSON.parse(pollResponse.job.response)
+
+                    if (result) {
+
+                        const textResult = result.text
+                        const glossaryResult = result.glossary
+
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('Normalized Glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry: GlossaryItem) => {
+                                /* let normalizedterm = newentry.term.toLowerCase() */
+                                if (!termSet.has(newentry.term.toLowerCase())) {
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
+
+
+
+
+                        setSlot2ResultDisplay(textResult)
+                        setSlot2Txt(textResult)
+                        setUserCurrency((prev) => {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - openAiCost
+                            }
+                            return prev
+                        })
+
+
+
+
+                    }
+
+
+                } catch (err) {
+                    console.error('[translateGpt] Error', err)
+                    if (err instanceof Error) {
+                        throw new Error(`[Better-2] ${err.message}`)
                     }
                 }
 
@@ -441,76 +513,6 @@ export default function MainInputForm() {
                 }
 
 
-            } else if (model === 'b2') {
-                setSlot1ModelName('Better-2')
-                console.log('user cur', userCurrency, openAiCost)
-
-                try {
-                    if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
-                        console.log(openAiCost > userCurrency)
-                        throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}).`)
-                    }
-
-                    setIsLoading(true)
-                    const jobId = await translateGpt(params)
-                    if (!jobId) {
-                        throw new Error('[Standard Model] Missing job Id')
-                    }
-                    console.log('[b2 Model] JobId:', jobId)
-                    const pollResponse = await pollJobStatus({
-                        jobId: jobId,
-                        startTime: startTime,
-                        interval: pollInterval,
-                    })
-                    const result = JSON.parse(pollResponse.job.response)
-
-                    if (result) {
-
-                        const textResult = result.text
-                        const glossaryResult = result.glossary
-
-                        if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            console.log('Normalized Glossary used')
-                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                            glossaryResult.forEach((newentry: GlossaryItem) => {
-                                /* let normalizedterm = newentry.term.toLowerCase() */
-                                if (!termSet.has(newentry.term.toLowerCase())) {
-                                    termSet.add(newentry.term)
-                                    normalizedGlossary.unshift(newentry)
-                                } else {
-                                    console.log(`Entry ${newentry.term} already exists.`)
-                                }
-                            })
-                            setGlossary(normalizedGlossary)
-                        } else {
-                            setGlossary(glossaryResult)
-                        }
-
-
-
-
-                        setSlot2ResultDisplay(textResult)
-                        setSlot2Txt(textResult)
-                        setUserCurrency((prev) => {
-                            if (prev !== null && prev !== undefined) {
-                                return prev - openAiCost
-                            }
-                            return prev
-                        })
-
-
-
-
-                    }
-
-
-                } catch (err) {
-                    console.error('[translateGpt] Error', err)
-                    if (err instanceof Error) {
-                        throw new Error(`[Better-2] ${err.message}`)
-                    }
-                }
-
             } else if (model === 'sb2') {
                 setSlot1ModelName('Free')
                 setSlot2ModelName('Better-2')
@@ -519,7 +521,6 @@ export default function MainInputForm() {
                     throw new Error(`You do not have enough currency. ${userCurrency} / ${openAiCost}`)
                 }
                 setIsLoading(true)
-
 
                 const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
@@ -548,36 +549,42 @@ export default function MainInputForm() {
                     ])
 
                     if (jobTwoResult.status === 'fulfilled') {
-                        const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
-                        console.log('[Sb2] job2Response', jobTwoResponse)
+                        if (jobTwoResult.value.jobStatus === 'failed') {
+                            const jobErrorMsg = jobTwoResult.value.job.response
+                            setSlot2Error(jobErrorMsg)
+                        } else if (jobTwoResult.value.jobStatus === 'completed') {
+                            const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
+                            console.log('[Sb2] job2Response', jobTwoResponse)
 
-                        const textResult = jobTwoResponse.text
-                        const glossaryResult = jobTwoResponse.glossary
+                            const textResult = jobTwoResponse.text
+                            const glossaryResult = jobTwoResponse.glossary
 
 
-                        if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            console.log('jobTwo glossary used')
-                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                            glossaryResult.forEach((newentry: GlossaryItem) => {
-                                if (!termSet.has(newentry.term.toLowerCase())) {
-                                    termSet.add(newentry.term)
-                                    normalizedGlossary.unshift(newentry)
-                                } else {
-                                    console.log(`Entry ${newentry.term} already exists.`)
-                                }
-                            })
-                            setGlossary(normalizedGlossary)
-                        } else {
-                            setGlossary(glossaryResult)
-                        }
-                        setSlot2ResultDisplay(textResult)
-                        setSlot2Txt(textResult)
-                        setUserCurrency((prev) => {
-                            if (prev !== null && prev !== undefined) {
-                                return prev - openAiCost
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('jobTwo glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
                             }
-                            return prev
-                        })
+                            setSlot2ResultDisplay(textResult)
+                            setSlot2Txt(textResult)
+                            setUserCurrency((prev) => {
+                                if (prev !== null && prev !== undefined) {
+                                    return prev - openAiCost
+                                }
+                                return prev
+                            })
+                        }
+
 
 
                     } else {
