@@ -5,11 +5,12 @@ import connectToMongoose from "@/lib/mongoose";
 import TransactiionModel from '@/app/_models/transactionModel'
 import mongoose from 'mongoose'
 import userModel from "@/app/_models/userModel";
+import { fiveDollarCurAmt, tenDollarsCurAmt, twentyDollarCurAmt } from "@/lib/currencyPrice";
 
 export async function POST(req: NextRequest) {
     const body = await req.text()
     const sig = req.headers.get('stripe-signature')
-    const ngrokSecret = ''
+    const ngrokSecret = ""
     //ngrok no env
     const endpointSecret = process.env.STRIPE_WEBHOOK_LOCAL_SECRET
     let event: Stripe.Event
@@ -57,15 +58,15 @@ export async function POST(req: NextRequest) {
                 let requests
                 switch (session4.amount) {
                     case 500:
-                        requests = 100
+                        requests = fiveDollarCurAmt
                         console.log('[Stripe Webhook] Adding 100 request credits...')
                         break
                     case 1000:
-                        requests = 200
+                        requests = tenDollarsCurAmt
                         console.log('[Stripe Webhook] Adding 200 request credits...')
                         break
                     case 2000:
-                        requests = 425
+                        requests = twentyDollarCurAmt
                         console.log('[Stripe Webhook] Adding 425 request credits...')
                         break
                     default:

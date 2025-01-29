@@ -41,8 +41,8 @@ export async function pollJobStatus({ jobId, startTime, interval }: {
                 console.log(`[pollJobStatus] job status failed, returning response...`)
                 return data
             } else  {
-                console.log('[pollJobStatus] Unhandled jobStatus.')
-                throw new Error('Unhandled jobStatus')
+                console.error('[pollJobStatus] Unhandled jobStatus.')
+                throw new Error('Something went wrong *_*, please try again later.')
             }
         }
 

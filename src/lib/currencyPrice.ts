@@ -1,9 +1,8 @@
 
 
-export const tenDollarsCurAmt = 200
+export const tenDollarsCurAmt = 100
 
-export const oneDollarCurAmt = 150
 
-export const fiveDollarCurAmt = 100
+export const fiveDollarCurAmt = 50
 
-export const twentyDollarCurAmt = 425
+export const twentyDollarCurAmt = 200

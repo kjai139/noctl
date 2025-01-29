@@ -6,13 +6,13 @@ const models = [
     {
         name: "Free",
         accuracy: 3.5,
-        info: "Much better than Google Translate & DeepL. Occasional speaker attribution errors.",
+        info: "Better than Google Translate & DeepL. Occasional speaker attribution errors.",
         pricing: "Free, 1 request every 10 min"
     },
     {
         name: "Better-1",
         accuracy: 4.5,
-        info: "Higher reading comprehension, less attribution errors, and more accurate compared to the 'Standard' model.",
+        info: "Higher reading comprehension, less speaker attribution errors, more accurate.",
         pricing: "50 requests @ $5 USD"
     },
     {
