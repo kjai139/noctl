@@ -205,7 +205,8 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate this text to ${language} and return me a list of terms, skills, and people names extracted from the text, only return me the text otherwise. - \n ${text}.`
+            prompt = `Please translate the text in <<< >>> to ${language} and return me a list of terms, skills, and people names extracted from the text, only return me the text otherwise. <<< \n ${text} >>>`
+            /* prompt = `Please translate the text inside <<< >>> and return me a list of terms, skills, and people names extracted from the text. Leave everything inside exactly as it is, including all punctuations, line breaks, and spacing. \n <<< ${text} >>>` */
         }
 
         //Making job on redis and starting lambda
@@ -264,8 +265,9 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
 
 
         } else {
-            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
-            console.log('[OpenAi] prompt 2 used')
+            prompt = `Please translate the text in <<< >>> to ${language} and extract a list of special terms, skills, and people names from the text. \n <<< ${text} >>>`
+            /* prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}` */
+            console.log('[OpenAi] prompt:', prompt)
         }
         const params: {
             model: ModelsType,
@@ -281,37 +283,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
         await existingUser.save()
         console.log(`[translateGpt] user currency updated`)
         return jobId
-        // const glossaryResponse = z.object({
-        //     term: z.string(),
-        //     translated_term: z.string()
-        // })
-
-        // const translatedTxtResponse = z.object({
-        //     glossary: z.array(glossaryResponse),
-        //     text: z.string()
-        // })
-
-        // const completion = await openAi.beta.chat.completions.parse({
-        //     model: 'gpt-4o-mini-2024-07-18',
-        //     messages: [
-        //         {
-        //             role: "system",
-        //             content: prompt
-        //         }
-        //     ],
-        //     response_format: zodResponseFormat(translatedTxtResponse, "translation_response"),
-        //     max_tokens: 8192,
-        // })
-
-        // const translation_response = completion.choices[0].message
-        // console.log('[OpenAi] translation response', translation_response)
-        // if (translation_response.parsed) {
-        //     console.log('[OpenAi] parsed', translation_response.parsed)
-        //     return translation_response.parsed
-        // } else if (translation_response.refusal) {
-        //     console.log('[OpenAi] refusal', translation_response.refusal)
-        //     throw new Error(translation_response.refusal)
-        // }
+        
 
     } catch (err) {
         console.error('[translateGpt] Encountered an error, ', err)
@@ -366,69 +338,11 @@ export async function translateClaude({ text, language, glossary }: translateTxt
            })
 
         } else {
-            prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}`
+            prompt = `Please translate the text in <<< >>> to ${language} and extract a list of special terms, skills, and people names from the text. \n <<< ${text} >>>`
             console.log('prompt 2 used')
         }
 
 
-
-
-
-        // const message = await client.messages.create({
-        //     max_tokens: 8192,
-        //     temperature: 0,
-        //     tool_choice: {
-        //         type: "tool",
-        //         name: "translate_text"
-        //     },
-        //     tools: [
-        //         {
-        //             name: "translate_text",
-        //             description: "Translate text to the language the user wants",
-        //             input_schema: {
-        //                 type: "object",
-        //                 properties: {
-        //                     "text": {
-        //                         type: "string",
-        //                         description: "The translated text. It has to be in the language the user wants"
-        //                     },
-        //                     "glossary": {
-        //                         type: "array",
-        //                         terms: {
-        //                             type: "object",
-        //                             properties: {
-        //                                 "term": {
-        //                                     type: "string",
-        //                                     description: "term name or people name or skill name in the original text's language"
-        //                                 },
-        //                                 "translated_term": {
-        //                                     type: "string",
-        //                                     description: "the term or name in the translated language"
-        //                                 },
-                                        
-        //                             },
-        //                             required: ["term", "translated_term"]
-        //                         },
-        //                         description: "Extract a list of special terms, skills, and people names from the text"
-        //                     }
-        //                 },
-        //                 required: ["text", "glossary"]
-        //             }
-        //         }
-        //     ],
-        //     messages: [{
-        //         role: 'user',
-        //         content: [
-        //             {
-        //                 type: 'text',
-        //                 text: prompt
-        //             },
-        //         ]
-        //     }],
-        //     model: 'claude-3-5-sonnet-20240620'
-        // }) as Anthropic.Message
-
-        // console.log(message)
         const params: {
             model: ModelsType,
             prompt: string,

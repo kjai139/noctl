@@ -361,8 +361,8 @@ export default function MainInputForm() {
 
 
 
-                        setSlot2ResultDisplay(textResult)
-                        setSlot2Txt(textResult)
+                        setSlot1ResultDisplay(textResult)
+                        setSlot1Txt(textResult)
                         setUserCurrency((prev) => {
                             if (prev !== null && prev !== undefined) {
                                 return prev - openAiCost

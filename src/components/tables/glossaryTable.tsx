@@ -263,7 +263,7 @@ export default function GlossaryTable() {
               </Button>
               <Button variant={'glossary'} onClick={downloadGlossary} className="gap-2">
                 <GrDocumentDownload></GrDocumentDownload>
-                <span>Download</span></Button>
+                <span>Save File</span></Button>
             </>
             : null
           }

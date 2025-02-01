@@ -23,10 +23,10 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     return (
         <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
             <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                <h2 className="underline font-semibold">{`Model: ${slotModelName}`}</h2>
+                <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
                 <ResultRenderTaskbar setSlotMergedLines={setSlotMergedLines} setCurDisplay={setSlotResultDisplay} curRaw={slotRaw} curOgTxt={slotTxt} setCurRaw={setSlotRaw} text={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn}></ResultRenderTaskbar>
             </div>
-            <div className="pt-8">
+            <div className="py-8">
                 {isRawOn ?
                 slotMergedLines && slotMergedLines.length > 0 ? 
                 slotMergedLines.map((line:any, idx:number) => {

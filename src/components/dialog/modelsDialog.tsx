@@ -23,7 +23,7 @@ const models = [
     },
     {
         name: "Duo modes",
-        accuracy: 4.5,
+        accuracy: 'NA',
         info: "Uses 2 models at the same time.",
         pricing: 'The total cost of the two chosen models.'
     },
@@ -81,7 +81,15 @@ export default function ModelsDialog() {
                                             {model.name}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <StarsIcons rating={model.accuracy}></StarsIcons>
+                                            
+                                            {
+                                                typeof model.accuracy === 'number' ?
+                                                <StarsIcons rating={model.accuracy}></StarsIcons> : 
+                                                <span>
+                                                    {model.accuracy}
+                                                </span> 
+                                            }
+                                            
                                         </TableCell>
                                         <TableCell>
                                             {model.info}

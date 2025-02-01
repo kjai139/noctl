@@ -5,6 +5,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { TransactionObjModel } from "@/app/_types/transactionType";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
+import { supportEmail } from "@/lib/supportEmail";
 
 interface PurchaseHistoryDialogProps {
     isDialogOpen: boolean,
@@ -146,7 +147,7 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                                                 {trans.status}
                                                 </span>
                                                 } */}
-                                                    <span>
+                                                    <span className={`${trans.status === 'completed' ? 'text-green-600' : ''}`}>
                                                         {trans.status}
                                                     </span>
                                                 </TableCell>
@@ -169,7 +170,7 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                         {
                             transArr && transArr.length > 0 &&
                             <span className="text-muted-foreground text-sm text-center">
-                                Any "pending" payments should resolve itself within the next few hours, but feel free to contact support with that payment ID for assistance.
+                                For payment assistance, contact <strong>{supportEmail}</strong> with the payment ID.
                             </span>
                         }
                     </div>
