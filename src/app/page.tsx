@@ -47,7 +47,7 @@ async function Home() {
   return (
     <>
       <AppSidebar></AppSidebar>
-      <div className="flex flex-col w-full h-auto flex-1">
+      <div className="flex flex-col w-full h-full flex-1">
         <TopNav products={plainProducts} session={session}></TopNav>
         <TopNavInfo></TopNavInfo>
         <main className="flex main-p flex-col items-center w-full">

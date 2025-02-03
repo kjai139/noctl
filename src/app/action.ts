@@ -32,7 +32,7 @@ interface translateTxtProps {
 
 const geminiRatelimit = new Ratelimit({
     redis: redis,
-    limiter: Ratelimit.slidingWindow(3, '10m')
+    limiter: Ratelimit.slidingWindow(1, '10m')
 })
 
 export async function createTransactionEntry(product: CheckoutProduct) {
@@ -150,7 +150,7 @@ async function queueJob({ prompt, userId, model }: {
 
     } catch (err) {
         console.error('[translateText] Encountered an error queueing job', err)
-        throw new Error('Encountered a server error. Please try again later.')
+        throw new Error('Encountered a server error -_-. Please try again later.')
     }
 
 }
@@ -168,7 +168,7 @@ function getPrompt({ glossary, language, text }: {
                         Translation: ${term.translated_term}
                         `).join('')}
                     `
-    const prompt = `${formattedGlossary} \n. Please use that glossary to translate this text to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. \n ${text}.`
+    const prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. <<<\n ${text}>>>`
     return prompt
 
 }
@@ -185,15 +185,15 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             throw new Error('Encountered a server error. Please try relogging.')
         }
 
-        /* const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
+        const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
         if (!success) {
             
             const remainingTime = reset - Date.now()
             const mins = Math.floor(remainingTime / 60000)
             const seconds = Math.floor((remainingTime / 60000) / 1000)
             console.log(reset, remainingTime, mins, seconds)
-            throw new Error(`You've hit the usage limit. Please try again in ${mins}m ${seconds}s`)
-        } */
+            throw new Error(`You've hit the usage limit. Please try again in ${mins}m ${seconds}s or use another model.`)
+        }
 
         let prompt
 
@@ -205,8 +205,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate the text in <<< >>> to ${language} and return me a list of terms, skills, and people names extracted from the text, only return me the text otherwise. <<< \n ${text} >>>`
-            /* prompt = `Please translate the text inside <<< >>> and return me a list of terms, skills, and people names extracted from the text. Leave everything inside exactly as it is, including all punctuations, line breaks, and spacing. \n <<< ${text} >>>` */
+            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the text format in the translated text the same as the original's. \n ### Text \n ${text}`
         }
 
         //Making job on redis and starting lambda
@@ -224,7 +223,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
 
 
     } catch (err) {
-        console.error(err)
+        console.error('[TranslateGemini] Error: ', err)
         throw err
     }
 
@@ -265,7 +264,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
 
 
         } else {
-            prompt = `Please translate the text in <<< >>> to ${language} and extract a list of special terms, skills, and people names from the text. \n <<< ${text} >>>`
+            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the text format the same. \n ### Text \n ${text}`
             /* prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}` */
             console.log('[OpenAi] prompt:', prompt)
         }
@@ -354,12 +353,19 @@ export async function translateClaude({ text, language, glossary }: translateTxt
         }
         const jobId = await queueJob(params)
         existingUser.currencyAmt -= claudeCost
-        await existingUser.save()
+        try {
+            await existingUser.save()
+        } catch (err) {
+            console.error('[TranslateClaude] Error updating user:', err)
+            throw new Error('Encountered a server error *_*, please try again later.')
+        }
+        
         console.log(`[TranslateClaude] user currency updated`)
         return jobId
     } catch (err) {
         console.error('[translateClaude] Error', err)
-        if (err instanceof Anthropic.APIError) {
+        throw err
+        /* if (err instanceof Anthropic.APIError) {
             switch (err.status) {
                 case 400:
                     throw new Error('Bad request, possibly due to NSFW')
@@ -377,12 +383,11 @@ export async function translateClaude({ text, language, glossary }: translateTxt
                     throw new Error('An unknown server error has occured.')
             }
         } else if (err instanceof Error) {
-
             throw err
         } else {
             console.log('[translateClaude] Hit an unhandled error type')
             throw new Error('Something went wrong. Please try again later.')
-        }
+        } */
 
     }
 

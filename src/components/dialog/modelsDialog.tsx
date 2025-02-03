@@ -23,7 +23,7 @@ const models = [
     },
     {
         name: "Duo modes",
-        accuracy: 'NA',
+        accuracy: 'N/A',
         info: "Uses 2 models at the same time.",
         pricing: 'The total cost of the two chosen models.'
     },

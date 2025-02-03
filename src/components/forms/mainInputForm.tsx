@@ -163,6 +163,7 @@ export default function MainInputForm() {
             console.log('[Api Lookup] Params used:', params)
 
             const txtLength = text.length
+            console.log('[Apilookup] Text length:', txtLength)
             let pollInterval = 5000
             // 1sec is 1k
             if (txtLength < 150) {
@@ -392,13 +393,126 @@ export default function MainInputForm() {
 
                 }
                 setIsLoading(true)
-                const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
+                
+                /* const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
                     translateGemini(params),
                     translateClaude(params)
 
+                ]) */
+
+                const jobOneId = await translateGemini(params)
+                const jobTwoId = await translateClaude(params)
+                
+                
+                const [jobOneResult, jobTwoResult] = await Promise.allSettled([
+                    pollJobStatus({
+                        jobId: jobOneId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    }),
+                    pollJobStatus({
+                        jobId: jobTwoId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
+
                 ])
 
-                if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
+                if (jobTwoResult.status === 'fulfilled') {
+                    if (jobTwoResult.value.jobStatus === 'failed') {
+                        const jobErrorMsg = jobTwoResult.value.job.response
+                        setSlot2Error(jobErrorMsg)
+                    } else if (jobTwoResult.value.jobStatus === 'completed') {
+                        const result = JSON.parse(jobTwoResult.value.job.response)
+                        if (result && result[0]) {
+                            if (result[0].type === 'tool_use') {
+                                const textResult = result[0].input.text
+                                const glossaryResult = result[0].input.glossary
+
+
+                                if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                    console.log('Normalized Glossary used')
+                                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                    glossaryResult.forEach((newentry: GlossaryItem) => {
+
+                                        if (!termSet.has(newentry.term.toLowerCase())) {
+                                            termSet.add(newentry.term)
+                                            normalizedGlossary.unshift(newentry)
+                                        } else {
+                                            console.log(`Entry ${newentry.term} already exists.`)
+                                        }
+                                    })
+                                    setGlossary(normalizedGlossary)
+                                } else {
+                                    setGlossary(glossaryResult)
+                                }
+
+
+                                setSlot2ResultDisplay(textResult)
+                                setSlot2Txt(textResult)
+                                setUserCurrency((prev) => {
+                                    if (prev !== null && prev !== undefined) {
+                                        return prev - claudeCost
+                                    }
+                                    return prev
+                                })
+
+
+                            }
+
+                        }
+                    }
+
+
+
+
+                } else {
+                    console.log('[jobTwo] status reejected. Reason: ', jobTwoResult.reason)
+                    setSlot2Error(jobTwoResult.reason)
+                }
+
+                if (jobOneResult.status === 'fulfilled') {
+                    if (jobOneResult.value.jobStatus === 'failed') {
+                        const jobErrorMsg = jobOneResult.value.job.response
+                        console.log('[jobOne] job status failed. Reason: ', jobErrorMsg)
+                        setSlot1Error(jobErrorMsg)
+                    } else if (jobOneResult.value.jobStatus === 'completed') {
+                        const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                        console.log('[Sb1] jobOneResponse', jobOneResponse)
+                        const textResult = jobOneResponse[0].translation
+                        if (jobTwoResult.status !== 'fulfilled') {
+
+                            const glossaryResult = jobOneResponse[0].glossary
+
+                            if (normalizedGlossary && normalizedGlossary.length > 0) {
+                                console.log('jobOne glossary used')
+                                const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                                glossaryResult.forEach((newentry: GlossaryItem) => {
+                                    if (!termSet.has(newentry.term.toLowerCase())) {
+                                        termSet.add(newentry.term)
+                                        normalizedGlossary.unshift(newentry)
+                                    } else {
+                                        console.log(`Entry ${newentry.term} already exists.`)
+                                    }
+                                })
+                                setGlossary(normalizedGlossary)
+                            } else {
+                                setGlossary(glossaryResult)
+                            }
+
+                        }
+                        setSlot1ResultDisplay(textResult)
+                        setSlot1Txt(textResult)
+                    }
+
+
+
+                } else {
+                    console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
+                    setSlot1Error(jobOneResult.reason)
+                }
+
+                /* if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
                     throw new Error('Encountered a server error. Please try again later.')
 
 
@@ -514,7 +628,7 @@ export default function MainInputForm() {
 
 
 
-                }
+                } */
 
 
             } else if (model === 'sb2') {

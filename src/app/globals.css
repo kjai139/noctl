@@ -205,7 +205,7 @@ body {
       transform: translateY(100%);
 } */
 
-@container rcont (max-width: 780px) {
+@container rcont (max-width: 1000px) {
       .r-wrap-cont {
             flex-direction: column;
       }
