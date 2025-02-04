@@ -192,7 +192,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             const mins = Math.floor(remainingTime / 60000)
             const seconds = Math.floor((remainingTime / 60000) / 1000)
             console.log(reset, remainingTime, mins, seconds)
-            throw new Error(`You've hit the usage limit. Please try again in ${mins}m ${seconds}s or use another model.`)
+            throw new Error(`[Free Model] You've hit the usage limit. Please try again in ${mins}m ${seconds}s or switch to another model.`)
         }
 
         let prompt
@@ -239,7 +239,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
     try {
         const session = await auth()
         if (!session || !session.user.id) {
-            throw new Error('Please sign in to use this model.')
+            throw new Error('Encountered an authentication error. Please sign in to use this model.')
         }
 
         const existingUser = await userModel.findById(session.user.id)
@@ -278,34 +278,23 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             userId: session.user.id
         }
         const jobId = await queueJob(params)
-        existingUser.currencyAmt -= openAiCost
-        await existingUser.save()
-        console.log(`[translateGpt] user currency updated`)
+        const UserCurrencyAmt:number = existingUser.currencyAmt
+        const updatedUsercur:number = UserCurrencyAmt - openAiCost
+        existingUser.currencyAmt = updatedUsercur
+        try {
+            await existingUser.save()
+        } catch (err) {
+            console.error('[translateGpt] Error saving to DB.', err)
+            throw new Error('Encountered a server error *_*. Please try again later.')
+        }
+        
+        console.log(`[translateGpt] user currency updated: ${UserCurrencyAmt} - ${openAiCost} = ${updatedUsercur}`)
         return jobId
         
 
     } catch (err) {
         console.error('[translateGpt] Encountered an error, ', err)
-        if (err instanceof OpenAI.APIError) {
-            if (err.status == 400) {
-                throw new Error('Bad request')
-            } else if (err.status === 401) {
-                throw new Error('Invalid Auth')
-            } else if (err.status == 403) {
-                throw new Error('Unsupported country, region, or territory.')
-            } else if (err.status == 429) {
-                throw new Error('Exceeded current quota. Please contact support.')
-            } else if (err.status == 500) {
-                throw new Error('Server is having issues at the moment. Please try again later.')
-            } else if (err.status == 503) {
-                throw new Error('Servers are experiencing high traffic. Please try after a brief wait.')
-            }
-        } else if (err instanceof Error) {
-            throw err
-        } else {
-            console.error('[translateGPT] Unhandled error type')
-            throw new Error('Something went wrong. Please try again later.')
-        }
+        throw err
 
     }
 }

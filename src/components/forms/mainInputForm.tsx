@@ -137,6 +137,7 @@ export default function MainInputForm() {
                 .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
 
             if (glossary.length > 0) {
+                console.log('[ApiLookup] Glossary detected :', glossary)
                 normalizedGlossary = glossary.map((entry) => {
                     return (
                         {
@@ -148,12 +149,14 @@ export default function MainInputForm() {
 
                 if (normalizedGlossary) {
                     filteredGlossary = normalizedGlossary.filter((entry: GlossaryItem) => normalizedtext.includes(entry.term))
+                    console.log('[Api Lookup] Filtered Glossary:', filteredGlossary)
                 }
+            } else {
+                console.log('[ApiLookup] No glossary used.')
             }
 
 
-            console.log('[Api Lookup] Non filtered Glossary:', glossary)
-            console.log('[Api Lookup] Filtered Glossary:', filteredGlossary)
+            
 
             const params = {
                 text: text,
@@ -163,7 +166,7 @@ export default function MainInputForm() {
             console.log('[Api Lookup] Params used:', params)
 
             const txtLength = text.length
-            console.log('[Apilookup] Text length:', txtLength)
+            
             let pollInterval = 5000
             // 1sec is 1k
             if (txtLength < 150) {
@@ -175,6 +178,8 @@ export default function MainInputForm() {
             } else if (txtLength > 1000) {
                 pollInterval = 30000
             }
+            console.log('[Apilookup] Text length:', txtLength)
+            console.log('[Apilookup] Polling Interval:', pollInterval, 'ms')
             const startTime = Date.now()
             //Standard Model
             if (model === 'standard') {
@@ -243,7 +248,7 @@ export default function MainInputForm() {
             } else if (model === 'b1') {
 
                 if (userCurrency && userCurrency < claudeCost) {
-                    throw new Error('You do not have enough currency to use this model. Please purchase more at the currency tab.')
+                    throw new Error(`You do not have enough currency to use this model (${userCurrency} / ${claudeCost}). You can purchase more at the currency tab.`)
 
                 }
                 setIsLoading(true)
@@ -317,7 +322,7 @@ export default function MainInputForm() {
                 try {
                     if (userCurrency !== undefined && userCurrency !== null && userCurrency < openAiCost) {
                         console.log(openAiCost > userCurrency)
-                        throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}).`)
+                        throw new Error(`You do not have enough currency. (${userCurrency} / ${openAiCost}). You can purchase more at the currency tab.`)
                     }
 
                     setIsLoading(true)
@@ -393,12 +398,6 @@ export default function MainInputForm() {
 
                 }
                 setIsLoading(true)
-                
-                /* const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
-                    translateGemini(params),
-                    translateClaude(params)
-
-                ]) */
 
                 const jobOneId = await translateGemini(params)
                 const jobTwoId = await translateClaude(params)
@@ -512,126 +511,9 @@ export default function MainInputForm() {
                     setSlot1Error(jobOneResult.reason)
                 }
 
-                /* if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
-                    throw new Error('Encountered a server error. Please try again later.')
-
-
-
-                } else {
-                    const [jobOneResult, jobTwoResult] = await Promise.allSettled([
-                        pollJobStatus({
-                            jobId: jobOneId.value,
-                            startTime: startTime,
-                            interval: pollInterval,
-                        }),
-                        pollJobStatus({
-                            jobId: jobTwoId.value,
-                            startTime: startTime,
-                            interval: pollInterval,
-                        })
-
-                    ])
-
-                    if (jobTwoResult.status === 'fulfilled') {
-                        if (jobTwoResult.value.jobStatus === 'failed') {
-                            const jobErrorMsg = jobTwoResult.value.job.response
-                            setSlot2Error(jobErrorMsg)
-                        } else if (jobTwoResult.value.jobStatus === 'completed') {
-                            const result = JSON.parse(jobTwoResult.value.job.response)
-                            if (result && result[0]) {
-                                if (result[0].type === 'tool_use') {
-                                    const textResult = result[0].input.text
-                                    const glossaryResult = result[0].input.glossary
-
-
-                                    if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                        console.log('Normalized Glossary used')
-                                        const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                        glossaryResult.forEach((newentry: GlossaryItem) => {
-
-                                            if (!termSet.has(newentry.term.toLowerCase())) {
-                                                termSet.add(newentry.term)
-                                                normalizedGlossary.unshift(newentry)
-                                            } else {
-                                                console.log(`Entry ${newentry.term} already exists.`)
-                                            }
-                                        })
-                                        setGlossary(normalizedGlossary)
-                                    } else {
-                                        setGlossary(glossaryResult)
-                                    }
-
-
-                                    setSlot2ResultDisplay(textResult)
-                                    setSlot2Txt(textResult)
-                                    setUserCurrency((prev) => {
-                                        if (prev !== null && prev !== undefined) {
-                                            return prev - claudeCost
-                                        }
-                                        return prev
-                                    })
-
-
-                                }
-
-                            }
-                        }
-
-
-
-
-                    } else {
-                        console.log('[jobTwo] status reejected. Reason: ', jobTwoResult.reason)
-                        setSlot2Error(jobTwoResult.reason)
-                    }
-
-                    if (jobOneResult.status === 'fulfilled') {
-                        if (jobOneResult.value.jobStatus === 'failed') {
-                            const jobErrorMsg = jobOneResult.value.job.response
-                            console.log('[jobOne] job status failed. Reason: ', jobErrorMsg)
-                            setSlot1Error(jobErrorMsg)
-                        } else if (jobOneResult.value.jobStatus === 'completed') {
-                            const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
-                            console.log('[Sb1] jobOneResponse', jobOneResponse)
-                            const textResult = jobOneResponse[0].translation
-                            if (jobTwoResult.status !== 'fulfilled') {
-
-                                const glossaryResult = jobOneResponse[0].glossary
-
-                                if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                    console.log('jobOne glossary used')
-                                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                    glossaryResult.forEach((newentry: GlossaryItem) => {
-                                        if (!termSet.has(newentry.term.toLowerCase())) {
-                                            termSet.add(newentry.term)
-                                            normalizedGlossary.unshift(newentry)
-                                        } else {
-                                            console.log(`Entry ${newentry.term} already exists.`)
-                                        }
-                                    })
-                                    setGlossary(normalizedGlossary)
-                                } else {
-                                    setGlossary(glossaryResult)
-                                }
-
-                            }
-                            setSlot1ResultDisplay(textResult)
-                            setSlot1Txt(textResult)
-                        }
-
-
-
-                    } else {
-                        console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
-                        setSlot1Error(jobOneResult.reason)
-                    }
-
-
-
-                } */
-
 
             } else if (model === 'sb2') {
+                //need test
                 setSlot1ModelName('Free')
                 setSlot2ModelName('Better-2')
 
@@ -640,46 +522,82 @@ export default function MainInputForm() {
                 }
                 setIsLoading(true)
 
-                const [jobOneId, jobTwoId]: [any, any] = await Promise.allSettled([
-                    translateGemini(params),
-                    translateGpt(params)
+                const jobOneId = await translateGemini(params)
+                const jobTwoId = await translateGpt(params)
+
+
+                const [jobOneResult, jobTwoResult] = await Promise.allSettled([
+                    pollJobStatus({
+                        jobId: jobOneId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    }),
+                    pollJobStatus({
+                        jobId: jobTwoId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
 
                 ])
 
-                if (jobOneId.status !== 'fulfilled' || jobTwoId.status !== 'fulfilled') {
-                    throw new Error('Encountered a server error. Please try again later.')
+                if (jobTwoResult.status === 'fulfilled') {
+                    if (jobTwoResult.value.jobStatus === 'failed') {
+                        const jobErrorMsg = jobTwoResult.value.job.response
+                        setSlot2Error(jobErrorMsg)
+                    } else if (jobTwoResult.value.jobStatus === 'completed') {
+                        const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
+                        console.log('[Sb2] job2Response', jobTwoResponse)
+
+                        const textResult = jobTwoResponse.text
+                        const glossaryResult = jobTwoResponse.glossary
+
+
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            console.log('jobTwo glossary used')
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry: GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())) {
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
+                        setSlot2ResultDisplay(textResult)
+                        setSlot2Txt(textResult)
+                        setUserCurrency((prev) => {
+                            if (prev !== null && prev !== undefined) {
+                                return prev - openAiCost
+                            }
+                            return prev
+                        })
+                    }
 
 
 
                 } else {
-                    const [jobOneResult, jobTwoResult] = await Promise.allSettled([
-                        pollJobStatus({
-                            jobId: jobOneId.value,
-                            startTime: startTime,
-                            interval: pollInterval,
-                        }),
-                        pollJobStatus({
-                            jobId: jobTwoId.value,
-                            startTime: startTime,
-                            interval: pollInterval,
-                        })
+                    console.log('[jobTwo] jobTwo failed. Reason: ', jobTwoResult.reason)
+                    setSlot2Error(jobTwoResult.reason)
+                }
 
-                    ])
+                if (jobOneResult.status === 'fulfilled') {
+                    if (jobOneResult.value.jobStatus === 'failed') {
+                        const jobErrorMsg = jobOneResult.value.job.response
+                        setSlot1Error(jobErrorMsg)
+                    } else if (jobOneResult.value.jobStatus === 'completed') {
+                        const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
+                        console.log('[Sb2] jobOneResponse', jobOneResponse)
+                        const textResult = jobOneResponse[0].translation
 
-                    if (jobTwoResult.status === 'fulfilled') {
-                        if (jobTwoResult.value.jobStatus === 'failed') {
-                            const jobErrorMsg = jobTwoResult.value.job.response
-                            setSlot2Error(jobErrorMsg)
-                        } else if (jobTwoResult.value.jobStatus === 'completed') {
-                            const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
-                            console.log('[Sb2] job2Response', jobTwoResponse)
+                        if (jobTwoResult.status !== 'fulfilled') {
 
-                            const textResult = jobTwoResponse.text
-                            const glossaryResult = jobTwoResponse.glossary
-
-
+                            const glossaryResult = jobOneResponse[0].glossary
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                console.log('jobTwo glossary used')
+                                console.log('jobOne glossary used')
                                 const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                                 glossaryResult.forEach((newentry: GlossaryItem) => {
                                     if (!termSet.has(newentry.term.toLowerCase())) {
@@ -693,66 +611,21 @@ export default function MainInputForm() {
                             } else {
                                 setGlossary(glossaryResult)
                             }
-                            setSlot2ResultDisplay(textResult)
-                            setSlot2Txt(textResult)
-                            setUserCurrency((prev) => {
-                                if (prev !== null && prev !== undefined) {
-                                    return prev - openAiCost
-                                }
-                                return prev
-                            })
+
                         }
-
-
-
-                    } else {
-                        console.log('[jobTwo] status reejected. Reason: ', jobTwoResult.reason)
-                        setSlot2Error(jobTwoResult.reason)
-                    }
-
-                    if (jobOneResult.status === 'fulfilled') {
-                        if (jobOneResult.value.jobStatus === 'failed') {
-                            const jobErrorMsg = jobOneResult.value.job.response
-                            setSlot1Error(jobErrorMsg)
-                        } else if (jobOneResult.value.jobStatus === 'completed') {
-                            const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
-                            console.log('[Sb2] jobOneResponse', jobOneResponse)
-                            const textResult = jobOneResponse[0].translation
-
-                            if (jobTwoResult.status !== 'fulfilled') {
-
-                                const glossaryResult = jobOneResponse[0].glossary
-                                if (normalizedGlossary && normalizedGlossary.length > 0) {
-                                    console.log('jobOne glossary used')
-                                    const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                                    glossaryResult.forEach((newentry: GlossaryItem) => {
-                                        if (!termSet.has(newentry.term.toLowerCase())) {
-                                            termSet.add(newentry.term)
-                                            normalizedGlossary.unshift(newentry)
-                                        } else {
-                                            console.log(`Entry ${newentry.term} already exists.`)
-                                        }
-                                    })
-                                    setGlossary(normalizedGlossary)
-                                } else {
-                                    setGlossary(glossaryResult)
-                                }
-
-                            }
-                            setSlot1ResultDisplay(textResult)
-                            setSlot1Txt(textResult)
-                        }
-
-
-
-                    } else {
-                        console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
-                        setSlot1Error(jobOneResult.reason)
+                        setSlot1ResultDisplay(textResult)
+                        setSlot1Txt(textResult)
                     }
 
 
 
+                } else {
+                    console.log('[jobOne] status reejected. Reason: ', jobOneResult.reason)
+                    setSlot1Error(jobOneResult.reason)
                 }
+
+
+               
 
 
 
