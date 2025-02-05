@@ -6,8 +6,10 @@ import React, { createContext, SetStateAction, useContext, useState } from "reac
 
 
 interface clipboardContexType {
-    clipboardTxt: string,
-    setClipboardTxt: React.Dispatch<SetStateAction<string>>
+    clipboard1Txt: string,
+    clipboard2Txt: string,
+    setClipboard1Txt: React.Dispatch<SetStateAction<string>>
+    setClipboard2Txt: React.Dispatch<SetStateAction<string>>
 }
 
 
@@ -15,10 +17,11 @@ const clipboardContext = createContext<clipboardContexType | undefined>(undefine
 
 
 export default function ClipboardeProvider ({children}:{children: React.ReactNode}) {
-    const [clipboardTxt, setClipboardTxt] = useState('')
+    const [clipboard1Txt, setClipboard1Txt] = useState('')
+    const [clipboard2Txt, setClipboard2Txt] = useState('')
 
     return (
-        <clipboardContext.Provider value={{clipboardTxt, setClipboardTxt}}>
+        <clipboardContext.Provider value={{clipboard1Txt, setClipboard1Txt, clipboard2Txt, setClipboard2Txt}}>
             {children}
         </clipboardContext.Provider>
     )

@@ -1,3 +1,4 @@
+import { standardModelLimit } from "@/lib/modelQuota";
 import StarsIcons from "../icons/stars";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -7,12 +8,12 @@ const models = [
         name: "Free",
         accuracy: 3.5,
         info: "Better than Google Translate & DeepL. Occasional speaker attribution errors.",
-        pricing: "Free, 1 request every 10 min"
+        pricing: `Free, ${standardModelLimit} requests every 10 min`
     },
     {
         name: "Better-1",
         accuracy: 4.5,
-        info: "Higher reading comprehension, less speaker attribution errors, more accurate.",
+        info: "Higher reading comprehension, more accurate, and less speaker attribution errors compared to the free model.",
         pricing: "50 requests @ $5 USD"
     },
     {

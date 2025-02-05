@@ -8,16 +8,19 @@ import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 interface CopyTextBtnProps {
     text: string,
     isRawOn:boolean,
+    clipboardTxt:string,
+
 }
 
-export default function CopyTextBtn ({text, isRawOn}: CopyTextBtnProps) {
+export default function CopyTextBtn ({text, isRawOn, clipboardTxt}: CopyTextBtnProps) {
 
     const [isCopied, setIsCopied] = useState(false)
-    const { clipboardTxt } = useClipboardContext()
+    
 
     const handleCopy = async () => {
         try {
             if (isRawOn) {
+                console.log('[CopyTextBtn] Clipboardtxt - ', clipboardTxt)
                 await navigator.clipboard.writeText(clipboardTxt)
                 setIsCopied(true)
                 setTimeout(() => setIsCopied(false), 2000)

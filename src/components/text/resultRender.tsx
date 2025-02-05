@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import ResultWrap from "../wrapper/resultWrap"
 import ErrorResult from "./errorResult"
+import { useClipboardContext } from "@/app/_contexts/clipboardContext"
 
 
 export default function ResultRender() {
 
     const { slot1ResultDisplay, setSlot1MergedLines, slot1MergedLines, slot1Txt, slot2MergedLines, setSlot2MergedLines, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
+    const { clipboard1Txt, clipboard2Txt, setClipboard1Txt, setClipboard2Txt } = useClipboardContext()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -82,6 +84,8 @@ export default function ResultRender() {
                                                 slotResultDisplay={slot1ResultDisplay}
                                                 isRawOn={isSlot1RawOn}
                                                 setIsRawOn={setIsSlot1RawOn}
+                                                clipboardTxt={clipboard1Txt}
+                                                setClipboardTxt={setClipboard1Txt}
                                                 >
                                                 </ResultWrap> : null}
                                         {
@@ -104,6 +108,8 @@ export default function ResultRender() {
                                             slotResultDisplay={slot2ResultDisplay}
                                             isRawOn={isSlot2RawOn}
                                             setIsRawOn={setIsSlot2RawOn}
+                                            clipboardTxt={clipboard2Txt}
+                                            setClipboardTxt={setClipboard2Txt}
                                             >
                                             </ResultWrap> : null
                                         }

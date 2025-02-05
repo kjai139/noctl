@@ -51,7 +51,7 @@ function TextAreaWatched({ control }: { control: Control<z.infer<typeof formSche
 
 export default function MainInputForm() {
     // curResult = Standard
-    const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency } = useWorkState()
+    const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency, setIsSlot1RawOn, setIsSlot2RawOn } = useWorkState()
     const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
 
@@ -124,6 +124,8 @@ export default function MainInputForm() {
         setSlot2Error('')
         setBetter1Error('')
         setStandardResultError('')
+        setIsSlot1RawOn(false)
+        setIsSlot2RawOn(false)
 
         try {
             if (!navigator.onLine) {
@@ -591,6 +593,7 @@ export default function MainInputForm() {
                     } else if (jobOneResult.value.jobStatus === 'completed') {
                         const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
                         console.log('[Sb2] jobOneResponse', jobOneResponse)
+                        console.log('[Sb2] jobOne Glossary', jobOneResponse[0].glossary)
                         const textResult = jobOneResponse[0].translation
 
                         if (jobTwoResult.status !== 'fulfilled') {

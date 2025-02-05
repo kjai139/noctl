@@ -35,6 +35,12 @@ const geminiRatelimit = new Ratelimit({
     limiter: Ratelimit.slidingWindow(1, '10m')
 })
 
+const termLookupRateLimit = new Ratelimit({
+    redis:redis,
+    limiter: Ratelimit.slidingWindow(2, '10s')
+
+})
+
 export async function createTransactionEntry(product: CheckoutProduct) {
     try {
         await connectToMongoose()
@@ -168,7 +174,7 @@ function getPrompt({ glossary, language, text }: {
                         Translation: ${term.translated_term}
                         `).join('')}
                     `
-    const prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} and then return me a list of special terms, skills, and people names extracted from the text that should be included in the glossary. <<<\n ${text}>>>`
+    const prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} while keeping the same format, and then return me a list of special terms, skills, and people names extracted from the text. <<<\n ${text}>>>`
     return prompt
 
 }
@@ -264,7 +270,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
 
 
         } else {
-            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the text format the same. \n ### Text \n ${text}`
+            prompt = `Please translate the following text to ${language} while keeping the same line breaks and format, and extract a list of special terms, skills, and people names. \n ### Text \n ${text}`
             /* prompt = `Please translate this text to ${language} and extract a list of special terms, skills, and people names from the text - \n ${text}` */
             console.log('[OpenAi] prompt:', prompt)
         }
@@ -326,7 +332,7 @@ export async function translateClaude({ text, language, glossary }: translateTxt
            })
 
         } else {
-            prompt = `Please translate the text in <<< >>> to ${language} and extract a list of special terms, skills, and people names from the text. \n <<< ${text} >>>`
+            prompt = `Please translate the text in <<< >>> to ${language} while keeping the same format, and extract a list of special terms, skills, and people names from the text. \n <<< ${text} >>>`
             console.log('prompt 2 used')
         }
 
@@ -390,6 +396,17 @@ interface TermLookupProps {
 
 export async function TermLookup({ term, context, language }: TermLookupProps) {
     try {
+        
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Encountered an authentication error. Please try relogging.')
+        }
+             
+        
+        const { success, remaining, reset } = await termLookupRateLimit.limit(`${session.user.id}-termRate`)
+        if (!success) {
+            throw new Error('Please wait a few seconds before trying again.')
+        }
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
             model: 'gemini-1.5-flash',
@@ -424,7 +441,7 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
 
         return result.response.text()
     } catch (err) {
-        console.error(err)
-        throw new Error('Encountered a server error.')
+        console.error('[Termlookup] Error' , err)
+        throw err
     }
 }

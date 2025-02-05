@@ -51,8 +51,9 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         setCurContext('')
         setIsDialogOpen(true)
         setIsLoading(true)
-        
+        setALookupError('')
         setResult('')
+        setALookupError('')
         console.log(`Looking up ${term} in ${language}`)
         try {
             const response = await TermLookup({
@@ -78,8 +79,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
     const additionalLookup = async (context:string) => {
         if (!context.includes(curTerm.toLowerCase())) {
-            console.log('Please enter a sentence with the term in it.')
-            setALookupError('Please enter a sentence with the term in it.')
+            setALookupError('Please include the term in your example / explanation.')
         } else {
             setResult('')
             setCurInterp('')
@@ -160,16 +160,16 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                                 Don't think it's quite right? Provide more context.
                                 </span>
                                 <span>
-                                    {`${curContext.length} / ${contextLimit}`}
+                                    {`(${curContext.length} / ${contextLimit})`}
                                 </span>
                             </span>
-                            <div className="flex gap-4">
-                            <Textarea className="max-h-[650px]shadow-none resize-none focus-visible:ring-0" maxLength={contextLimit} value={curContext} onChange={handleContextChange} placeholder="Enter an example sentence or a small passage with the term included here..." onInput={(e) => {
+                            <div className="flex gap-4 flex-col">
+                            <Textarea className="max-h-[650px]shadow-none resize-none focus-visible:ring-0" maxLength={contextLimit} value={curContext} onChange={handleContextChange} placeholder="Enter an example sentence or more context with the term included here..." onInput={(e) => {
                                     const target = e.target as HTMLTextAreaElement
                                     target.style.height = 'auto';
                                     target.style.height = `${target.scrollHeight}px`;
                                 }}></Textarea>
-                            <Button className="mt-auto" onClick={() => additionalLookup(curContext)}>
+                            <Button onClick={() => additionalLookup(curContext)}>
                                 Re-search
                             </Button>
                             </div>

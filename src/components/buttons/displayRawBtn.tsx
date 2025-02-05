@@ -1,5 +1,5 @@
 'use client'
-import { SetStateAction, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
 import { TbListDetails } from "react-icons/tb";
 import { useWorkState } from "@/app/_contexts/workStateContext";
@@ -11,11 +11,12 @@ interface DisplayRawBtnProps {
     setIsRawOn: React.Dispatch<SetStateAction<boolean>>
     slotTxt: string,
     isRawOn:boolean,
+    setClipboardTxt: React.Dispatch<SetStateAction<string>>
 }
 
-export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTxt}:DisplayRawBtnProps) {
+export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTxt, setClipboardTxt}:DisplayRawBtnProps) {
 
-    const { clipboardTxt, setClipboardTxt} = useClipboardContext()
+   
 
     const setRawOn = () => {
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
