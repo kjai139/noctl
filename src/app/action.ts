@@ -37,7 +37,7 @@ const geminiRatelimit = new Ratelimit({
 
 const termLookupRateLimit = new Ratelimit({
     redis:redis,
-    limiter: Ratelimit.slidingWindow(2, '10s')
+    limiter: Ratelimit.slidingWindow(1, '10s')
 
 })
 
@@ -388,6 +388,51 @@ export async function translateClaude({ text, language, glossary }: translateTxt
 
 }
 
+interface ClaudeEditProps {
+    prompt: string
+}
+
+export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
+    try {
+        const message = await client.messages.create({
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 8192,
+            "messages": [{
+                "role": "user",
+                "content": prompt
+            }],
+            "tools": [{
+                "name": "edit_translated_text",
+                "description": "Edit the translated text by comparing the original text and the translated lines to remove hallucinations and improve accuracy.",
+                "input_schema": {
+                    "required": ["lines"],
+                    "type": "object",
+                    "properties": {
+                        "lines": {
+                            "type": "array",
+                            "description": "A list containing the edited lines from top to bottom",
+                            "properties": {
+                                "line": {
+                                    "type": "text",
+                                    "description": "The edited line after comparing the translated line to the original to remove any hallucinations.",
+    
+                                }
+                            }
+                        }
+                    }
+                },
+               
+               
+            }]
+        })
+        console.log('[claudeEdit] message', message)
+        return message
+    } catch (err) {
+        console.error('[claudeEdit] Error', err)
+        throw err
+    }
+}
+
 interface TermLookupProps {
     term: string
     context?: string,
@@ -405,7 +450,7 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
         
         const { success, remaining, reset } = await termLookupRateLimit.limit(`${session.user.id}-termRate`)
         if (!success) {
-            throw new Error('Please wait a few seconds before trying again.')
+            throw new Error(`You're doing too much! Please wait a few seconds before trying again!`)
         }
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({

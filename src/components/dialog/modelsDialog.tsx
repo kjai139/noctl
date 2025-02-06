@@ -12,8 +12,8 @@ const models = [
     },
     {
         name: "Better-1",
-        accuracy: 4.5,
-        info: "Higher reading comprehension, more accurate, and less speaker attribution errors compared to the free model.",
+        accuracy: 4.7,
+        info: "This model generally performs the best. It has higher reading comprehension, higher accuracy , and less speaker attribution errors compared to the free model.",
         pricing: "50 requests @ $5 USD"
     },
     {

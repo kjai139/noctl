@@ -28,7 +28,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
                 <ResultRenderTaskbar setSlotMergedLines={setSlotMergedLines} curRaw={slotRaw} curOgTxt={slotTxt} text={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt}></ResultRenderTaskbar>
             </div>
-            <div className="py-8">
+            <div className="py-8 w-cont">
                 {isRawOn ?
                 slotMergedLines && slotMergedLines.length > 0 ? 
                 slotMergedLines.map((line:any, idx:number) => {

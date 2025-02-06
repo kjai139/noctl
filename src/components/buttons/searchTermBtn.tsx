@@ -54,6 +54,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         setALookupError('')
         setResult('')
         setALookupError('')
+        setErrorMsg('')
         console.log(`Looking up ${term} in ${language}`)
         try {
             const response = await TermLookup({
@@ -73,7 +74,12 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
         } catch (err) {
             setIsLoading(false)
-            console.log(err)
+            console.error('Error looking up term.')
+            if (err instanceof Error) {
+                setErrorMsg(err.message)
+            } else {
+                setErrorMsg('Encountered a server error. Please try again later.')
+            }
         }
     }
 
@@ -81,8 +87,8 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         if (!context.includes(curTerm.toLowerCase())) {
             setALookupError('Please include the term in your example / explanation.')
         } else {
-            setResult('')
-            setCurInterp('')
+            setALookupError('')
+            setErrorMsg('')
             setIsLoading(true)
             try {
                 const response = await TermLookup({
@@ -102,7 +108,12 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
             } catch (err) {
                 setIsLoading(false)
-                console.log(err)
+                console.error('Error looking up term.')
+                if (err instanceof Error) {
+                    setErrorMsg(err.message)
+                } else {
+                    setErrorMsg('Encountered a server error. Please try again later.')
+                }
             }
         }
 
@@ -174,11 +185,19 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                             </Button>
                             </div>
                             <span className="text-destructive font-semibold text-sm">
-                                {aLookupError ? aLookupError : null}
+                                {aLookupError && !errorMsg ? aLookupError : null}
                             </span>
                         </div>
                     </div>
                     : null
+                }
+                {
+                    errorMsg && !isLoading ? 
+                    <div>
+                        <span className="text-destructive">
+                            {`${errorMsg}`}
+                        </span>
+                    </div> : null
                 }
             </div>
         </DialogContent>
