@@ -15,6 +15,9 @@ export default function ResultRender() {
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
 
+    const [isSlot1Editing, setIsSlot1Editing] = useState(false)
+    const [isSlot2Editing, setIsSlot2Editing] = useState(false)
+
     useEffect(() => {
         if (isLoading) {
             setSeconds(0)

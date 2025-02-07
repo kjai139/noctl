@@ -1,6 +1,7 @@
 import DisplayRawBtn from "../buttons/displayRawBtn"
 import CopyTextBtn from "../buttons/copyTextBtn"
 import { SetStateAction } from "react"
+import EditTextBtn from "../buttons/editTextBtn"
 
 interface ResultRenderTaskbarProps {
     curRaw: string, // untranslated raw txt
@@ -18,6 +19,7 @@ export default function ResultRenderTaskbar ({setSlotMergedLines, curRaw, curOgT
     return (
         <div className="flex gap-2">
         <DisplayRawBtn setSlotMergedLines={setSlotMergedLines} slotRaw={curRaw} slotTxt={curOgTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn} setClipboardTxt={setClipboardTxt}></DisplayRawBtn>
+        <EditTextBtn slotRaw={curRaw} slotTxt={text}></EditTextBtn>
         <CopyTextBtn isRawOn={isRawOn} text={text} clipboardTxt={clipboardTxt}></CopyTextBtn>
         </div>
     )

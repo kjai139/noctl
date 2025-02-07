@@ -394,39 +394,48 @@ interface ClaudeEditProps {
 
 export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
     try {
+        const textPrompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n 
+        그렇다 할지라도!
+        Even if that’s the case!
+
+        좋아하는 게임에 캐릭터가 되어달라는 제안을 어떤 게이머가 거절할 수 있나.
+        What gamer could possibly refuse the offer to become a character in their favorite game?
+        `
         const message = await client.messages.create({
-            "model": "claude-3-5-sonnet-20241022",
-            "max_tokens": 8192,
-            "messages": [{
-                "role": "user",
-                "content": prompt
-            }],
-            "tools": [{
-                "name": "edit_translated_text",
-                "description": "Edit the translated text by comparing the original text and the translated lines to remove hallucinations and improve accuracy.",
-                "input_schema": {
-                    "required": ["lines"],
-                    "type": "object",
-                    "properties": {
-                        "lines": {
-                            "type": "array",
-                            "description": "A list containing the edited lines from top to bottom",
-                            "properties": {
-                                "line": {
-                                    "type": "text",
-                                    "description": "The edited line after comparing the translated line to the original to remove any hallucinations.",
-    
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 8192,
+            temperature: 0.2,
+            tool_choice: {
+                type: 'tool',
+                name: 'edit_translated_text'
+            },
+            tools: [
+                {
+                    name: "edit_translated_text",
+                    description: "To make improvements and remove any hallucinations from the translated text.",
+                    input_schema: {
+                        type:"object",
+                        properties: {
+                            "result_array": {
+                                type:"array",
+                                translated_line: {
+                                    type:"string",
+                                    description:"The translated line after checking for hallucination and improvements."
                                 }
+
                             }
                         }
                     }
-                },
-               
-               
-            }]
+                }
+            ],
+            messages: [{
+                role: "user",
+                content: textPrompt
+            }],
+            
         })
         console.log('[claudeEdit] message', message)
-        return message
+        return message.content
     } catch (err) {
         console.error('[claudeEdit] Error', err)
         throw err
