@@ -5,22 +5,23 @@ import EditTextBtn from "../buttons/editTextBtn"
 
 interface ResultRenderTaskbarProps {
     curRaw: string, // untranslated raw txt
-    curOgTxt: string,
-    text: string,
+    slotTranslatedTxt: string,  //translated txt used for processing. eg in raw toggle
+    slotResultDisplay: string, //translated text for display
     isRawOn: boolean,
     setIsRawOn: React.Dispatch<SetStateAction<boolean>>,
     setSlotMergedLines: React.Dispatch<SetStateAction<string[]>>,
     clipboardTxt: string,
-    setClipboardTxt: React.Dispatch<SetStateAction<string>>
+    setClipboardTxt: React.Dispatch<SetStateAction<string>>,
+    setSlotDisplay: React.Dispatch<SetStateAction<string>>,
 }
 
-export default function ResultRenderTaskbar ({setSlotMergedLines, curRaw, curOgTxt, setIsRawOn, isRawOn, text, clipboardTxt, setClipboardTxt}:ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar ({setSlotMergedLines, curRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay}:ResultRenderTaskbarProps) {
 
     return (
         <div className="flex gap-2">
-        <DisplayRawBtn setSlotMergedLines={setSlotMergedLines} slotRaw={curRaw} slotTxt={curOgTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn} setClipboardTxt={setClipboardTxt}></DisplayRawBtn>
-        <EditTextBtn slotRaw={curRaw} slotTxt={text}></EditTextBtn>
-        <CopyTextBtn isRawOn={isRawOn} text={text} clipboardTxt={clipboardTxt}></CopyTextBtn>
+        <DisplayRawBtn setSlotMergedLines={setSlotMergedLines} slotRaw={curRaw} slotTranslatedTxt={slotTranslatedTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn} setClipboardTxt={setClipboardTxt}></DisplayRawBtn>
+        <EditTextBtn slotRaw={curRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay}></EditTextBtn>
+        <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>
         </div>
     )
 }

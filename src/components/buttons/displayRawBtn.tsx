@@ -9,19 +9,20 @@ interface DisplayRawBtnProps {
     setSlotMergedLines: React.Dispatch<SetStateAction<string[]>>,
     slotRaw: string,
     setIsRawOn: React.Dispatch<SetStateAction<boolean>>
-    slotTxt: string,
+    slotTranslatedTxt: string,
     isRawOn:boolean,
     setClipboardTxt: React.Dispatch<SetStateAction<string>>
 }
 
-export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTxt, setClipboardTxt}:DisplayRawBtnProps) {
+export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTranslatedTxt, setClipboardTxt}:DisplayRawBtnProps) {
 
    
 
     const setRawOn = () => {
+        console.log('[setRawOn]: slotTranslatedTxt', slotTranslatedTxt)
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
             const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
-            const normalizedTxt = slotTxt.replace(/\n+/g, '\n').trim()
+            const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
             const resultLines = normalizedTxt.split('\n')
 
             const maxLines = Math.max(rawlines.length, resultLines.length)
@@ -56,6 +57,7 @@ export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn,
         } else if (isRawOn) {
             /* setCurDisplay(curOgTxt) */
             setIsRawOn(false)
+            console.log('slotTranslatedTxt', slotTranslatedTxt)
         }
         
 

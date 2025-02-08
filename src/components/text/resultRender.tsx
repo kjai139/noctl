@@ -5,12 +5,14 @@ import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import ResultWrap from "../wrapper/resultWrap"
 import ErrorResult from "./errorResult"
 import { useClipboardContext } from "@/app/_contexts/clipboardContext"
+import { useEditTabContext } from "@/app/_contexts/editContext"
 
 
 export default function ResultRender() {
 
     const { slot1ResultDisplay, setSlot1MergedLines, slot1MergedLines, slot1Txt, slot2MergedLines, setSlot2MergedLines, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
     const { clipboard1Txt, clipboard2Txt, setClipboard1Txt, setClipboard2Txt } = useClipboardContext()
+    const { setSlot1EditedTxt } = useEditTabContext()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -82,7 +84,7 @@ export default function ResultRender() {
                                                 setSlotMergedLines={setSlot1MergedLines}
                                                 setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot1ResultDisplay}
                                                 slotModelName={slot1ModelName}
-                                                slotTxt={slot1Txt}
+                                                slotTranslatedTxt={slot1Txt}
                                                 slotRaw={slot1Raw}
                                                 slotResultDisplay={slot1ResultDisplay}
                                                 isRawOn={isSlot1RawOn}
@@ -106,7 +108,7 @@ export default function ResultRender() {
                                             setSlotMergedLines={setSlot2MergedLines} 
                                             setSlotRaw={setSlot1Raw} setSlotResultDisplay={setSlot2ResultDisplay}
                                             slotModelName={slot2ModelName}
-                                            slotTxt={slot2Txt}
+                                            slotTranslatedTxt={slot2Txt}
                                             slotRaw={slot1Raw}
                                             slotResultDisplay={slot2ResultDisplay}
                                             isRawOn={isSlot2RawOn}

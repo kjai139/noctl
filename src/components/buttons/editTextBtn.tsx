@@ -1,12 +1,15 @@
 import { ClaudeEdit } from "@/app/action";
 import { Button } from "../ui/button";
+import React, { SetStateAction } from "react";
 
 interface EditTextBtnProps {
     slotRaw: string,
     slotTxt: string,
+    setIsSlotEditing?: React.Dispatch<SetStateAction<boolean>>,
+    setSlotDisplay:React.Dispatch<SetStateAction<string>>,
 }
 
-export default function EditTextBtn ({slotRaw, slotTxt}:EditTextBtnProps) {
+export default function EditTextBtn ({slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay}:EditTextBtnProps) {
 
 
 
@@ -50,6 +53,8 @@ export default function EditTextBtn ({slotRaw, slotTxt}:EditTextBtnProps) {
             const linesArr = response[0].input.result_array
             console.log(linesArr)
             const formattedTextResult = linesArr.map((line:any) => line.translated_line).join('\n')
+            
+            
         } catch (err) {
             console.error('[editTxt] error', err)
         }
