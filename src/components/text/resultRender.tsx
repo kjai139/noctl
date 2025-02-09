@@ -12,13 +12,11 @@ export default function ResultRender() {
 
     const { slot1ResultDisplay, setSlot1MergedLines, slot1MergedLines, slot1Txt, slot2MergedLines, setSlot2MergedLines, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
     const { clipboard1Txt, clipboard2Txt, setClipboard1Txt, setClipboard2Txt } = useClipboardContext()
-    const { setSlot1EditedTxt } = useEditTabContext()
+    const { setSlot1EditedTxt, setSlot2EditedTxt, slot1EditedText, slot2EditedText, isSlot1EditShowing, isSlot2EditShowing, setIsSlot1EditShowing, setIsSlot2EditShowing } = useEditTabContext()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
 
-    const [isSlot1Editing, setIsSlot1Editing] = useState(false)
-    const [isSlot2Editing, setIsSlot2Editing] = useState(false)
 
     useEffect(() => {
         if (isLoading) {
@@ -91,6 +89,10 @@ export default function ResultRender() {
                                                 setIsRawOn={setIsSlot1RawOn}
                                                 clipboardTxt={clipboard1Txt}
                                                 setClipboardTxt={setClipboard1Txt}
+                                                setIsSlotEditShowing={setIsSlot1EditShowing}
+                                                isSlotEditShowing={isSlot1EditShowing}
+                                                slotEditedText={slot1EditedText}
+                                                setSlotEditedText={setSlot1EditedTxt}
                                                 >
                                                 </ResultWrap> : null}
                                         {
@@ -115,6 +117,10 @@ export default function ResultRender() {
                                             setIsRawOn={setIsSlot2RawOn}
                                             clipboardTxt={clipboard2Txt}
                                             setClipboardTxt={setClipboard2Txt}
+                                            setIsSlotEditShowing={setIsSlot2EditShowing}
+                                            isSlotEditShowing={isSlot2EditShowing}
+                                            slotEditedText={slot2EditedText}
+                                            setSlotEditedText={setSlot2EditedTxt}
                                             >
                                             </ResultWrap> : null
                                         }

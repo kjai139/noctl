@@ -7,9 +7,10 @@ interface EditTextBtnProps {
     slotTxt: string,
     setIsSlotEditing?: React.Dispatch<SetStateAction<boolean>>,
     setSlotDisplay:React.Dispatch<SetStateAction<string>>,
+    setSlotEditedText:React.Dispatch<SetStateAction<string>>,
 }
 
-export default function EditTextBtn ({slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay}:EditTextBtnProps) {
+export default function EditTextBtn ({slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText}:EditTextBtnProps) {
 
 
 
@@ -53,6 +54,7 @@ export default function EditTextBtn ({slotRaw, slotTxt, setIsSlotEditing, setSlo
             const linesArr = response[0].input.result_array
             console.log(linesArr)
             const formattedTextResult = linesArr.map((line:any) => line.translated_line).join('\n')
+            setSlotEditedText(formattedTextResult)
             
             
         } catch (err) {
