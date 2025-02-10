@@ -23,7 +23,9 @@ export default function DisplayEditedTxtBtn ({isSlotEditShowing, setIsSlotEditSh
 
     return (
         <Button onClick={toggleEditDisplay}>
-            Show Edit
+            {
+                isSlotEditShowing ? 'Hide Edit' : 'Show Edit'
+            }
         </Button>
     )
 }

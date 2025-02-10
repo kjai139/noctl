@@ -227,7 +227,7 @@ body {
       ); */
 }
 
-@container navinfo (max-width:650px) {
+@container navinfo (max-width:718px) {
       .nv-item {
             flex-direction: column;
       }

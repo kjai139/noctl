@@ -10,41 +10,46 @@ interface DisplayRawBtnProps {
     slotRaw: string,
     setIsRawOn: React.Dispatch<SetStateAction<boolean>>
     slotTranslatedTxt: string,
-    isRawOn:boolean,
+    isRawOn: boolean,
     setClipboardTxt: React.Dispatch<SetStateAction<string>>
+    editedText: string,
+    isEditShowing: boolean,
 }
 
-export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTranslatedTxt, setClipboardTxt}:DisplayRawBtnProps) {
+export default function DisplayRawBtn({ setSlotMergedLines, slotRaw, setIsRawOn, isRawOn, slotTranslatedTxt, setClipboardTxt, editedText, isEditShowing }: DisplayRawBtnProps) {
 
-   
+
 
     const setRawOn = () => {
         console.log('[setRawOn]: slotTranslatedTxt', slotTranslatedTxt)
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
-            const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
-            const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
-            const resultLines = normalizedTxt.split('\n')
+        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
+        const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
+        const resultLines = normalizedTxt.split('\n')
+        const normalizedEditedTxt = editedText.replace(/\n+/g, '\n').trim()
+        const editedLines = normalizedEditedTxt.split('\n')
 
-            const maxLines = Math.max(rawlines.length, resultLines.length)
 
-            let mergedLines = []
-            for (let i = 0; i < maxLines; i++) {
-                const line1 = rawlines[i] || ''
-                const line2 = resultLines[i] + '\n' || ''
+        const maxLines = Math.max(rawlines.length, resultLines.length)
 
-                mergedLines.push(line1)
-                mergedLines.push(line2)
+        let mergedLines = []
+        for (let i = 0; i < maxLines; i++) {
+            const line1 = rawlines[i] || ''
+            const line2 = resultLines[i] + '\n' || ''
 
-            }
+            mergedLines.push(line1)
+            mergedLines.push(line2)
 
-            const mergedTxt = mergedLines.join('\n')
-            setClipboardTxt(mergedTxt)
+        }
 
-            console.log('[renderText] mergedLines', mergedLines)
-            setSlotMergedLines(mergedLines)
-            setIsRawOn(true)
+        const mergedTxt = mergedLines.join('\n')
+        setClipboardTxt(mergedTxt)
 
-            
+        console.log('[renderText] mergedLines', mergedLines)
+        setSlotMergedLines(mergedLines)
+        setIsRawOn(true)
+
+
 
     }
 
@@ -52,25 +57,38 @@ export default function DisplayRawBtn ({setSlotMergedLines, slotRaw, setIsRawOn,
         /* console.log('[Toggle Raw] curRaw : ', curRaw)
         console.log('[Toggle Raw] curOgTxt: ', curOgTxt) */
         if (!isRawOn) {
-        
-            setRawOn()
+
+            setIsRawOn(true)
         } else if (isRawOn) {
             /* setCurDisplay(curOgTxt) */
             setIsRawOn(false)
             console.log('slotTranslatedTxt', slotTranslatedTxt)
         }
-        
+
 
     }
 
     return (
         <div>
             <Button onClick={toggleRaw} variant={'secondary'}>
-                <div className="flex gap-2 items-center">
-                    <TbListDetails></TbListDetails>
-                    <span>Raw</span>
+                {
+                    isRawOn ?
+                        <div className="flex gap-2 items-center">
 
-                </div>
+
+                            <TbListDetails></TbListDetails>
+                            <span>Hide Raw</span>
+
+                        </div> :
+                        <div className="flex gap-2 items-center">
+
+
+                            <TbListDetails></TbListDetails>
+                            <span>Show Raw</span>
+
+                        </div>
+                }
+
             </Button>
         </div>
     )
