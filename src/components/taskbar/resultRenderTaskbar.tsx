@@ -25,7 +25,7 @@ interface ResultRenderTaskbarProps {
 export default function ResultRenderTaskbar ({setSlotMergedLines, curRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing}:ResultRenderTaskbarProps) {
 
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 shadow-lg rounded-sm p-2">
         <DisplayRawBtn setSlotMergedLines={setSlotMergedLines} slotRaw={curRaw} slotTranslatedTxt={slotTranslatedTxt} setIsRawOn={setIsRawOn} isRawOn={isRawOn} setClipboardTxt={setClipboardTxt}></DisplayRawBtn>
         <EditTextBtn slotRaw={curRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText}></EditTextBtn>
         <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>

@@ -4,6 +4,7 @@ import { Button } from "../ui/button"
 import { useState } from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { useClipboardContext } from "@/app/_contexts/clipboardContext";
+import { toolbarIconSize } from "@/lib/toolbarIcons";
 
 interface CopyTextBtnProps {
     text: string,
@@ -48,7 +49,7 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt}: CopyTextBtnP
                     <span>Copied!</span>
                     </div> : 
                     <div className="flex items-center gap-2">
-                    <ImCopy></ImCopy>
+                    <ImCopy size={toolbarIconSize}></ImCopy>
                     <span>Copy</span>
                     </div>
 

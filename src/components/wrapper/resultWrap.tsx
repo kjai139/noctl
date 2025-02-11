@@ -31,20 +31,20 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     }
     const renderText = () => {
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
-        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　').map((line) => ({text: line, color: textColors.raw}))
+        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　').map((line) => ({text: line, color: 'raw'}))
         const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
-        const resultLines = normalizedTxt.split('\n').map((line) => ({text: line, color: textColors.result}))
+        const resultLines = normalizedTxt.split('\n').map((line) => ({text: line, color: 'result'}))
         const normalizedEditedTxt = slotEditedText.replace(/\n+/g, '\n').trim()
-        const editedLines = normalizedEditedTxt.split('\n').map((line) => ({text: line, color: textColors.edit}))
+        const editedLines = normalizedEditedTxt.split('\n').map((line) => ({text: line, color: 'edit'}))
         
         const maxLines = Math.max(rawlines.length, resultLines.length, editedLines.length)
 
         let mergedLines = []
 
         const mergedLinesArr = Array.from({ length: maxLines}).flatMap((_, i) => [
-            isRawOn ? (rawlines[i] ?? { text: '', color: textColors.raw}) : null,
-            resultLines[i] ?? {text: '', color: textColors.result},
-            isSlotEditShowing ? (editedLines[i] ?? { text: '', color: textColors.edit}) : null
+            isRawOn ? (rawlines[i] ?? { text: '', color: 'raw'}) : null,
+            resultLines[i] ?? {text: '', color: 'result'},
+            isSlotEditShowing ? (editedLines[i] ?? { text: '', color: 'edit'}) : null
         ]).filter(Boolean)
 
         /* for (let i = 0; i < maxLines; i++) {
@@ -72,9 +72,24 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             if (!line) {
                 return null
             }
+            let color = null
+            let margin = null
+            if (line.color === 'result') {
+                if (isRawOn && !isSlotEditShowing) {
+                    margin = 'mb-8'
+                }
+
+            } else if (line.color === 'edit') {
+                color = 'text-green-700'
+                if (isSlotEditShowing) {
+                    margin = 'mb-8'
+                }
+            } else if (line.color === 'raw') {
+                color = 'text-muted-foreground'
+            }
             return (
                 <div key={`line${idx}`}>
-                    <p className={`mb-8' ${line.color}`}>
+                    <p className={`mb-8' ${color} ${margin}`}>
                         {line.text}
                     </p>
                 </div>

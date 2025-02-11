@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { TbListDetails } from "react-icons/tb";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { useClipboardContext } from "@/app/_contexts/clipboardContext";
+import { toolbarIconSize } from "@/lib/toolbarIcons";
 
 interface DisplayRawBtnProps {
     setSlotMergedLines: React.Dispatch<SetStateAction<string[]>>,
@@ -76,14 +77,14 @@ export default function DisplayRawBtn({ setSlotMergedLines, slotRaw, setIsRawOn,
                         <div className="flex gap-2 items-center">
 
 
-                            <TbListDetails></TbListDetails>
+                            <TbListDetails size={toolbarIconSize}></TbListDetails>
                             <span>Hide Raw</span>
 
                         </div> :
                         <div className="flex gap-2 items-center">
 
 
-                            <TbListDetails></TbListDetails>
+                            <TbListDetails size={toolbarIconSize}></TbListDetails>
                             <span>Show Raw</span>
 
                         </div>
