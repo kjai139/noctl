@@ -1,6 +1,8 @@
 import React, { SetStateAction } from "react";
 import { Button } from "../ui/button";
-
+import { MdOutlineVisibility } from "react-icons/md";
+import { MdOutlineVisibilityOff } from "react-icons/md";
+import { toolbarIconSize } from "@/lib/toolbarIcons";
 
 interface DisplayEditedTxtBtnProps {
     isSlotEditShowing: boolean,
@@ -9,7 +11,7 @@ interface DisplayEditedTxtBtnProps {
 
 
 
-export default function DisplayEditedTxtBtn ({isSlotEditShowing, setIsSlotEditShowing}:DisplayEditedTxtBtnProps) {
+export default function DisplayEditedTxtBtn({ isSlotEditShowing, setIsSlotEditShowing }: DisplayEditedTxtBtnProps) {
 
 
     const toggleEditDisplay = () => {
@@ -22,9 +24,23 @@ export default function DisplayEditedTxtBtn ({isSlotEditShowing, setIsSlotEditSh
 
 
     return (
-        <Button onClick={toggleEditDisplay}>
+        <Button onClick={toggleEditDisplay} variant={'ghost'} className="w-full">
             {
-                isSlotEditShowing ? 'Hide Edit' : 'Show Edit'
+                isSlotEditShowing ?
+                    <div className="flex gap-2 items-center">
+
+
+                        <MdOutlineVisibilityOff size={toolbarIconSize}></MdOutlineVisibilityOff>
+                        <span>Hide Edited Text</span>
+
+                    </div> :
+                    <div className="flex gap-2 items-center">
+
+
+                        <MdOutlineVisibility size={toolbarIconSize}></MdOutlineVisibility>
+                        <span>Show Edited Text</span>
+
+                    </div> 
             }
         </Button>
     )

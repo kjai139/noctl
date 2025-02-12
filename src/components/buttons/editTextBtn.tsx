@@ -77,7 +77,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                 </Button>
             </TooltipTrigger>
             <TooltipContent side="top" className="flixed left-0 top-0">
-                <p>Quality Check</p>
+                <p>Check translation</p>
             </TooltipContent>
         </Tooltip>
         

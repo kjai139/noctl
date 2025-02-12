@@ -430,7 +430,7 @@ export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
             ],
             messages: [{
                 role: "user",
-                content: textPrompt
+                content: prompt
             }],
             
         })
