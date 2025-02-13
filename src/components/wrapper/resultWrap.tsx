@@ -96,6 +96,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             )
         })
 
+
         return renderedLines
         
     }
@@ -106,7 +107,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
         <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
             <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
-                <ResultRenderTaskbar setSlotMergedLines={setSlotMergedLines} curRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText}></ResultRenderTaskbar>
+                <ResultRenderTaskbar setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText}></ResultRenderTaskbar>
             </div>
             <div className="py-8 w-cont">
                 {renderText()}

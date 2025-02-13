@@ -8,9 +8,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Button } from "../ui/button"
 import { MdOutlineVisibility } from "react-icons/md";
 import { MdOutlineVisibilityOff } from "react-icons/md";
+import { FaFileDownload } from "react-icons/fa";
+import SaveFileDocx from "../buttons/saveToDocx"
 
 interface ResultRenderTaskbarProps {
-    curRaw: string, // untranslated raw txt
+    slotRaw: string,
     slotTranslatedTxt: string,  //translated txt used for processing. eg in raw toggle
     slotResultDisplay: string, //translated text for display
     isRawOn: boolean,
@@ -27,13 +29,14 @@ interface ResultRenderTaskbarProps {
     setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>,
 }
 
-export default function ResultRenderTaskbar ({setSlotMergedLines, curRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing}:ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar ({setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing}:ResultRenderTaskbarProps) {
 
     return (
         <div className="flex gap-2 shadow-md rounded-sm p-2 border-1 border">
             
             <div className="flex gap-2">
-            <EditTextBtn slotRaw={curRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText}></EditTextBtn>
+                <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw}></SaveFileDocx>
+            <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText}></EditTextBtn>
             <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>
             </div>
             

@@ -6,6 +6,7 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 import { toolbarIconSize } from "@/lib/toolbarIcons";
 import { FaRegCopy } from "react-icons/fa";
+import { FaRegCheckCircle } from "react-icons/fa";
 
 interface CopyTextBtnProps {
     text: string,
@@ -42,14 +43,21 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt}: CopyTextBtnP
 
     return (
         
-            <Button onClick={handleCopy} disabled={isCopied} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null}`} variant={'outline'} size={'icon'}>
+            <Button onClick={handleCopy} disabled={isCopied} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null} min-w-[128px]`} variant={'outline'}>
                 {
                     isCopied ?
                     <div className="flex items-center gap-2">
-                    <IoIosCheckmarkCircleOutline size={toolbarIconSize}></IoIosCheckmarkCircleOutline>
+                    <FaRegCheckCircle size={toolbarIconSize}>
+                    </FaRegCheckCircle>
+                    <span>Copied!</span>
                     </div> : 
                     <div className="flex items-center gap-2">
-                    <FaRegCopy size={toolbarIconSize}></FaRegCopy>
+                    <FaRegCopy size={toolbarIconSize}>
+                        
+                    </FaRegCopy>
+                    <span>
+                        Copy Text
+                    </span>
                     </div>
 
                 }
