@@ -24,6 +24,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
 
 
     const filenameInputref = useRef<HTMLInputElement>(null)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const handleSaveFile = async () => {
         if (filenameInputref.current) {
@@ -99,6 +100,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
                 throw new Error('Filename is blank.')
             }
             saveAs(blob, `${filenameInputref.current.value}.docx`)
+            setIsDialogOpen(false)
         } catch (err) {
             console.error('Error generating .docx file', err)
         }
@@ -110,7 +112,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
     }
 
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button variant={'outline'} size={'icon'}>
                     <FaFileDownload size={toolbarIconSize}></FaFileDownload>

@@ -21,7 +21,7 @@ export async function UpdateUserCurrency () {
         return existingUser.currencyAmt ?? 0
     } catch (err) {
         console.error('[Update User Currency] ', err)
-        throw err
+        throw new Error('Something went wrong *_*. Please try again later.')
     }
 }
 

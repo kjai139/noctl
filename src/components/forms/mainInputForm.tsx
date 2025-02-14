@@ -202,6 +202,17 @@ export default function MainInputForm() {
                     })
 
                     console.log(`[Standard Model] pollResponse for id ${jobId}`, pollResponse)
+                    if (pollResponse.job.jobStatus === 'failed') {
+                       
+                        if (typeof pollResponse.job.response === 'string') {
+                            throw new Error(pollResponse.job.response)
+                        } else {
+                            throw new Error('Something went wrong *_*. Please try again later.')
+                        }
+                       
+
+                        
+                    }
                     const response = JSON.parse(pollResponse.job.response)
                     console.log(response)
                     if (response[0].glossary?.terms) {
