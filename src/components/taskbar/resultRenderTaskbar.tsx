@@ -25,21 +25,24 @@ interface ResultRenderTaskbarProps {
     slotEditedText: string,
     setSlotEditedText: React.Dispatch<SetStateAction<string>>,
 
-    isSlotEditShowing:boolean,
+    isSlotEditShowing: boolean,
     setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>,
+
+    isSlotEditing:boolean,
+    setIsSlotEditing:React.Dispatch<SetStateAction<boolean>>,
 }
 
-export default function ResultRenderTaskbar ({setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing}:ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing }: ResultRenderTaskbarProps) {
 
     return (
         <div className="flex gap-2 shadow-md rounded-sm p-2 border-1 border">
-            
+
             <div className="flex gap-2">
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw}></SaveFileDocx>
-            <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText}></EditTextBtn>
-            <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>
+                <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditShowing} isSlotEditing={isSlotEditing}></EditTextBtn>
+                <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>
             </div>
-            
+
             <div className="flex gap-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -50,24 +53,24 @@ export default function ResultRenderTaskbar ({setSlotMergedLines, slotRaw, slotT
                     <DropdownMenuContent>
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
-                            <DisplayRawBtn setIsRawOn={setIsRawOn} isRawOn={isRawOn}></DisplayRawBtn>
+                                <DisplayRawBtn setIsRawOn={setIsRawOn} isRawOn={isRawOn}></DisplayRawBtn>
                             </DropdownMenuItem>
                             {
-                                slotEditedText ? 
-                                <DropdownMenuItem>
-                                <DisplayEditedTxtBtn setIsSlotEditShowing={setIsSlotEditShowing} isSlotEditShowing={isSlotEditShowing}></DisplayEditedTxtBtn>
-                                </DropdownMenuItem>
-                                 : null
+                                slotEditedText ?
+                                    <DropdownMenuItem>
+                                        <DisplayEditedTxtBtn setIsSlotEditShowing={setIsSlotEditShowing} isSlotEditShowing={isSlotEditShowing}></DisplayEditedTxtBtn>
+                                    </DropdownMenuItem>
+                                    : null
                             }
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            
-            
+
+
             </div>
-        
-        
-        
+
+
+
 
         </div>
     )

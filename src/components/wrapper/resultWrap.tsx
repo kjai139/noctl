@@ -1,13 +1,14 @@
 'use client'
-import { SetStateAction } from "react"
+import { SetStateAction, useEffect, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
+import { string } from "zod"
 
 
 
 
-export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMergedLines, setSlotResultDisplay, setSlotRaw, slotRaw, slotResultDisplay, slotTranslatedTxt, isRawOn, setIsRawOn, clipboardTxt, setClipboardTxt, setIsSlotEditShowing, setSlotEditedText, isSlotEditShowing, slotEditedText, isSlotEditing, setIsSlotEditing}: {
+export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMergedLines, setSlotResultDisplay, setSlotRaw, slotRaw, slotResultDisplay, slotTranslatedTxt, isRawOn, setIsRawOn, clipboardTxt, setClipboardTxt, setIsSlotEditShowing, setSlotEditedText, isSlotEditShowing, slotEditedText, isSlotEditing, setIsSlotEditing }: {
     slotMergedLines: any,
-    slotModelName:string,
+    slotModelName: string,
     slotRaw: string,
     slotResultDisplay: string,
     slotTranslatedTxt: string,
@@ -21,33 +22,38 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     slotEditedText: string,
     setSlotEditedText: React.Dispatch<SetStateAction<string>>,
     isSlotEditShowing: boolean,
-    setIsSlotEditShowing : React.Dispatch<SetStateAction<boolean>>
-    isSlotEditing:boolean,
+    setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>
+    isSlotEditing: boolean,
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>
 
 }) {
-    const textColors = {
-        raw:'text-muted-foreground',
-        result: '',
-        edit: 'green'
-    }
+
+    const [displayTxt, setDisplaytxt] = useState<any>()
+
     const renderText = () => {
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
-        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　').map((line) => ({text: line, color: 'raw'}))
+        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　').map((line) => ({ text: line, color: 'raw' }))
         const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
-        const resultLines = normalizedTxt.split('\n').map((line) => ({text: line, color: 'result'}))
+        console.log('translatedTxt:', slotTranslatedTxt)
+        console.log('normalizedtxt', normalizedTxt)
+        const resultLines = normalizedTxt.split('\n').map((line) => ({ text: line, color: 'result' }))
         const normalizedEditedTxt = slotEditedText.replace(/\n+/g, '\n').trim()
-        const editedLines = normalizedEditedTxt.split('\n').map((line) => ({text: line, color: 'edit'}))
-        
+        const editedLines = normalizedEditedTxt.split('\n').map((line) => ({ text: line, color: 'edit' }))
+
         const maxLines = Math.max(rawlines.length, resultLines.length, editedLines.length)
 
         let mergedLines = []
 
-        const mergedLinesArr = Array.from({ length: maxLines}).flatMap((_, i) => [
-            isRawOn ? (rawlines[i] ?? { text: '', color: 'raw'}) : null,
-            resultLines[i] ?? {text: '', color: 'result'},
-            isSlotEditShowing ? (editedLines[i] ?? { text: '', color: 'edit'}) : null
+        const mergedLinesArr = Array.from({ length: maxLines }).flatMap((_, i) => [
+            isRawOn ? (rawlines[i] ?? { text: '', color: 'raw' }) : null,
+            resultLines[i] ?? { text: '', color: 'result' },
+            isSlotEditShowing ? (editedLines[i] ?? { text: '', color: 'edit' }) : null
         ]).filter(Boolean)
+
+
+
+        return mergedLinesArr
+
 
         /* for (let i = 0; i < maxLines; i++) {
             const line1 = rawlines[i] || ''
@@ -77,7 +83,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             let color = null
             let margin = null
             if (line.color === 'result') {
-                if (isRawOn && !isSlotEditShowing) {
+                if (!isSlotEditShowing) {
                     margin = 'mb-8'
                 }
 
@@ -91,7 +97,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             }
             return (
                 <div key={`line${idx}`}>
-                    <p className={`mb-8' ${color} ${margin}`}>
+                    <p className={`${color} ${margin}`}>
                         {line.text}
                     </p>
                 </div>
@@ -100,8 +106,38 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
 
 
         return renderedLines
-        
+
     }
+
+
+    useEffect(() => {
+        if (!isRawOn && !isSlotEditShowing) {
+            setClipboardTxt(slotTranslatedTxt)
+        } else {
+            const text = renderText()
+            setDisplaytxt(text)
+
+            const clipboardTxt = text.map((line: any) => {
+                if (line.color === 'result') {
+                    if (!isSlotEditShowing) {
+                        return line.text + '\n'
+                    }
+                } else if (line.color === 'edit') {
+                    if (isSlotEditShowing) {
+                        return line.text + '\n'
+                    }
+                } else if (line.color === 'raw') {
+                    return line.text
+                }
+            }).join('\n')
+            console.log('clipboardTxt', clipboardTxt)
+
+            setClipboardTxt(clipboardTxt)
+        }
+        console.log('TEXT:', displayTxt)
+        console.log('clipboard', clipboardTxt)
+
+    }, [isSlotEditShowing, isRawOn, slotResultDisplay])
 
 
 
@@ -112,7 +148,33 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                 <ResultRenderTaskbar setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing}></ResultRenderTaskbar>
             </div>
             <div className="py-8 w-cont">
-                {renderText()}
+                {isRawOn || isSlotEditShowing ? displayTxt && displayTxt.map((line: { text: string, color: string }, idx: number) => {
+                    if (!line) {
+                        return null
+                    }
+                    let color = null
+                    let margin = null
+                    if (line.color === 'result') {
+                        if (!isSlotEditShowing) {
+                            margin = 'mb-8'
+                        }
+
+                    } else if (line.color === 'edit') {
+                        color = 'text-green-700'
+                        if (isSlotEditShowing) {
+                            margin = 'mb-8'
+                        }
+                    } else if (line.color === 'raw') {
+                        color = 'text-muted-foreground'
+                    }
+                    return (
+                        <div key={`line${idx}`}>
+                            <p className={`${color} ${margin}`}>
+                                {line.text}
+                            </p>
+                        </div>
+                    )
+                }) : slotTranslatedTxt}
             </div>
         </div>
     )

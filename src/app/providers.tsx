@@ -12,8 +12,9 @@ import EditedTabProvider from "./_contexts/editContext"
 export function Providers({ children }: { children: React.ReactNode }) {
 
     return (
+        <SessionProvider>
         <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <SessionProvider>
+            
                 <WorkStateProvider>
                     <ClipboardeProvider>
                         <EditedTabProvider>
@@ -29,7 +30,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
                         </EditedTabProvider>
                     </ClipboardeProvider>
                 </WorkStateProvider>
-            </SessionProvider>
+            
         </NextThemesProvider>
+        </SessionProvider>
     )
 }

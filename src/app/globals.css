@@ -353,7 +353,7 @@ body {
       color: #0000;
       animation: l19 2s infinite linear;
     }
-    .loader:before {
+    .editloader:before {
       content:"Checking quality...";
     }
     
