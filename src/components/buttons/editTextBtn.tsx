@@ -1,6 +1,7 @@
+'use client'
 import { ClaudeEdit } from "@/app/action";
 import { Button } from "../ui/button";
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { BiMessageAltEdit } from "react-icons/bi";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
@@ -11,10 +12,12 @@ import { useWorkState } from "@/app/_contexts/workStateContext";
 interface EditTextBtnProps {
     slotRaw: string,
     slotTxt: string,
-    setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>,
+    
     setSlotDisplay: React.Dispatch<SetStateAction<string>>,
     setSlotEditedText: React.Dispatch<SetStateAction<string>>,
     isSlotEditing: boolean,
+    setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>,
+    
    
 }
 
@@ -75,6 +78,22 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
 
     }
 
+    const textFunc = () => {
+        console.log('SETTING EDIT TO TRUE')
+        setIsSlotEditing(!isSlotEditing)
+        setIsDialogOpen(false)
+    }
+
+    useEffect(() => {
+        console.log('IS SLOT EIDITNG', isSlotEditing)
+    }, [isSlotEditing, setIsSlotEditing])
+
+    return (
+        <Button onClick={textFunc}>
+            TEST LOAD STATE
+        </Button>
+    )
+
 
 
     return (
@@ -120,7 +139,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                     </AlertDialogCancel>
                     {
                         userCurrency && userCurrency > 0 ?
-                        <AlertDialogAction onClick={() => {console.log('confirmed'); setIsDialogOpen(false)}}>
+                        <AlertDialogAction onClick={textFunc}>
                         Confirm
                          </AlertDialogAction> : null
                     }

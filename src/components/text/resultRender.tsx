@@ -12,7 +12,7 @@ export default function ResultRender() {
 
     const { slot1ResultDisplay, setSlot1MergedLines, slot1MergedLines, slot1Txt, slot2MergedLines, setSlot2MergedLines, setSlot1Txt, slot2Txt, setSlot2Txt, isLoading, slot2ResultDisplay, setSlot1ResultDisplay, setSlot2ResultDisplay, setSlot1Raw, slot1Raw, isSlot1RawOn, isSlot2RawOn, setIsSlot1RawOn, setIsSlot2RawOn, slot1ModelName, slot2ModelName, slot1Error, slot2Error } = useWorkState()
     const { clipboard1Txt, clipboard2Txt, setClipboard1Txt, setClipboard2Txt } = useClipboardContext()
-    const { setSlot1EditedTxt, setSlot2EditedTxt, slot1EditedText, slot2EditedText, isSlot1EditShowing, isSlot2EditShowing, setIsSlot1EditShowing, setIsSlot2EditShowing, isSlot1Editing, isSlot2Editing, setIsSlot1Editing, setIsSlot2Editing } = useEditTabContext()
+    const { setSlot1EditedTxt, setSlot2EditedTxt, slot1EditedText, slot2EditedText, isSlot1EditShowing, isSlot2EditShowing, setIsSlot1EditShowing, setIsSlot2EditShowing, isSlot1Editing, isSlot2Editing, setIsSlot1Editing, setIsSlot2Editing, isSlot1ResultShowing, setIsSlot1ResultShowing, isSlot2ResultShowing, setIsSlot2ResultShowing } = useEditTabContext()
     const [seconds, setSeconds] = useState(0)
     const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const loadingRef = useRef<HTMLDivElement | null>(null)
@@ -95,6 +95,8 @@ export default function ResultRender() {
                                                 setSlotEditedText={setSlot1EditedTxt}
                                                 isSlotEditing={isSlot1Editing}
                                                 setIsSlotEditing={setIsSlot1Editing}
+                                                isSlotResultShowing={isSlot1ResultShowing}
+                                                setIsSlotResultShowing={setIsSlot1ResultShowing}
                                                 >
                                                 </ResultWrap> : null}
                                         {
@@ -125,6 +127,8 @@ export default function ResultRender() {
                                             setSlotEditedText={setSlot2EditedTxt}
                                             isSlotEditing={isSlot2Editing}
                                             setIsSlotEditing={setIsSlot2Editing}
+                                            isSlotResultShowing={isSlot2ResultShowing}
+                                            setIsSlotResultShowing={setIsSlot2ResultShowing}
                                             >
                                             </ResultWrap> : null
                                         }

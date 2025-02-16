@@ -10,6 +10,7 @@ import { MdOutlineVisibility } from "react-icons/md";
 import { MdOutlineVisibilityOff } from "react-icons/md";
 import { FaFileDownload } from "react-icons/fa";
 import SaveFileDocx from "../buttons/saveToDocx"
+import DisplayResultBtn from "../buttons/displayResultBtn"
 
 interface ResultRenderTaskbarProps {
     slotRaw: string,
@@ -30,16 +31,19 @@ interface ResultRenderTaskbarProps {
 
     isSlotEditing:boolean,
     setIsSlotEditing:React.Dispatch<SetStateAction<boolean>>,
+
+    isSlotResultShowing:boolean,
+    setIsSlotResultShowing:React.Dispatch<SetStateAction<boolean>>,
 }
 
-export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing }: ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setIsSlotEditing }: ResultRenderTaskbarProps) {
 
     return (
         <div className="flex gap-2 shadow-md rounded-sm p-2 border-1 border">
 
             <div className="flex gap-2">
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw}></SaveFileDocx>
-                <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditShowing} isSlotEditing={isSlotEditing}></EditTextBtn>
+                <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing}></EditTextBtn>
                 <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt}></CopyTextBtn>
             </div>
 
@@ -61,6 +65,12 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
                                         <DisplayEditedTxtBtn setIsSlotEditShowing={setIsSlotEditShowing} isSlotEditShowing={isSlotEditShowing}></DisplayEditedTxtBtn>
                                     </DropdownMenuItem>
                                     : null
+                            }
+                            {
+                                slotEditedText ?
+                                <DropdownMenuItem>
+                                    <DisplayResultBtn setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing}></DisplayResultBtn>
+                                </DropdownMenuItem> : null
                             }
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
