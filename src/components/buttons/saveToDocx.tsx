@@ -17,10 +17,11 @@ interface SaveFileDocxProps {
     slotEditedText: string,
     isRawOn: boolean,
     isSlotEditShowing: boolean
+    isSlotEditing:boolean
 
 }
 
-export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt, slotEditedText, isRawOn, isSlotEditShowing }: SaveFileDocxProps) {
+export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt, slotEditedText, isRawOn, isSlotEditShowing, isSlotEditing }: SaveFileDocxProps) {
 
 
     const filenameInputref = useRef<HTMLInputElement>(null)
@@ -114,7 +115,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant={'outline'} size={'icon'}>
+                <Button variant={'outline'} size={'icon'} disabled={isSlotEditing}>
                     <FaFileDownload size={toolbarIconSize}></FaFileDownload>
                 </Button>
             </DialogTrigger>

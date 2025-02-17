@@ -12,10 +12,11 @@ interface CopyTextBtnProps {
     text: string,
     isRawOn:boolean,
     clipboardTxt:string,
+    isSlotEditing:boolean
 
 }
 
-export default function CopyTextBtn ({text, isRawOn, clipboardTxt}: CopyTextBtnProps) {
+export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing}: CopyTextBtnProps) {
 
     const [isCopied, setIsCopied] = useState(false)
     
@@ -43,7 +44,7 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt}: CopyTextBtnP
 
     return (
         
-            <Button onClick={handleCopy} disabled={isCopied} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null} min-w-[128px]`} variant={'outline'}>
+            <Button onClick={handleCopy} disabled={isCopied || isSlotEditing} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null} min-w-[128px]`} variant={'outline'}>
                 {
                     isCopied ?
                     <div className="flex items-center gap-2">

@@ -73,6 +73,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
 
 
         } catch (err) {
+            setIsSlotEditing(false)
             console.error('[editTxt] error', err)
         }
 
@@ -88,15 +89,12 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
         console.log('IS SLOT EIDITNG', isSlotEditing)
     }, [isSlotEditing, setIsSlotEditing])
 
-    return (
-        <Button onClick={textFunc}>
-            TEST LOAD STATE
-        </Button>
-    )
-
+   
 
 
     return (
+        <>
+        <Button onClick={textFunc}>Test</Button>
         <AlertDialog onOpenChange={(open) => {setIsTooltipAllowed(false); setIsDialogOpen(open)}} open={isDialogOpen}>
             
                 <Tooltip>
@@ -148,6 +146,6 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-
+                </>
     )
 }

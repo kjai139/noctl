@@ -213,6 +213,12 @@ export default function MainInputForm() {
 
                         
                     }
+                    try {
+                        const response = JSON.parse(pollResponse.job.response)
+                    } catch (err) {
+                        console.error('Invalid JSON:', pollResponse.job.response)
+                        throw new Error('Encountered a server error *_*. Please try again.')
+                    }
                     const response = JSON.parse(pollResponse.job.response)
                     console.log(response)
                     if (response[0].glossary?.terms) {

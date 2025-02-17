@@ -184,8 +184,14 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                     )
                 }) : null}
                 {
+                    !isSlotEditing && !isRawOn && !isSlotEditShowing ?
+                    <div>
+                        {slotTranslatedTxt}
+                    </div> : null
+                }
+                {
                     isSlotEditing ?
-                    <div className="editloader">
+                    <div className="flex gap-2 flex-col"> <span className="animate-pulse"> Checking Quality...</span><span className="font-semibold">This could take a minute, please be patient...</span>
                         </div> : null
                 }
             </div>
