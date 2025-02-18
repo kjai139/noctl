@@ -34,8 +34,8 @@ export default function DisplayRawBtn({ setIsRawOn, isRawOn }: DisplayRawBtnProp
     }
 
     return (
-        <div>
-            <Button onClick={toggleRaw} variant={'ghost'} className="w-full">
+      
+            <Button onClick={toggleRaw} variant={'ghost'} className="w-full justify-start">
                 {
                     isRawOn ?
                         <div className="flex gap-2 items-center">
@@ -55,6 +55,6 @@ export default function DisplayRawBtn({ setIsRawOn, isRawOn }: DisplayRawBtnProp
                 }
 
             </Button>
-        </div>
+       
     )
 }

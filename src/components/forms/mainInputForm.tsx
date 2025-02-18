@@ -20,6 +20,7 @@ import { useOutputContext } from "@/app/_contexts/outputContext";
 import { useSession } from "next-auth/react";
 import redis from "@/lib/redis";
 import { pollJobStatus } from "@/app/_utils/pollJobStatus";
+import { jsonrepair } from 'jsonrepair'
 
 
 const tokenLimit = 10000
@@ -200,6 +201,7 @@ export default function MainInputForm() {
                         startTime: startTime,
                         interval: pollInterval,
                     })
+                    
 
                     console.log(`[Standard Model] pollResponse for id ${jobId}`, pollResponse)
                     if (pollResponse.job.jobStatus === 'failed') {
@@ -213,13 +215,18 @@ export default function MainInputForm() {
 
                         
                     }
-                    try {
-                        const response = JSON.parse(pollResponse.job.response)
-                    } catch (err) {
-                        console.error('Invalid JSON:', pollResponse.job.response)
-                        throw new Error('Encountered a server error *_*. Please try again.')
+                    let jsonResponse = pollResponse.job.response
+                    if (/^```|```$/.test(pollResponse.job.response)) {
+                        console.log("String has triple backticks at the start or end")
+                        try {
+                            jsonResponse = jsonrepair(jsonResponse)
+                            console.log('new JSON RESPONSE', jsonResponse)
+                        } catch (err) {
+                            throw new Error('AI returned corrupted data. This is a rare bug that seems to happen if the last line is a dialog with single quotes.')
+                        }
+                        
                     }
-                    const response = JSON.parse(pollResponse.job.response)
+                    const response = JSON.parse(jsonResponse)
                     console.log(response)
                     if (response[0].glossary?.terms) {
                         const glossaryResult = response[0].glossary.terms

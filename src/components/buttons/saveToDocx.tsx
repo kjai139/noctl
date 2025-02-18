@@ -30,62 +30,24 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
     const handleSaveFile = async () => {
         if (filenameInputref.current) {
             console.log('[handlesaveFile] File Name: ', filenameInputref.current.value)
-            console.log('slotRaw', slotRaw)
         }
-
-
-        const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
-        const rawlines = normalizedRaw.split('\n').filter(line => line !== '　')
-        const normalizedTxt = slotTranslatedTxt.replace(/\n+/g, '\n').trim()
-        const resultLines = normalizedTxt.split('\n')
-        const normalizedEditedTxt = slotEditedText.replace(/\n+/g, '\n').trim()
-        const editedLines = normalizedEditedTxt.split('\n')
-
-        const maxLines = Math.max(rawlines.length, resultLines.length, editedLines.length)
-
-        let mergedLines = []
-
-
-        for (let i = 0; i < maxLines; i++) {
-            const line1 = rawlines[i] ?? ''
-            const line2 = resultLines[i] ?? ''
-            const line3 = editedLines[i] ?? ''
-
-            if (isRawOn) {
-                mergedLines.push(line1)
-                if (!isSlotEditShowing) {
-                    mergedLines.push(line2 + '\n')
-                } else {
-                    mergedLines.push(line2)
-                }
-
-
-            } else {
-
-                if (isSlotEditShowing) {
-                    mergedLines.push(line2)
-                    mergedLines.push(line3 + '\n')
-                } else {
-                    mergedLines.push(line2)
-                }
-            }
-
-
-
-        }
-
-        const mergedTxt = mergedLines.join('\n')
-        console.log('copyText: ', mergedTxt)
-
+    
+        const docArr = clipboardTxt.split('\n')
+        console.log('[saveFileBtn] docArr', docArr)
+    
         const para = new Paragraph({
-            children: mergedTxt.split('\m').flatMap((line, idx, arr) => {
-                const runs = [new TextRun(line)]
-                if (idx < arr.length - 1) {
-                    runs.push(new TextRun({ break: 1}))
+            children: docArr.flatMap((line) => {
+                if (line === '') {
+                    return [new TextRun({break: 1})]
+                } else {
+                    return [new TextRun(line), new TextRun({break: 1})]
+
                 }
-                return runs
             })
         })
+    
+
+
 
         const doc = new Document({
             sections: [

@@ -191,7 +191,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             throw new Error('Encountered a server error. Please try relogging.')
         }
 
-        const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
+        /* const { success, remaining, reset } = await geminiRatelimit.limit(session.user.id)
         if (!success) {
             
             const remainingTime = reset - Date.now()
@@ -199,7 +199,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             const seconds = Math.floor((remainingTime / 60000) / 1000)
             console.log(reset, remainingTime, mins, seconds)
             throw new Error(`[Free Model] You've hit the usage limit. Please try again in ${mins}m ${seconds}s or switch to another model.`)
-        }
+        } */
 
         let prompt
 
@@ -211,7 +211,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the text format in the translated text the same as the original's. \n ### Text \n ${text}`
+            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Follow the linebreaks of the original text. \n ### Text \n ${text}`
         }
 
         //Making job on redis and starting lambda

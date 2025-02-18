@@ -11,6 +11,7 @@ import { MdOutlineVisibilityOff } from "react-icons/md";
 import { FaFileDownload } from "react-icons/fa";
 import SaveFileDocx from "../buttons/saveToDocx"
 import DisplayResultBtn from "../buttons/displayResultBtn"
+import { toolbarIconSize } from "@/lib/toolbarIcons"
 
 interface ResultRenderTaskbarProps {
     slotRaw: string,
@@ -51,8 +52,8 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
             <div className="flex gap-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant={'outline'} disabled={isSlotEditing}>
-                            Visibility
+                        <Button variant={'outline'} disabled={isSlotEditing} size={'icon'}>
+                            <MdOutlineVisibility size={toolbarIconSize}></MdOutlineVisibility>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -66,12 +67,6 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
                                         <DisplayEditedTxtBtn setIsSlotEditShowing={setIsSlotEditShowing} isSlotEditShowing={isSlotEditShowing}></DisplayEditedTxtBtn>
                                     </DropdownMenuItem>
                                     : null
-                            }
-                            {
-                                slotEditedText ?
-                                <DropdownMenuItem>
-                                    <DisplayResultBtn setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing}></DisplayResultBtn>
-                                </DropdownMenuItem> : null
                             }
                         </DropdownMenuGroup>
                     </DropdownMenuContent>

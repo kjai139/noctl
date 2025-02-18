@@ -23,16 +23,9 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing
 
     const handleCopy = async () => {
         try {
-            if (isRawOn) {
-                console.log('[CopyTextBtn] Clipboardtxt - ', clipboardTxt)
-                await navigator.clipboard.writeText(clipboardTxt)
+            await navigator.clipboard.writeText(clipboardTxt)
                 setIsCopied(true)
                 setTimeout(() => setIsCopied(false), 2000)
-            } else {
-                await navigator.clipboard.writeText(text)
-                setIsCopied(true)
-                setTimeout(() => setIsCopied(false), 2000)
-            }
             
 
         } catch (err) {

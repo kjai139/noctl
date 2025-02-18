@@ -58,6 +58,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
         const prompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n ${lineByLine}`
         console.log('[editText] prompt used: ', prompt)
         try {
+            setIsDialogOpen(false)
             setIsSlotEditing(true)
             const response: any = await ClaudeEdit({
                 prompt: prompt
@@ -94,7 +95,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
 
     return (
         <>
-        <Button onClick={textFunc}>Test</Button>
+        {/* <Button onClick={textFunc}>Test</Button> */}
         <AlertDialog onOpenChange={(open) => {setIsTooltipAllowed(false); setIsDialogOpen(open)}} open={isDialogOpen}>
             
                 <Tooltip>
@@ -137,7 +138,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                     </AlertDialogCancel>
                     {
                         userCurrency && userCurrency > 0 ?
-                        <AlertDialogAction onClick={textFunc}>
+                        <AlertDialogAction onClick={editText}>
                         Confirm
                          </AlertDialogAction> : null
                     }

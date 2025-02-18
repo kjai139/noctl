@@ -41,6 +41,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
         const resultLines = normalizedTxt.split('\n').map((line) => ({ text: line, color: 'result' }))
         const normalizedEditedTxt = slotEditedText.replace(/\n+/g, '\n').trim()
         const editedLines = normalizedEditedTxt.split('\n').map((line) => ({ text: line, color: 'edit' }))
+        console.log('editedTXT', editedLines)
 
         const maxLines = Math.max(rawlines.length, resultLines.length, editedLines.length)
 
@@ -113,21 +114,24 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
 
 
     useEffect(() => {
+        console.log('IS SLOT EDIT SHOWING:', isSlotEditShowing)
         if (!isRawOn && !isSlotEditShowing) {
             setClipboardTxt(slotTranslatedTxt)
-        } else if (!isRawOn && isSlotEditShowing && !isSlotResultShowing) {
-            setClipboardTxt(slotEditedText)
-        } else {
+        }   else {
             const text = renderText()
-            setDisplaytxt(text)
+            console.log('rendertext:', text)
 
             const clipboardTxt = text.map((line: any) => {
                 if (line.color === 'result') {
                     if (!isSlotEditShowing) {
+                        console.log('SLOT EDIT IS NOT SHOWING')
                         return line.text + '\n'
+                    } else {
+                        return line.text
                     }
                 } else if (line.color === 'edit') {
                     if (isSlotEditShowing) {
+                        console.log('SLOT EDIT IS SHOWING')
                         return line.text + '\n'
                     }
                 } else if (line.color === 'raw') {
@@ -135,13 +139,14 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                 }
             }).join('\n')
             console.log('clipboardTxt', clipboardTxt)
-
+            setDisplaytxt(text)
             setClipboardTxt(clipboardTxt)
+            console.log('TEXT:', displayTxt)
         }
-        console.log('TEXT:', displayTxt)
+    
         console.log('clipboard', clipboardTxt)
 
-    }, [isSlotEditShowing, isRawOn, slotResultDisplay, isSlotResultShowing])
+    }, [isSlotEditShowing, isRawOn, slotResultDisplay])
 
     useEffect(() => {
         console.log('isSlotEditing:', isSlotEditing)
@@ -189,6 +194,11 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                         {slotTranslatedTxt}
                     </div> : null
                 }
+                {/* {
+                    !isSlotResultShowing && !isSlotEditing && !isRawOn && isSlotEditShowing ?
+                    <div>
+                    </div> : null
+                } */}
                 {
                     isSlotEditing ?
                     <div className="flex gap-2 flex-col"> <span className="animate-pulse"> Checking Quality...</span><span className="font-semibold">This could take a minute, please be patient...</span>
