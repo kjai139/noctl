@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { MdOutlineVisibility } from "react-icons/md";
 import { MdOutlineVisibilityOff } from "react-icons/md";
 import { toolbarIconSize } from "@/lib/toolbarIcons";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface DisplayEditedTxtBtnProps {
     isSlotEditShowing: boolean,
@@ -24,6 +25,7 @@ export default function DisplayEditedTxtBtn({ isSlotEditShowing, setIsSlotEditSh
 
 
     return (
+        
         <Button onClick={toggleEditDisplay} variant={'ghost'} className="w-full">
             {
                 isSlotEditShowing ?
@@ -43,5 +45,6 @@ export default function DisplayEditedTxtBtn({ isSlotEditShowing, setIsSlotEditSh
                     </div> 
             }
         </Button>
+       
     )
 }

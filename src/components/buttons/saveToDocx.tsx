@@ -9,6 +9,7 @@ import { FaFileDownload } from "react-icons/fa";
 import { toolbarIconSize } from "@/lib/toolbarIcons"
 import { Document, Packer, Paragraph, TextRun } from "docx"
 import { saveAs } from 'file-saver'
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 interface SaveFileDocxProps {
     clipboardTxt: string,
@@ -26,6 +27,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
 
     const filenameInputref = useRef<HTMLInputElement>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
 
     const handleSaveFile = async () => {
         if (filenameInputref.current) {
@@ -43,7 +45,8 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
                     return [new TextRun(line), new TextRun({break: 1})]
 
                 }
-            })
+            }),
+            
         })
     
 
@@ -54,7 +57,17 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
                 {
                     children: [para]
                 }
-            ]
+            ],
+            styles: {
+                default: {
+                    document: {
+                        run: {
+                            font: "Arial",
+                            size: 24
+                        }
+                    }
+                }
+            }
         })
 
         try {
@@ -76,11 +89,22 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Tooltip>
+        <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
             <DialogTrigger asChild>
                 <Button variant={'outline'} size={'icon'} disabled={isSlotEditing}>
                     <FaFileDownload size={toolbarIconSize}></FaFileDownload>
                 </Button>
             </DialogTrigger>
+        </TooltipTrigger>
+        {
+            isTooltipAllowed ? 
+            <TooltipContent>
+            <p>Download Document</p>
+            </TooltipContent> : null
+        }
+       
+        </Tooltip>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>

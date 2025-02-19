@@ -222,7 +222,7 @@ export default function MainInputForm() {
                             jsonResponse = jsonrepair(jsonResponse)
                             console.log('new JSON RESPONSE', jsonResponse)
                         } catch (err) {
-                            throw new Error('AI returned corrupted data. This is a rare bug that seems to happen if the last line is a dialog with single quotes.')
+                            throw new Error('AI returned corrupted data. This is a rare bug that seems to happen with this model if the last line of text is a dialog with single quotes.')
                         }
                         
                     }

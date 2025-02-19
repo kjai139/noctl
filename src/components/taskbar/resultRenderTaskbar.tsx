@@ -12,6 +12,7 @@ import { FaFileDownload } from "react-icons/fa";
 import SaveFileDocx from "../buttons/saveToDocx"
 import DisplayResultBtn from "../buttons/displayResultBtn"
 import { toolbarIconSize } from "@/lib/toolbarIcons"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 interface ResultRenderTaskbarProps {
     slotRaw: string,
@@ -42,20 +43,24 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
 
     return (
         <div className="flex gap-2 shadow-md rounded-sm p-2 border-1 border">
-
+            <div>
+            <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing}></CopyTextBtn>
+            </div>
             <div className="flex gap-2">
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw} isSlotEditing={isSlotEditing}></SaveFileDocx>
                 <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing}></EditTextBtn>
-                <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing}></CopyTextBtn>
-            </div>
-
-            <div className="flex gap-2">
-                <DropdownMenu>
+                {/* <DropdownMenu>
+                    <Tooltip>
+                        <TooltipTrigger onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)} asChild>
                     <DropdownMenuTrigger asChild>
                         <Button variant={'outline'} disabled={isSlotEditing} size={'icon'}>
                             <MdOutlineVisibility size={toolbarIconSize}></MdOutlineVisibility>
                         </Button>
                     </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Visibility</p>
+                    </TooltipContent>
                     <DropdownMenuContent>
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
@@ -70,10 +75,12 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
                             }
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
-                </DropdownMenu>
-
-
+                    </Tooltip>
+                </DropdownMenu> */}
+                
             </div>
+
+           
 
 
 

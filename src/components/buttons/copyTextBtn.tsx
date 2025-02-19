@@ -7,6 +7,7 @@ import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 import { toolbarIconSize } from "@/lib/toolbarIcons";
 import { FaRegCopy } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
+import { Tooltip } from "../ui/tooltip";
 
 interface CopyTextBtnProps {
     text: string,
@@ -36,7 +37,7 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing
 
 
     return (
-        
+      
             <Button onClick={handleCopy} disabled={isCopied || isSlotEditing} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null} min-w-[128px]`} variant={'outline'}>
                 {
                     isCopied ?
@@ -56,6 +57,7 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing
 
                 }
             </Button>
+        
         
     )
 }
