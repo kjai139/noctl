@@ -42,6 +42,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
     const pathname = usePathname()
     const { userCurrency, setUserCurrency } = useWorkState()
     const [errorMsg, setErrorMsg] = useState('')
+    const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
 
     const [hasMounted, setHasMounted] = useState(false)
 
@@ -158,7 +159,7 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             
                 <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
                     <DropdownMenuTrigger asChild>
                         <Button variant={'ghost'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow currencyBtn hover:brightness-90'>
                             {/* <TbHexagonLetterRFilled size={30} /> */}
@@ -167,9 +168,9 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
                         </Button>
                     </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <TooltipContent>
+                    {isTooltipAllowed ? <TooltipContent>
                         <p>Currency tab</p>
-                    </TooltipContent>
+                    </TooltipContent> : null}
             </Tooltip>
             
             <DropdownMenuContent>

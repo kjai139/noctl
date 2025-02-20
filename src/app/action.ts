@@ -211,7 +211,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Follow the linebreaks of the original text. \n ### Text \n ${text}`
+            prompt = `Please translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the original format and maintain the same linebreaks as the original text. \n ### Text \n ${text}`
         }
 
         //Making job on redis and starting lambda
@@ -388,12 +388,29 @@ export async function translateClaude({ text, language, glossary }: translateTxt
 
 }
 
+
 interface ClaudeEditProps {
     prompt: string
 }
 
 export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
+
+    
     try {
+
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Please sign in to use this model.')
+        }
+
+        const existingUser = await userModel.findById(session.user.id)
+
+        if (!existingUser) {
+            throw new Error('Encountered a server error. Please try relogging.')
+        }
+        if (existingUser.currencyAmt < claudeCost) {
+            throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
+        }
         const textPrompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n 
         그렇다 할지라도!
         Even if that’s the case!

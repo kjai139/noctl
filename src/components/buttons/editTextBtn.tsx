@@ -17,11 +17,12 @@ interface EditTextBtnProps {
     setSlotEditedText: React.Dispatch<SetStateAction<string>>,
     isSlotEditing: boolean,
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>,
+    setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>,
     
    
 }
 
-export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing }: EditTextBtnProps) {
+export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing }: EditTextBtnProps) {
 
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
     const { userCurrency } = useWorkState()
@@ -53,7 +54,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
 
     }
 
-    const editText = async () => {
+    const checkQuality = async () => {
         const lineByLine = getLinebyLineTxt()
         const prompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n ${lineByLine}`
         console.log('[editText] prompt used: ', prompt)
@@ -70,6 +71,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
             console.log(linesArr)
             const formattedTextResult = linesArr.map((line: any) => line.translated_line).join('\n')
             setSlotEditedText(formattedTextResult)
+            setIsSlotEditShowing(true)
             setIsSlotEditing(false)
 
 
@@ -126,7 +128,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                     <AlertDialogDescription className="flex flex-col">
                         <span>This function will use the best paid model to check the quality of the translation, looking to fix any hallucinations and errors.</span>
                         <span className="mt-2">
-                            It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform. {
+                            It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform this action. {
                                 userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
                             }
                         </span>
@@ -138,7 +140,7 @@ export default function EditTextBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlo
                     </AlertDialogCancel>
                     {
                         userCurrency && userCurrency > 0 ?
-                        <AlertDialogAction onClick={editText}>
+                        <AlertDialogAction onClick={checkQuality}>
                         Confirm
                          </AlertDialogAction> : null
                     }

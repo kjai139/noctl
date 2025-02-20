@@ -42,9 +42,9 @@ export default function VisibilityDropDown({
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
-                <TooltipContent>
+                {isTooltipAllowed ? <TooltipContent>
                     <p>Visibility</p>
-                </TooltipContent>
+                </TooltipContent> : null}
                 <DropdownMenuContent>
                     <DropdownMenuGroup>
                         <DropdownMenuItem>

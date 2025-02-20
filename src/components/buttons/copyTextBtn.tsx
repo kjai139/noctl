@@ -7,7 +7,7 @@ import { useClipboardContext } from "@/app/_contexts/clipboardContext";
 import { toolbarIconSize } from "@/lib/toolbarIcons";
 import { FaRegCopy } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { Tooltip } from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface CopyTextBtnProps {
     text: string,
@@ -20,6 +20,7 @@ interface CopyTextBtnProps {
 export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing}: CopyTextBtnProps) {
 
     const [isCopied, setIsCopied] = useState(false)
+    const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
     
 
     const handleCopy = async () => {
@@ -37,26 +38,32 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing
 
 
     return (
-      
-            <Button onClick={handleCopy} disabled={isCopied || isSlotEditing} className={`disabled:opacity-100 ${isCopied ? 'bg-green-400' : null} min-w-[128px]`} variant={'outline'}>
+        <Tooltip>
+            <TooltipTrigger asChild onMouseEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+            <Button onClick={handleCopy} disabled={isCopied || isSlotEditing} className={`disabled:opacity-100 ${isCopied ? 'color-green-400' : null}`} variant={'outline'} size={'icon'}>
                 {
                     isCopied ?
                     <div className="flex items-center gap-2">
-                    <FaRegCheckCircle size={toolbarIconSize}>
+                    <FaRegCheckCircle color="green" size={toolbarIconSize}>
                     </FaRegCheckCircle>
-                    <span>Copied!</span>
+                    {/* <span>Copied!</span> */}
                     </div> : 
                     <div className="flex items-center gap-2">
                     <FaRegCopy size={toolbarIconSize}>
                         
                     </FaRegCopy>
-                    <span>
+                    {/* <span>
                         Copy Text
-                    </span>
+                    </span> */}
                     </div>
 
                 }
             </Button>
+            </TooltipTrigger>
+            {
+                isTooltipAllowed ? <TooltipContent> <p>Copy Text</p> </TooltipContent> : null
+            }
+        </Tooltip>
         
         
     )

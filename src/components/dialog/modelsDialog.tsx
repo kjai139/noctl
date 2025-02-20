@@ -7,13 +7,13 @@ const models = [
     {
         name: "Free",
         accuracy: 3.5,
-        info: "Better than Google Translate & DeepL. Occasional speaker attribution errors.",
+        info: "Better than Google Translate & DeepL. Occasional speaker attribution errors and formatting issues.",
         pricing: `Free, ${standardModelLimit} requests every 10 min`
     },
     {
         name: "Better-1",
         accuracy: 4.7,
-        info: "This model generally performs the best. It has higher reading comprehension, higher accuracy , and less speaker attribution errors compared to the free model.",
+        info: "This model generally performs the best. It has better reading comprehension, higher accuracy, fewer speaker attribution errors compared to the free model, and more consistent formatting.",
         pricing: "50 requests @ $5 USD"
     },
     {
@@ -51,8 +51,12 @@ export default function ModelsDialog() {
                 </DialogHeader>
                 <Table>
                     <TableCaption>
-                        <span className="flex flex-col gap-1">
-                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts. Signing in with gmail is required to prevent abuse.
+                        <span className="flex flex-col gap-2">
+                            
+                            <span className="text-foreground font-semibold">
+                            Signing in with Gmail is required to prevent abuse.
+                            </span>
+                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts, requiring separate requests.
                             </span>
                         </span>
 

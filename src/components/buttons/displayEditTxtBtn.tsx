@@ -17,6 +17,7 @@ export default function DisplayEditedTxtBtn({ isSlotEditShowing, setIsSlotEditSh
 
     const toggleEditDisplay = () => {
         if (isSlotEditShowing) {
+            console.log('SETTING SLOT EDIT SHOW OFF')
             setIsSlotEditShowing(false)
         } else if (!isSlotEditShowing) {
             setIsSlotEditShowing(true)
