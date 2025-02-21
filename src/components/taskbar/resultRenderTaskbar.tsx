@@ -1,19 +1,9 @@
-import DisplayRawBtn from "../buttons/displayRawBtn"
+
 import CopyTextBtn from "../buttons/copyTextBtn"
 import { SetStateAction } from "react"
-import EditTextBtn from "../buttons/editTextBtn"
-import DisplayEditedTxtBtn from "../buttons/displayEditTxtBtn"
-import { Separator } from "../ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
-import { Button } from "../ui/button"
-import { MdOutlineVisibility } from "react-icons/md";
-import { MdOutlineVisibilityOff } from "react-icons/md";
-import { FaFileDownload } from "react-icons/fa";
 import SaveFileDocx from "../buttons/saveToDocx"
-import DisplayResultBtn from "../buttons/displayResultBtn"
-import { toolbarIconSize } from "@/lib/toolbarIcons"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import VisibilityDropDown from "../dropdown/visibilityDisplay"
+import CheckQualityBtn from "../buttons/checkQuality"
 
 interface ResultRenderTaskbarProps {
     slotRaw: string,
@@ -49,7 +39,7 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
             </div>
             <div className="flex gap-2">
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw} isSlotEditing={isSlotEditing}></SaveFileDocx>
-                <EditTextBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing} setIsSlotEditShowing={setIsSlotEditShowing}></EditTextBtn>
+                <CheckQualityBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing} setIsSlotEditShowing={setIsSlotEditShowing}></CheckQualityBtn>
                 <VisibilityDropDown isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} isSlotEditing={isSlotEditing} setIsRawOn={setIsRawOn} setIsSlotEditShowing={setIsSlotEditShowing} slotEditedText={slotEditedText}></VisibilityDropDown>
                
                 

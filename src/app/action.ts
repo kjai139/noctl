@@ -5,7 +5,7 @@ import { GlossaryItem, GlossaryType, ModelsType } from "./_types/glossaryType"
 import { GoogleGenerativeAI, HarmCategory, SchemaType, HarmBlockThreshold } from "@google/generative-ai"
 import { auth } from "../../auth"
 import userModel from "./_models/userModel"
-import { claudeCost, openAiCost } from "@/lib/modelPrice"
+import { claudeCost, editCost, openAiCost } from "@/lib/modelPrice"
 import { Ratelimit } from '@upstash/ratelimit'
 import redis from "@/lib/redis"
 import connectToMongoose from "@/lib/mongoose"
@@ -360,29 +360,7 @@ export async function translateClaude({ text, language, glossary }: translateTxt
     } catch (err) {
         console.error('[translateClaude] Error', err)
         throw err
-        /* if (err instanceof Anthropic.APIError) {
-            switch (err.status) {
-                case 400:
-                    throw new Error('Bad request, possibly due to NSFW')
-                case 401:
-                    throw new Error('Authentication Error')
-                case 429:
-                    throw new Error('Rate limit Error')
-                case 403:
-                    throw new Error('Permission denied')
-                case 422:
-                    throw new Error('Unprocessable Entity Error')
-                case 500:
-                    throw new Error('Internal server error')
-                default:
-                    throw new Error('An unknown server error has occured.')
-            }
-        } else if (err instanceof Error) {
-            throw err
-        } else {
-            console.log('[translateClaude] Hit an unhandled error type')
-            throw new Error('Something went wrong. Please try again later.')
-        } */
+       
 
     }
 
@@ -408,17 +386,40 @@ export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
         }
-        if (existingUser.currencyAmt < claudeCost) {
-            throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
+        if (existingUser.currencyAmt < editCost) {
+            throw new Error('You do not have enough currency to use this function. Purchase more at the currency tab.')
         }
-        const textPrompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n 
+        /* const textPrompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n 
         그렇다 할지라도!
         Even if that’s the case!
 
         좋아하는 게임에 캐릭터가 되어달라는 제안을 어떤 게이머가 거절할 수 있나.
         What gamer could possibly refuse the offer to become a character in their favorite game?
-        `
-        const message = await client.messages.create({
+        ` */
+
+        const params: {
+            model: ModelsType,
+            prompt: string,
+            userId: string
+        } = {
+            model: 'e1',
+            prompt: prompt,
+            userId: session.user.id
+        }
+        const jobId = await queueJob(params)
+        existingUser.currencyAmt -= editCost
+        try {
+            await existingUser.save()
+        } catch (err) {
+            console.error('[ClaudeEdit] Error updating user:', err)
+            throw new Error('Encountered a server error *_*, please try again later.')
+        }
+
+        console.log(`[ClaudeEdit] user currency updated`)
+        return jobId
+
+
+        /* const message = await client.messages.create({
             model: "claude-3-5-sonnet-20241022",
             max_tokens: 8192,
             temperature: 0.2,
@@ -452,7 +453,7 @@ export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
             
         })
         console.log('[claudeEdit] message', message)
-        return message.content
+        return message.content */
     } catch (err) {
         console.error('[claudeEdit] Error', err)
         throw err

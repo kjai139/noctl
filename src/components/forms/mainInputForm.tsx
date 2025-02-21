@@ -287,7 +287,7 @@ export default function MainInputForm() {
                         console.error('[B-1] Missing job Id')
                         throw new Error('Something went wrong -_-, please try again later.')
                     }
-                    console.log('[Standard Model] JobId:', jobId)
+                    console.log('[B1 Model] JobId:', jobId)
                     const pollResponse = await pollJobStatus({
                         jobId: jobId,
                         startTime: startTime,
