@@ -2,6 +2,7 @@
 import { SetStateAction, useEffect, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import { string } from "zod"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shadcn/ui/tabs"
 
 
 
@@ -25,8 +26,8 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>
     isSlotEditing: boolean,
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>
-    isSlotResultShowing:boolean,
-    setIsSlotResultShowing:React.Dispatch<SetStateAction<boolean>>,
+    isSlotResultShowing: boolean,
+    setIsSlotResultShowing: React.Dispatch<SetStateAction<boolean>>,
 
 }) {
 
@@ -117,7 +118,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
         console.log('IS SLOT EDIT SHOWING:', isSlotEditShowing)
         if (!isRawOn && !isSlotEditShowing) {
             setClipboardTxt(slotTranslatedTxt)
-        }   else {
+        } else {
             const text = renderText()
             console.log('rendertext:', text)
 
@@ -143,7 +144,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             setClipboardTxt(clipboardTxt)
             console.log('TEXT:', displayTxt)
         }
-    
+
         console.log('clipboard', clipboardTxt)
 
     }, [isSlotEditShowing, isRawOn, slotResultDisplay])
@@ -155,56 +156,81 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
 
 
     return (
-        <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
-            <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
-                <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
-                <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing}></ResultRenderTaskbar>
-            </div>
-            <div className="py-8 w-cont">
-                {!isSlotEditing && (isRawOn || isSlotEditShowing) ? displayTxt && displayTxt.map((line: { text: string, color: string }, idx: number) => {
-                    if (!line) {
-                        return null
-                    }
-                    let color = null
-                    let margin = null
-                    if (line.color === 'result') {
-                        if (!isSlotEditShowing) {
-                            margin = 'mb-8'
-                        }
+        <div className="w-full">
+            <Tabs defaultValue={`original`} className="flex flex-col">
+                <TabsList>
+                    <TabsTrigger value="original">
+                        {slotModelName}
+                    </TabsTrigger>
+                    <TabsTrigger value="edited">
+                        Edited
+                    </TabsTrigger>
+                </TabsList>
+                    <TabsContent value="original" className="flex w-full justify-center">
+                        <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
+                            <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
+                                <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
+                                <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing}></ResultRenderTaskbar>
+                            </div>
+                            <div className="py-8 w-cont">
+                                {!isSlotEditing && (isRawOn || isSlotEditShowing) ? displayTxt && displayTxt.map((line: { text: string, color: string }, idx: number) => {
+                                    if (!line) {
+                                        return null
+                                    }
+                                    let color = null
+                                    let margin = null
+                                    if (line.color === 'result') {
+                                        if (!isSlotEditShowing) {
+                                            margin = 'mb-8'
+                                        }
 
-                    } else if (line.color === 'edit') {
-                        color = 'text-green-700'
-                        if (isSlotEditShowing) {
-                            margin = 'mb-8'
-                        }
-                    } else if (line.color === 'raw') {
-                        color = 'text-muted-foreground'
-                    }
-                    return (
-                        <div key={`line${idx}`}>
-                            <p className={`${color} ${margin}`}>
-                                {line.text}
-                            </p>
+                                    } else if (line.color === 'edit') {
+                                        color = 'text-green-700'
+                                        if (isSlotEditShowing) {
+                                            margin = 'mb-8'
+                                        }
+                                    } else if (line.color === 'raw') {
+                                        color = 'text-muted-foreground'
+                                    }
+                                    return (
+                                        <div key={`line${idx}`}>
+                                            <p className={`${color} ${margin}`}>
+                                                {line.text}
+                                            </p>
+                                        </div>
+                                    )
+                                }) : null}
+                                {
+                                    !isSlotEditing && !isRawOn && !isSlotEditShowing ?
+                                        <div>
+                                            {slotTranslatedTxt}
+                                        </div> : null
+                                }
+                                {
+                                    isSlotEditing ?
+                                        <div className="flex gap-2 flex-col"> <span className="animate-pulse"> Checking Quality...</span><span className="font-semibold">This could take a minute, please be patient...</span>
+                                        </div> : null
+                                }
+                            </div>
                         </div>
-                    )
-                }) : null}
-                {
-                    !isSlotEditing && !isRawOn && !isSlotEditShowing ?
-                    <div>
-                        {slotTranslatedTxt}
-                    </div> : null
-                }
-                {/* {
-                    !isSlotResultShowing && !isSlotEditing && !isRawOn && isSlotEditShowing ?
-                    <div>
-                    </div> : null
-                } */}
-                {
-                    isSlotEditing ?
-                    <div className="flex gap-2 flex-col"> <span className="animate-pulse"> Checking Quality...</span><span className="font-semibold">This could take a minute, please be patient...</span>
-                        </div> : null
-                }
-            </div>
+                    </TabsContent>
+                    <TabsContent value="edited" className="flex w-full justify-center m-0">
+                    <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
+                            <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
+                                <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
+                                <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing}></ResultRenderTaskbar>
+                            </div>
+                            <div className="py-8 w-cont">
+                                {slotEditedText}
+                            </div>
+                        </div>
+
+                    </TabsContent>
+                
+
+            </Tabs>
         </div>
+
+        
     )
 }

@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { TbCircleLetterRFilled } from "react-icons/tb";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { pollJobStatus } from "@/app/_utils/pollJobStatus";
+import useButtonDisabled from "@/hooks/use-disabled";
 
 
 interface CheckQualityBtnProps {
@@ -28,6 +29,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
     const { userCurrency } = useWorkState()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const isDisabled = useButtonDisabled()
 
     const getLinebyLineTxt = () => {
         const normalizedRaw = slotRaw.replace(/\n+/g, '\n').trim()
@@ -142,7 +144,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
 
                         <AlertDialogTrigger asChild>
-                            <Button size={'icon'} variant={'outline'} disabled={isSlotEditing}>
+                            <Button size={'icon'} variant={'outline'} disabled={isDisabled}>
                                 <BiMessageAltEdit size={23} />
                             </Button>
                         </AlertDialogTrigger>

@@ -8,6 +8,7 @@ import { toolbarIconSize } from "@/lib/toolbarIcons";
 import { FaRegCopy } from "react-icons/fa";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import useButtonDisabled from "@/hooks/use-disabled";
 
 interface CopyTextBtnProps {
     text: string,

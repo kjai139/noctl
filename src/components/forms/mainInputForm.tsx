@@ -21,6 +21,8 @@ import { useSession } from "next-auth/react";
 import redis from "@/lib/redis";
 import { pollJobStatus } from "@/app/_utils/pollJobStatus";
 import { jsonrepair } from 'jsonrepair'
+import { useEditTabContext } from "@/app/_contexts/editContext";
+import useButtonDisabled from "@/hooks/use-disabled";
 
 
 const tokenLimit = 10000
@@ -55,6 +57,7 @@ export default function MainInputForm() {
     const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency, setIsSlot1RawOn, setIsSlot2RawOn } = useWorkState()
     const { outputLang } = useOutputContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
+    const isDisabled = useButtonDisabled()
 
     const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('standard')
@@ -901,7 +904,7 @@ export default function MainInputForm() {
 
 
                         {/* cara */}
-                        <ChunkCarousel isDisabled={isLoading} setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
+                        <ChunkCarousel isDisabled={isDisabled} setTextArea={setTxtareaContent} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk}></ChunkCarousel>
 
                     </div>
                     <div className="flex flex-col gap-4 main-wrap border-4 border-transparent rounded-xl">
@@ -914,7 +917,7 @@ export default function MainInputForm() {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
-                                        }} placeholder="Enter or paste your text here..." {...field} className="max-h-[300px] w-full border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isLoading}>
+                                        }} placeholder="Enter or paste your text here..." {...field} className="max-h-[300px] w-full border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isDisabled}>
 
                                         </Textarea>
 
@@ -927,13 +930,13 @@ export default function MainInputForm() {
 
                         </FormField>
                         <div className="justify-end flex gap-2 items-center p-2 pb-1">
-                            <AiModelSelect setModel={setAiModel} isDisabled={isLoading}></AiModelSelect>
+                            <AiModelSelect setModel={setAiModel} isDisabled={isDisabled}></AiModelSelect>
                             <div className="text-destructive p-0 flex gap-2 items-center">
                                 {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}
                                 {/* {form.formState.errors.language ? form.formState.errors.language.message : null} */}
                                 <TextAreaWatched control={form.control}></TextAreaWatched>
                             </div>
-                            <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isLoading}>Translate</Button>
+                            <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isDisabled}>Translate</Button>
                         </div>
                     </div>
                 </form>

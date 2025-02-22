@@ -197,6 +197,7 @@ body {
 
 .w-cont {
       overflow-wrap: anywhere;
+      animation: fadeEffect 1s;
 }
 
 
@@ -356,6 +357,15 @@ body {
       animation: pulse 1.5s infinite;
 }
 
+@keyframes fadeEffect {
+      from {
+            opacity: 0;
+      }
+      to {
+            opacity: 1;
+      }
+}
+
 
 @supports (animation: grow .5s cubic-bezier(.25, .25, .25, 1) forwards) {
       .tick {
@@ -426,4 +436,15 @@ body {
       .nv-item {
             flex-direction: column;
       }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
