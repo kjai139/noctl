@@ -200,6 +200,10 @@ body {
       animation: fadeEffect 1s;
 }
 
+.pg-mw {
+      max-width: 800px;
+}
+
 
 /* [data-gstate="e"] {
       transform: translateY(0);

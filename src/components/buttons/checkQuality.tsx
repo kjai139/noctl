@@ -20,11 +20,11 @@ interface CheckQualityBtnProps {
     isSlotEditing: boolean,
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>,
     setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>,
-
+    setSlotEditedError: React.Dispatch<SetStateAction<string>>,
 
 }
 
-export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing }: CheckQualityBtnProps) {
+export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing, setSlotEditedError }: CheckQualityBtnProps) {
 
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
     const { userCurrency } = useWorkState()
@@ -116,6 +116,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
         } catch (err) {
             setIsSlotEditing(false)
             console.error('[editTxt] error', err)
+            
         }
 
     }

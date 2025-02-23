@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shadcn/ui/tabs"
 
 
 
-export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMergedLines, setSlotResultDisplay, setSlotRaw, slotRaw, slotResultDisplay, slotTranslatedTxt, isRawOn, setIsRawOn, clipboardTxt, setClipboardTxt, setIsSlotEditShowing, setSlotEditedText, isSlotEditShowing, slotEditedText, isSlotEditing, setIsSlotEditing, isSlotResultShowing, setIsSlotResultShowing }: {
+export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMergedLines, setSlotResultDisplay, setSlotRaw, slotRaw, slotResultDisplay, slotTranslatedTxt, isRawOn, setIsRawOn, clipboardTxt, setClipboardTxt, setIsSlotEditShowing, setSlotEditedText, isSlotEditShowing, slotEditedText, isSlotEditing, setIsSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setSlotEditError }: {
     slotMergedLines: any,
     slotModelName: string,
     slotRaw: string,
@@ -28,6 +28,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>
     isSlotResultShowing: boolean,
     setIsSlotResultShowing: React.Dispatch<SetStateAction<boolean>>,
+    setSlotEditError:React.Dispatch<SetStateAction<string>>,
 
 }) {
 
@@ -157,8 +158,8 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
 
     return (
         <div className="w-full">
-            <Tabs defaultValue={`original`} className="flex flex-col">
-                <TabsList>
+            <Tabs defaultValue={`original`} className="flex flex-col items-center">
+                <TabsList className="pg-mw w-full justify-start">
                     <TabsTrigger value="original">
                         {slotModelName}
                     </TabsTrigger>

@@ -22,6 +22,11 @@ interface editTabContexType {
     isSlot2ResultShowing:boolean,
     setIsSlot1ResultShowing: React.Dispatch<SetStateAction<boolean>>,
     setIsSlot2ResultShowing: React.Dispatch<SetStateAction<boolean>>
+    slot1EditErrorMsg: string,
+    slot2EditErrorMsg: string,
+    setSlot1EditErrorMsg: React.Dispatch<SetStateAction<string>>,
+    setSlot2EditErrorMsg: React.Dispatch<SetStateAction<string>>
+    
 }
 
 
@@ -37,9 +42,11 @@ export default function EditedTabProvider ({children}:{children: React.ReactNode
     const [isSlot2Editing, setIsSlot2Editing] = useState(false)
     const [isSlot1ResultShowing, setIsSlot1ResultShowing] = useState(true)
     const [isSlot2ResultShowing, setIsSlot2ResultShowing] = useState(true)
+    const [slot1EditErrorMsg, setSlot1EditErrorMsg] = useState('')
+    const [slot2EditErrorMsg, setSlot2EditErrorMsg] = useState('')
 
     return (
-        <editTabContext.Provider value={{slot1EditedText, slot2EditedText, setSlot1EditedTxt, setSlot2EditedTxt, isSlot1EditShowing, isSlot2EditShowing, setIsSlot1EditShowing, setIsSlot2EditShowing, isSlot1Editing, isSlot2Editing, setIsSlot1Editing, setIsSlot2Editing, isSlot1ResultShowing, isSlot2ResultShowing, setIsSlot1ResultShowing, setIsSlot2ResultShowing}}>
+        <editTabContext.Provider value={{slot1EditedText, slot2EditedText, setSlot1EditedTxt, setSlot2EditedTxt, isSlot1EditShowing, isSlot2EditShowing, setIsSlot1EditShowing, setIsSlot2EditShowing, isSlot1Editing, isSlot2Editing, setIsSlot1Editing, setIsSlot2Editing, isSlot1ResultShowing, isSlot2ResultShowing, setIsSlot1ResultShowing, setIsSlot2ResultShowing, slot1EditErrorMsg, slot2EditErrorMsg, setSlot1EditErrorMsg, setSlot2EditErrorMsg}}>
             {children}
         </editTabContext.Provider>
     )
