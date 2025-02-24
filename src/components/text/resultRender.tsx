@@ -48,11 +48,11 @@ export default function ResultRender() {
     return (
         <>
         {
-            slot1EditErrorMsg ? 
+            slot1EditErrorMsg && !isSlot1Editing ? 
             <ErrorResultAlert errorMsg={slot1EditErrorMsg} setErrorMsg={setSlot1EditErrorMsg}></ErrorResultAlert> : null
         }
         {
-            slot2EditErrorMsg ?
+            slot2EditErrorMsg && !isSlot2Editing ?
             <ErrorResultAlert errorMsg={slot2EditErrorMsg} setErrorMsg={setSlot2EditErrorMsg}></ErrorResultAlert> : null
         }
             {
@@ -106,7 +106,7 @@ export default function ResultRender() {
                                                 setIsSlotEditing={setIsSlot1Editing}
                                                 isSlotResultShowing={isSlot1ResultShowing}
                                                 setIsSlotResultShowing={setIsSlot1ResultShowing}
-                                                setSlotEditError={setSlot1ErrorMsg}
+                                                setSlotEditErrorMsg={setSlot1EditErrorMsg}
                                                 >
                                                 </ResultWrap> : null}
                                         {
@@ -139,7 +139,7 @@ export default function ResultRender() {
                                             setIsSlotEditing={setIsSlot2Editing}
                                             isSlotResultShowing={isSlot2ResultShowing}
                                             setIsSlotResultShowing={setIsSlot2ResultShowing}
-                                            setSlotEditError={setSlot2ErrorMsg}
+                                            setSlotEditErrorMsg={setSlot2EditErrorMsg}
                                             >
                                             </ResultWrap> : null
                                         }

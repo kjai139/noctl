@@ -20,11 +20,11 @@ interface CheckQualityBtnProps {
     isSlotEditing: boolean,
     setIsSlotEditing: React.Dispatch<SetStateAction<boolean>>,
     setIsSlotEditShowing: React.Dispatch<SetStateAction<boolean>>,
-    setSlotEditedError: React.Dispatch<SetStateAction<string>>,
+    setSlotEditErrorMsg: React.Dispatch<SetStateAction<string>>,
 
 }
 
-export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing, setSlotEditedError }: CheckQualityBtnProps) {
+export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing, setSlotEditErrorMsg }: CheckQualityBtnProps) {
 
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
     const { userCurrency } = useWorkState()
@@ -96,7 +96,8 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             if (pollResponse.job.jobStatus === 'failed') {
                        
                 if (typeof pollResponse.job.response === 'string') {
-                    throw new Error(pollResponse.job.response)
+                    console.error('Error from poll in str:', pollResponse.job.response)
+                    throw new Error('Encountered a server error. Please try again later.')
                 } else {
                     throw new Error('Something went wrong *_*. Please try again later.')
                 }
@@ -104,9 +105,16 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
                 
             }
+            let jsonResponse
+            try {
+                jsonResponse = JSON.parse(pollResponse.job.response)
+            } catch (err) {
+                console.error('[checkQuality] JSON parse failed:', pollResponse.job.response)
+                throw new Error('Encountered a server error. Please try again later.')
+            }
 
-            const linesArr = pollResponse.job.response[0].input.result_array
-            console.log('[QC] Edit arr', linesArr)
+            const linesArr = jsonResponse[0].input.result_array
+            console.log('[QC] Edited text array', linesArr)
             const formattedTextResult = linesArr.map((line: any) => line.translated_line).join('\n')
             setSlotEditedText(formattedTextResult)
             setIsSlotEditShowing(true)
@@ -114,8 +122,14 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
 
         } catch (err) {
+            if (err instanceof Error) {
+                setSlotEditErrorMsg(err.message)
+            } else {
+                console.error('[CheckQuality] Encountered an unknown error')
+                setSlotEditErrorMsg('Encountered an unknown error. Please try again later.')
+            }
             setIsSlotEditing(false)
-            console.error('[editTxt] error', err)
+            console.error('[CheckQuality] error', err)
             
         }
 

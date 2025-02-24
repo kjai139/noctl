@@ -5,7 +5,7 @@ import SaveFileDocx from "../buttons/saveToDocx"
 import VisibilityDropDown from "../dropdown/visibilityDisplay"
 import CheckQualityBtn from "../buttons/checkQuality"
 
-interface ResultRenderTaskbarProps {
+interface EditTabToolbarProps {
     slotRaw: string,
     slotTranslatedTxt: string,  //translated txt used for processing. eg in raw toggle
     slotResultDisplay: string, //translated text for display
@@ -31,7 +31,7 @@ interface ResultRenderTaskbarProps {
     setSlotEditErrorMsg: React.Dispatch<SetStateAction<string>>,
 }
 
-export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setIsSlotEditing, setSlotEditErrorMsg }: ResultRenderTaskbarProps) {
+export default function EditTabToolbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setIsSlotEditing, setSlotEditErrorMsg }: EditTabToolbarProps) {
 
 
     return (
@@ -41,10 +41,7 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
             </div>
             <div className="flex gap-2">
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw} isSlotEditing={isSlotEditing}></SaveFileDocx>
-                <CheckQualityBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditErrorMsg={setSlotEditErrorMsg}></CheckQualityBtn>
-                <VisibilityDropDown isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} isSlotEditing={isSlotEditing} setIsRawOn={setIsRawOn} setIsSlotEditShowing={setIsSlotEditShowing} slotEditedText={slotEditedText}></VisibilityDropDown>
                
-                
             </div>
 
            
