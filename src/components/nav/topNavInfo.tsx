@@ -13,7 +13,7 @@ export default function TopNavInfo () {
                 <h1 className="text-3xl font-semibold">Modern Machine Translator</h1>
                 <div className="flex flex-col mt-1">
                 <p>
-                    Translating Asian languages into English and vice versa using the most accurate modern LLMs. 
+                    Translating Asian literature into English and vice versa using the most accurate modern LLMs. 
                 </p>
                 <p className="text-sm text-muted-foreground mt-4">
                     Start by signing in with gmail to receive a one-time bonus of 10 free credits <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> for the paid models.

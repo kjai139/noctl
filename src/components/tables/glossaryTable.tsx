@@ -29,6 +29,8 @@ import AddGlossEntryBtn from "../buttons/addGlossEntryBtn";
 import GlossaryInfo from "../cards/glossaryInfo";
 import GlossaryInfoDialog from "../dialog/glossaryInfoDialog";
 import { useWorkState } from "@/app/_contexts/workStateContext";
+import EditGlossaryTLPopover from "../popover/glossaryTl";
+
 
 interface GlossaryTableTypes {
   glossary: GlossaryItem[],
@@ -59,6 +61,27 @@ export default function GlossaryTable() {
   const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
   const [errorMsg, setErrorMsg] = useState('')
   const [lang, setLang] = useState<LanguagesType>('English')
+  const [editedGlossEntries, setEditedGlossEntries] = useState<{[id: number]: string}>({})
+
+
+  const handleTempChange = (id: number, newValue:string) => {
+    setEditedGlossEntries((prev) =>  ({...prev, [id]: newValue}))
+  }
+
+  const handleSaveChanges = (newDef: string, id:number) => {
+    const updatedData = glossary.map((node, idx) => {
+      if (id === idx) {
+        return (
+          { ...node, translated_term: newDef }
+        )
+      } else {
+        return node
+      }
+    })
+
+    /* setTestGloss(updatedData) */
+    setGlossary(updatedData)
+  }
 
 
   const handleInputchange = (newDef: string, id: number) => {
@@ -221,14 +244,18 @@ export default function GlossaryTable() {
                 </TableCell>
 
                 <TableCell className="flex gap-4">
+                  {/* <EditGlossaryTLPopover translation={node.translated_term} idx={idx} handleSave={handleSaveChanges}>
+
+                  </EditGlossaryTLPopover> */}
 
                   <Tooltip>
                     <TooltipTrigger>
-                      <Input type="text" maxLength={30} value={node.translated_term} onChange={(e) => handleInputchange(e.target.value, idx)}>
+                      <Input type="text" maxLength={30} value={editedGlossEntries[idx] ?? node.translated_term} onChange={(e) => handleTempChange(idx, e.target.value)}>
                       </Input>
+                      
                     </TooltipTrigger>
                     <TooltipContent>
-                      <span>{node.translated_term}</span>
+                      <span>{editedGlossEntries[idx] ?? node.translated_term}</span>
                     </TooltipContent>
                   </Tooltip>
 

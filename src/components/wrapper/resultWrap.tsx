@@ -3,6 +3,7 @@ import { SetStateAction, useEffect, useState } from "react"
 import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import { string } from "zod"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shadcn/ui/tabs"
+import EditTabToolbar from "../taskbar/editTabToolbar"
 
 
 
@@ -219,7 +220,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                     <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
                             <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
-                                <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing} setSlotEditErrorMsg={setSlotEditErrorMsg}></ResultRenderTaskbar>
+                                <EditTabToolbar slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} slotEditedText={slotEditedText} isSlotEditShowing={isSlotEditShowing} isSlotEditing={isSlotEditing}></EditTabToolbar>
                             </div>
                             <div className="py-8 w-cont">
                                 {slotEditedText}

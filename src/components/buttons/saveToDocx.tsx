@@ -18,11 +18,12 @@ interface SaveFileDocxProps {
     slotEditedText: string,
     isRawOn: boolean,
     isSlotEditShowing: boolean
-    isSlotEditing:boolean
+    isSlotEditing:boolean,
+    mode?:'edit'
 
 }
 
-export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt, slotEditedText, isRawOn, isSlotEditShowing, isSlotEditing }: SaveFileDocxProps) {
+export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt, slotEditedText, isRawOn, isSlotEditShowing, isSlotEditing, mode }: SaveFileDocxProps) {
 
 
     const filenameInputref = useRef<HTMLInputElement>(null)
@@ -33,8 +34,13 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
         if (filenameInputref.current) {
             console.log('[handlesaveFile] File Name: ', filenameInputref.current.value)
         }
-    
-        const docArr = clipboardTxt.split('\n')
+        let docArr
+        if (mode && mode === 'edit') {
+            docArr = slotEditedText.split('\n')
+        } else {
+            docArr = clipboardTxt.split('\n')
+        }
+        
         console.log('[saveFileBtn] docArr', docArr)
     
         const para = new Paragraph({
