@@ -30,6 +30,7 @@ import GlossaryInfo from "../cards/glossaryInfo";
 import GlossaryInfoDialog from "../dialog/glossaryInfoDialog";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import EditGlossaryTLPopover from "../popover/glossaryTl";
+import TButton from "../buttons/translationBtn";
 
 
 interface GlossaryTableTypes {
@@ -244,20 +245,11 @@ export default function GlossaryTable() {
                 </TableCell>
 
                 <TableCell className="flex gap-4">
-                  {/* <EditGlossaryTLPopover translation={node.translated_term} idx={idx} handleSave={handleSaveChanges}>
+                  <EditGlossaryTLPopover translation={node.translated_term} idx={idx} handleSave={handleSaveChanges}>
 
-                  </EditGlossaryTLPopover> */}
+                  </EditGlossaryTLPopover>
 
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Input type="text" maxLength={30} value={editedGlossEntries[idx] ?? node.translated_term} onChange={(e) => handleTempChange(idx, e.target.value)}>
-                      </Input>
-                      
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>{editedGlossEntries[idx] ?? node.translated_term}</span>
-                    </TooltipContent>
-                  </Tooltip>
+                 
 
                   <div className="flex items-center">
 
