@@ -23,6 +23,7 @@ import { pollJobStatus } from "@/app/_utils/pollJobStatus";
 import { jsonrepair } from 'jsonrepair'
 import { useEditTabContext } from "@/app/_contexts/editContext";
 import useButtonDisabled from "@/hooks/use-disabled";
+import MainTextArea from "../textarea/mainTextarea";
 
 
 const tokenLimit = 10000
@@ -913,13 +914,14 @@ export default function MainInputForm() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Textarea maxLength={13000} onInput={(e) => {
+                                        {/* <Textarea maxLength={13000} onInput={(e) => {
                                             const target = e.target as HTMLTextAreaElement
                                             target.style.height = 'auto';
                                             target.style.height = `${target.scrollHeight}px`;
                                         }} placeholder="Enter or paste your text here..." {...field} className="max-h-[300px] w-full border-none shadow-none resize-none main-ta focus-visible:ring-0" disabled={isDisabled}>
 
-                                        </Textarea>
+                                        </Textarea> */}
+                                        <MainTextArea field={field} isDisabled={isDisabled}></MainTextArea>
 
                                     </FormControl>
 

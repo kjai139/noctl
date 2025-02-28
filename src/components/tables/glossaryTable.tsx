@@ -177,7 +177,7 @@ export default function GlossaryTable() {
           }
             
           
-          setGlossary(result.data)
+          setGlossary(result.data as GlossaryItem[])
 
           
           
@@ -194,12 +194,12 @@ export default function GlossaryTable() {
   }
 
   const downloadAsCsv = () => {
-    const headers = Object.keys(glossary[0])
+    const headers = Object.keys(glossary[0]) as (keyof GlossaryItem)[]
     console.log('[dlCsv] headers:', headers)
 
     const csvContent = [
       headers.join(','),
-      ...glossary.map(row => headers.map(key => `"${row[key]}"`).join(",")),
+      ...glossary.map((row) => headers.map(key => `"${row[key]}"`).join(",")),
     ].join("\n")
 
     console.log('[dlcsv] Csv Content:', csvContent)
