@@ -24,7 +24,7 @@ export default async function TopNav({ products, session}:TopNavProps) {
 
                 </Image>
                 <div className="font-semibold text-xl hidden sm:block">
-                    MMTL
+                    MachinaX
                 </div>
                 </div>
                 <div className="flex gap-4">

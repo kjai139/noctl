@@ -10,7 +10,7 @@ export interface GlossaryItem {
 export type GlossaryType = GlossaryItem[]
 
 
-export type LanguagesType = 'English' | 'Chinese' | 'Korean' | 'Japanese'
+export type LanguagesType = 'English' | 'Chinese' | 'Korean' | 'Japanese' | 'Spanish' | 'French'
 
 
 export type ModelsType = 'standard' | 'b1' | 'b2' | 'sb1' | 'sb2' | 'b12' | 'e1'

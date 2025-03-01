@@ -185,6 +185,10 @@ body {
       transform: translateX(-100%);
 }
 
+.ta-mw {
+      max-width:680px;
+}
+
 .gloss-c {
       transition: all 300ms ease-in-out;
       height: 100%;

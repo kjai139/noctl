@@ -24,6 +24,7 @@ import { jsonrepair } from 'jsonrepair'
 import { useEditTabContext } from "@/app/_contexts/editContext";
 import useButtonDisabled from "@/hooks/use-disabled";
 import MainTextArea from "../textarea/mainTextarea";
+import OutputSelect from "../select/outputSelect";
 
 
 const tokenLimit = 10000
@@ -884,7 +885,7 @@ export default function MainInputForm() {
 
     return (
 
-        <div className="flex gap-8 justify-center items-center my-8">
+        <div className="flex gap-8 justify-center items-center">
             {
                 errorMsg ?
                     <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
@@ -932,6 +933,7 @@ export default function MainInputForm() {
 
                         </FormField>
                         <div className="justify-end flex gap-2 items-center p-2 pb-1">
+                            <OutputSelect></OutputSelect>
                             <AiModelSelect setModel={setAiModel} isDisabled={isDisabled}></AiModelSelect>
                             <div className="text-destructive p-0 flex gap-2 items-center">
                                 {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}

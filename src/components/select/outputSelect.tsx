@@ -4,6 +4,7 @@ import { useOutputContext } from "@/app/_contexts/outputContext"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
 import { Label } from "../ui/label"
 import { LanguagesType } from "@/app/_types/glossaryType"
+import { Separator } from "../ui/separator"
 
 const outputLanguages = [
     {
@@ -17,6 +18,12 @@ const outputLanguages = [
     },
     {
         name:'Chinese'
+    },
+    {
+        name:"Spanish"
+    },
+    {
+        name:"French"
     }
 
 ]
@@ -28,16 +35,18 @@ export default function OutputSelect () {
         setOutputLang(value)
     }
     return (
-        <div className="flex flex-col gap-2">
-        <Label htmlFor="outputlang-select"><span className="text-lg">Output Language</span></Label>
+        
+        <div>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
-            <SelectTrigger id="outputlang-select" className="bg-background">
+            <SelectTrigger id="outputlang-select" className="bg-background border-transparent shadow-none hover:shadow hover:border-blue-400 border-2 focus:ring-0">
                 <SelectValue placeholder="Select Language">
                 </SelectValue>
             </SelectTrigger>
         
             <SelectContent>
+                <h6 className="text-sm p-1 text-center">Translate to</h6>
+                <Separator></Separator>
                 {
                     outputLanguages.map((node, idx) => {
                         return (
@@ -51,5 +60,6 @@ export default function OutputSelect () {
         
         </Select>
         </div>
+       
     )
 }

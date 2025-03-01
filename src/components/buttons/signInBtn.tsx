@@ -1,32 +1,37 @@
 
-import { AvatarImage } from "@radix-ui/react-avatar";
 import { auth, signIn } from "../../../auth";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { FaUserCircle } from "react-icons/fa";
 import GoogleSignInBtn from "./googleSignInBtn";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import GoogleSignOutBtn from "./googleSignOutBtn";
 import { type Session } from 'next-auth'
+import { useSession } from "next-auth/react";
+
 
 interface SignInBtnProps {
     session: Session | null
 }
 
 
-export default async function SignInBtn ({session}:SignInBtnProps) {
+export default function SignInBtn({session}: SignInBtnProps) {
+
 
     
-    console.log('session', session)
-    
+
 
     if (!session?.user || !session) {
-       return (
+        return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant={'ghost'} className="rounded-xl gap-2">
-                    <FaUserCircle color="gray" size={30}></FaUserCircle>
-                    <span className="text-base text-muted-foreground">Sign in</span>
+                        <FaUserCircle color="gray" size={30}></FaUserCircle>
+                        <span className="text-base text-muted-foreground">Sign in</span>
+                        <Avatar>
+
+                        </Avatar>
+
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -38,30 +43,29 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-            
-       ) 
+
+        )
     }
-    /* const cacheBustedUrl = `${session.user.image}?v=${new Date().getTime()}` */
+    const cacheBustedUrl = `${session.user.image}?v=${new Date().getTime()}`
+    const testBlankurl = undefined
 
     return (
-        <div>
+        
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    {
-                        session.user.image ? 
-                        <Avatar className="hover:cursor-pointer">
-                        <AvatarImage alt="User avatar" src={session.user.image!}></AvatarImage>
-                        
+                    <Button variant='ghost' className="h-9 w-9 rounded-full py-0 px-0 md:rounded-sm md:px-4 md:py-2 md:w-auto">
+                    <Avatar className="md:hidden h-[30px] w-[30px]">
+                        <AvatarImage src={cacheBustedUrl} alt="avatar image user"></AvatarImage>
                         <AvatarFallback>
-                        <FaUserCircle size={40}></FaUserCircle>
+                            <FaUserCircle size={30}></FaUserCircle>
                         </AvatarFallback>
-                        </Avatar>
-                        : 
-                        <AvatarFallback>
-                        <FaUserCircle size={40}></FaUserCircle>
-                        </AvatarFallback>
-                    }
-
+                    </Avatar>
+                    <span className="hidden md:inline font-semibold">
+                    {session.user.name}
+                    </span>
+                    </Button>
+                  
+  
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuLabel className="text-muted-foreground">
@@ -76,8 +80,8 @@ export default async function SignInBtn ({session}:SignInBtnProps) {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-            
 
-        </div>
+
+       
     )
 }

@@ -82,7 +82,7 @@ export default function ModelsDialog() {
                             models.map((model, idx) => {
                                 return (
                                     <TableRow key={`mdl-${idx}`} className="flex flex-col sm:table-row">
-                                        <TableCell className="font-semibold">
+                                        <TableCell className="font-semibold whitespace-nowrap">
                                             {model.name}
                                         </TableCell>
                                         <TableCell className="text-center">
