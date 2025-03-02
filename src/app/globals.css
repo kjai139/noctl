@@ -189,6 +189,7 @@ body {
       max-width:680px;
 }
 
+
 .gloss-c {
       transition: all 300ms ease-in-out;
       height: 100%;
@@ -444,8 +445,28 @@ body {
       .nv-item {
             flex-direction: column;
       }
+      
+      .f-txt {
+            flex-direction: column;
+            gap:0;
+            font-size: small;
+      }
 }
 
+@media (max-width:500px) {
+      .f-txt, .f-txt > span {
+            font-size: small;
+            text-align: center;
+            
+      }
+}
+
+@media (max-width:440px) {
+      .f-btn {
+            flex-direction: column;
+            flex:1;
+      }
+}
 
 
 @layer base {

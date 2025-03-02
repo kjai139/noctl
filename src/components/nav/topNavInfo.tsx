@@ -11,11 +11,11 @@ export default function TopNavInfo () {
             <div className="flex-1 flex justify-center">
                 <div className="p-8 ta-mw">
                 <h1 className="text-5xl font-semibold text-center">Machinax</h1>
-                <div className="flex flex-col mt-1">
-                <p className="text-xl">
+                <div className="flex flex-col mt-1 items-center">
+                <p className="text-xl text-center">
                     Translating literature using the most accurate modern LLMs. 
                 </p>
-                <p className="text-sm text-muted-foreground mt-4">
+                <p className="text-sm text-muted-foreground mt-4 text-center max-w-[340px]">
                     Start by signing in with gmail to receive a one-time bonus of 10 free credits <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> for the paid models.
                 </p>
                 </div>

@@ -51,7 +51,7 @@ function TextAreaWatched({ control }: { control: Control<z.infer<typeof formSche
         defaultValue: ''
     })
 
-    return <p>{textarea.length} / {tokenLimit}</p>
+    return <p className="whitespace-nowrap">{textarea.length} / {tokenLimit}</p>
 }
 
 export default function MainInputForm() {
@@ -933,14 +933,18 @@ export default function MainInputForm() {
 
                         </FormField>
                         <div className="justify-end flex gap-2 items-center p-2 pb-1">
+                            <div className="flex gap-2 f-btn">
                             <OutputSelect></OutputSelect>
                             <AiModelSelect setModel={setAiModel} isDisabled={isDisabled}></AiModelSelect>
-                            <div className="text-destructive p-0 flex gap-2 items-center">
+                            </div>
+                            <div className="flex gap-2 f-btn">
+                            <div className="text-destructive p-0 flex gap-2 items-center justify-center f-txt text-center">
                                 {form.formState.errors.targetText ? <span className="text-sm">{form.formState.errors.targetText.message}</span> : null}
                                 {/* {form.formState.errors.language ? form.formState.errors.language.message : null} */}
                                 <TextAreaWatched control={form.control}></TextAreaWatched>
                             </div>
                             <Button className="rounded-lg py-0" variant={'ghost'} type="submit" disabled={isDisabled}>Translate</Button>
+                            </div>
                         </div>
                     </div>
                 </form>

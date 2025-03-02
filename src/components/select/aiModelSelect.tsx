@@ -65,6 +65,10 @@ export default function AiModelSelect({ setModel, isDisabled }: AiModelSelectPro
                 </SelectTrigger>
 
                 <SelectContent>
+                    <span className="mt-2 p-2 w-full justify-center font-semibold text-sm">
+                        Models
+                    </span>
+                    <Separator></Separator>
                     {
                         models.map((node, idx) => {
                             return (

@@ -45,7 +45,7 @@ export default function OutputSelect () {
             </SelectTrigger>
         
             <SelectContent>
-                <h6 className="text-sm p-1 text-center">Translate to</h6>
+                <h6 className="text-sm p-1 font-semibold">Translate to</h6>
                 <Separator></Separator>
                 {
                     outputLanguages.map((node, idx) => {
