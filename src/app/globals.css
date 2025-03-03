@@ -468,6 +468,11 @@ body {
       }
 }
 
+@media (max-width: 360px) {
+      .ptb {
+            flex-direction: column-reverse;
+      }
+}
 
 @layer base {
   * {

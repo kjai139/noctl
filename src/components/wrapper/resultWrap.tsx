@@ -160,21 +160,29 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
     return (
         <div className="w-full">
             <Tabs defaultValue={`original`} className="flex flex-col items-center">
-                <TabsList className="pg-mw w-full justify-start">
-                    <TabsTrigger value="original">
-                        {slotModelName}
+                <div className="flex justify-between w-full max-w-[800px] gap-2 ptb">
+                <TabsList className="pg-mw w-full justify-between p-0">
+                    <div>
+                    <TabsTrigger value="original" className="p-tab">
+                        {`Model: ${slotModelName}`}
                     </TabsTrigger>
-                    <TabsTrigger value="edited">
+                    {slotEditedText ? <TabsTrigger value="edited">
                         Edited
-                    </TabsTrigger>
+                    </TabsTrigger> : null}
+                    </div>
+                   
                 </TabsList>
+                <div>
+                    <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing} setSlotEditErrorMsg={setSlotEditErrorMsg}></ResultRenderTaskbar>
+                    </div>
+                </div>
                     <TabsContent value="original" className="flex w-full justify-center">
                         <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
-                            <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
+                            {/* <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
                                 <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing} setSlotEditErrorMsg={setSlotEditErrorMsg}></ResultRenderTaskbar>
-                            </div>
-                            <div className="py-8 w-cont">
+                            </div> */}
+                            <div className="py-4 w-cont min-h-[1000px]">
                                 {!isSlotEditing && (isRawOn || isSlotEditShowing) ? displayTxt && displayTxt.map((line: { text: string, color: string }, idx: number) => {
                                     if (!line) {
                                         return null

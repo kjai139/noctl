@@ -35,7 +35,7 @@ export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotT
 
 
     return (
-        <div className="flex gap-2 shadow-md rounded-sm p-2 border-1 border">
+        <div className="flex gap-2">
             <div>
             <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing}></CopyTextBtn>
             </div>

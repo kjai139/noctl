@@ -57,7 +57,7 @@ export default function MainTextArea ({
                         indexRef.current = (indexRef.current + 1) % placeholderTexts.length
                         
                         curText = placeholderTexts[indexRef.current]
-                        console.log('indexref:', indexRef.current)
+                        /* console.log('indexref:', indexRef.current) */
                         timeoutRef.current = setTimeout(typeEffect, 500)
                     }
                 }
