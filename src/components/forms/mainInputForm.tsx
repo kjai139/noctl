@@ -934,7 +934,7 @@ export default function MainInputForm() {
                         </FormField>
                         <div className="justify-end flex gap-2 items-center p-2 pb-1">
                             <div className="flex gap-2 f-btn">
-                            <OutputSelect></OutputSelect>
+                            <OutputSelect isDisabled={isDisabled}></OutputSelect>
                             <AiModelSelect setModel={setAiModel} isDisabled={isDisabled}></AiModelSelect>
                             </div>
                             <div className="flex gap-2 f-btn">

@@ -135,10 +135,24 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
     }
 
-    const textFunc = () => {
-        console.log('SETTING EDIT TO TRUE')
-        setIsSlotEditing(!isSlotEditing)
+    const textFunc = ({mode}: {
+        mode: 'error' | 'load'
+    }) => {
         setIsDialogOpen(false)
+        setIsSlotEditing(true)
+        if (mode === 'load') {
+            setTimeout(() => {
+                setIsSlotEditing(false)
+                setIsSlotEditShowing(true)
+                setSlotEditedText("Here's some text for testing purposes. ")
+            }, 1000)
+        } else if (mode === 'error') {
+            setTimeout(() => {
+                setIsSlotEditing(false)
+                setSlotEditErrorMsg('Encountered an test error. Please try again later.')
+            }, 5000)
+        }
+                
     }
 
     useEffect(() => {
@@ -193,7 +207,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         </AlertDialogCancel>
                         {
                             userCurrency && userCurrency > 0 ?
-                                <AlertDialogAction onClick={checkQuality}>
+                                <AlertDialogAction onClick={() => textFunc({mode:'load'})}>
                                     Confirm
                                 </AlertDialogAction> : null
                         }

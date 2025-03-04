@@ -203,6 +203,7 @@ body {
 .w-cont {
       overflow-wrap: anywhere;
       animation: fadeEffect 1s;
+      min-height: 1000px;
 }
 
 .pg-mw {
@@ -364,6 +365,13 @@ body {
 
 .icon-load {
       animation: pulse 1.5s infinite;
+}
+
+.p-tab {
+      border-radius: 10px 10px 0 0;
+      border: 2px solid hsl(var(--muted));
+      z-index: 10;
+      border-bottom: none;
 }
 
 @keyframes fadeEffect {

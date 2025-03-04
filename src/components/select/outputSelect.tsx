@@ -28,7 +28,13 @@ const outputLanguages = [
 
 ]
 
-export default function OutputSelect () {
+interface OutputSelectProps {
+    isDisabled: boolean
+}
+
+export default function OutputSelect ({
+    isDisabled
+}:OutputSelectProps) {
     const { setOutputLang } = useOutputContext()
 
     const handleValueChange = (value:LanguagesType) => {
@@ -39,7 +45,7 @@ export default function OutputSelect () {
         <div>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
-            <SelectTrigger id="outputlang-select" className="bg-background border-transparent shadow-none hover:shadow hover:border-blue-400 border-2 focus:ring-0">
+            <SelectTrigger disabled={isDisabled} id="outputlang-select" className="bg-background border-transparent shadow-none hover:shadow hover:border-blue-400 border-2 focus:ring-0">
                 <SelectValue placeholder="Select Language">
                 </SelectValue>
             </SelectTrigger>

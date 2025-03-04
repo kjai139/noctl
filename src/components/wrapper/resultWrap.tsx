@@ -4,7 +4,8 @@ import ResultRenderTaskbar from "../taskbar/resultRenderTaskbar"
 import { string } from "zod"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shadcn/ui/tabs"
 import EditTabToolbar from "../taskbar/editTabToolbar"
-
+import { Loader2 } from "lucide-react"
+import LoadTimer from "../timer/loadTimer"
 
 
 
@@ -162,8 +163,8 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             <Tabs defaultValue={`original`} className="flex flex-col items-center">
                 <div className="flex justify-between w-full max-w-[800px] gap-2 ptb">
                 <TabsList className="pg-mw w-full justify-between p-0">
-                    <div>
-                    <TabsTrigger value="original" className="p-tab">
+                    <div className="absolute flex gap-1">
+                    <TabsTrigger value="original" className="p-tab shadow-none">
                         {`Model: ${slotModelName}`}
                     </TabsTrigger>
                     {slotEditedText ? <TabsTrigger value="edited">
@@ -176,13 +177,13 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                     <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing} setSlotEditErrorMsg={setSlotEditErrorMsg}></ResultRenderTaskbar>
                     </div>
                 </div>
-                    <TabsContent value="original" className="flex w-full justify-center">
+                    <TabsContent value="original" className="flex w-full justify-center mt-0">
                         <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
                             {/* <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
                                 <ResultRenderTaskbar setIsSlotResultShowing={setIsSlotResultShowing} isSlotResultShowing={isSlotResultShowing} setSlotMergedLines={setSlotMergedLines} slotRaw={slotRaw} slotTranslatedTxt={slotTranslatedTxt} slotResultDisplay={slotResultDisplay} setIsRawOn={setIsRawOn} isRawOn={isRawOn} clipboardTxt={clipboardTxt} setClipboardTxt={setClipboardTxt} setSlotDisplay={setSlotResultDisplay} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditedText={setSlotEditedText} isSlotEditShowing={isSlotEditShowing} slotEditedText={slotEditedText} isSlotEditing={isSlotEditing} setIsSlotEditing={setIsSlotEditing} setSlotEditErrorMsg={setSlotEditErrorMsg}></ResultRenderTaskbar>
                             </div> */}
-                            <div className="py-4 w-cont min-h-[1000px]">
+                            <div className="py-4 w-cont">
                                 {!isSlotEditing && (isRawOn || isSlotEditShowing) ? displayTxt && displayTxt.map((line: { text: string, color: string }, idx: number) => {
                                     if (!line) {
                                         return null
@@ -218,13 +219,15 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                                 }
                                 {
                                     isSlotEditing ?
-                                        <div className="flex gap-2 flex-col"> <span className="animate-pulse"> Checking Quality...</span><span className="font-semibold">This could take a minute, please be patient...</span>
+                                        <div className="flex gap-2 flex-col"> 
+                                       
+                                        <LoadTimer></LoadTimer>
                                         </div> : null
                                 }
                             </div>
                         </div>
                     </TabsContent>
-                    <TabsContent value="edited" className="flex w-full justify-center m-0">
+                    <TabsContent value="edited" className="flex w-full justify-center mt-0">
                     <div className="whitespace-pre-line sm:p-10 px-4 py-8 relative max-w-[800px] min-h-[800px] flex-1 border-2 border-muted w-full mb-auto">
                             <div className="flex sm:flex-row flex-col-reverse gap-2 sm:gap-0 justify-between items-center">
                                 <h2 className="underline font-semibold text-stone-600">{`Model: ${slotModelName}`}</h2>
