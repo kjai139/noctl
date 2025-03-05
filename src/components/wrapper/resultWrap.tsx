@@ -160,14 +160,14 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
 
     return (
         <div className="w-full">
-            <Tabs defaultValue={`original`} className="flex flex-col items-center">
+            <Tabs defaultValue={`original`} className="flex flex-col items-center tab-b">
                 <div className="flex justify-between w-full max-w-[800px] gap-2 ptb">
-                <TabsList className="pg-mw w-full justify-between p-0">
-                    <div className="absolute flex gap-1">
+                <TabsList className="w-full justify-between p-0 max-w-[300px]">
+                    <div className="flex gap-1">
                     <TabsTrigger value="original" className="p-tab shadow-none">
                         {`Model: ${slotModelName}`}
                     </TabsTrigger>
-                    {slotEditedText ? <TabsTrigger value="edited">
+                    {slotEditedText ? <TabsTrigger value="edited" className="shadow-none p-tab">
                         Edited
                     </TabsTrigger> : null}
                     </div>

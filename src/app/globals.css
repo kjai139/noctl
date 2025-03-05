@@ -367,10 +367,15 @@ body {
       animation: pulse 1.5s infinite;
 }
 
+.tab-b {
+      border-radius: 10px 10px 0 0;
+}
+
 .p-tab {
       border-radius: 10px 10px 0 0;
       border: 2px solid hsl(var(--muted));
       z-index: 10;
+      height:2.5rem;
       border-bottom: none;
 }
 
