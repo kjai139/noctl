@@ -15,11 +15,12 @@ interface CopyTextBtnProps {
     isRawOn:boolean,
     clipboardTxt:string,
     isSlotEditing:boolean,
-    mode?: 'direct'
+    slotEditedText: string,
+    mode?: 'direct' | 'edited'
 
 }
 
-export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing, mode}: CopyTextBtnProps) {
+export default function CopyTextBtn ({text, clipboardTxt, isSlotEditing, mode, slotEditedText}: CopyTextBtnProps) {
 
     const [isCopied, setIsCopied] = useState(false)
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
@@ -29,6 +30,10 @@ export default function CopyTextBtn ({text, isRawOn, clipboardTxt, isSlotEditing
         try {
             if (mode && mode === 'direct') {
                 await navigator.clipboard.writeText(text)
+                setIsCopied(true)
+                setTimeout(() => setIsCopied(false), 2000)
+            } else if (mode === 'edited') {
+                await navigator.clipboard.writeText(slotEditedText)
                 setIsCopied(true)
                 setTimeout(() => setIsCopied(false), 2000)
             } else {

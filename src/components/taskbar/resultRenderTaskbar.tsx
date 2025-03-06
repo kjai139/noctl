@@ -29,23 +29,28 @@ interface ResultRenderTaskbarProps {
     setIsSlotResultShowing:React.Dispatch<SetStateAction<boolean>>,
 
     setSlotEditErrorMsg: React.Dispatch<SetStateAction<string>>,
+    activeTab: string
 }
 
-export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setIsSlotEditing, setSlotEditErrorMsg }: ResultRenderTaskbarProps) {
+export default function ResultRenderTaskbar({ setSlotMergedLines, slotRaw, slotTranslatedTxt, setIsRawOn, isRawOn, slotResultDisplay, clipboardTxt, setClipboardTxt, setSlotDisplay, setSlotEditedText, slotEditedText, isSlotEditShowing, setIsSlotEditShowing, isSlotEditing, isSlotResultShowing, setIsSlotResultShowing, setIsSlotEditing, setSlotEditErrorMsg, activeTab }: ResultRenderTaskbarProps) {
 
 
     return (
-        <div className="flex gap-2">
-            <div>
-            <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing}></CopyTextBtn>
-            </div>
-            <div className="flex gap-2">
+        <div className="flex gap-2 relative top-[-.5rem]">
+           
+            {activeTab === 'tab1' ? <div className="flex gap-2">
+                <CopyTextBtn isRawOn={isRawOn} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing} slotEditedText={slotEditedText} mode={'direct'}></CopyTextBtn>
                 <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw} isSlotEditing={isSlotEditing}></SaveFileDocx>
                 <CheckQualityBtn slotRaw={slotRaw} slotTxt={slotResultDisplay} setSlotDisplay={setSlotDisplay} setSlotEditedText={setSlotEditedText} setIsSlotEditing={setIsSlotEditing} isSlotEditing={isSlotEditing} setIsSlotEditShowing={setIsSlotEditShowing} setSlotEditErrorMsg={setSlotEditErrorMsg}></CheckQualityBtn>
                 <VisibilityDropDown isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} isSlotEditing={isSlotEditing} setIsRawOn={setIsRawOn} setIsSlotEditShowing={setIsSlotEditShowing} slotEditedText={slotEditedText}></VisibilityDropDown>
                
                 
+            </div>:
+            <div className="flex gap-2">
+                <CopyTextBtn isRawOn={isRawOn} mode={'edited'} text={slotResultDisplay} clipboardTxt={clipboardTxt} isSlotEditing={isSlotEditing} slotEditedText={slotEditedText}></CopyTextBtn>
+               <SaveFileDocx clipboardTxt={clipboardTxt} slotEditedText={slotEditedText} slotTranslatedTxt={slotTranslatedTxt} isRawOn={isRawOn} isSlotEditShowing={isSlotEditShowing} slotRaw={slotRaw} isSlotEditing={isSlotEditing} mode={'edit'}></SaveFileDocx>
             </div>
+            }
 
            
 
