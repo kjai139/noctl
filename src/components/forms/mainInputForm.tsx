@@ -143,6 +143,14 @@ export default function MainInputForm() {
             const normalizedtext = text.toLowerCase()
                 .replace(/[(){}\[\]<>]/g, ' ')
                 .replace(/[!"#$%&'*+,\-./:;<=>?@[\]^_`{|}~]/g, '')
+            
+            console.log('[Normalized Text]', normalizedtext)
+
+            const normalizedTxtWithBrackets = text.toLowerCase()
+            .replace(/[{}<>]/g, ' ') // Removes only curly braces and angle brackets
+            .replace(/[!"#$%&'*+,\-./:;=?@^_`{|}~]/g, ''); // Keeps [], ()
+
+            console.log('[normalizedTxtWithBrackets]', normalizedTxtWithBrackets)
 
             if (glossary.length > 0) {
                 console.log('[ApiLookup] Glossary detected :', glossary)
@@ -156,7 +164,7 @@ export default function MainInputForm() {
                 })
 
                 if (normalizedGlossary) {
-                    filteredGlossary = normalizedGlossary.filter((entry: GlossaryItem) => normalizedtext.includes(entry.term))
+                    filteredGlossary = normalizedGlossary.filter((entry: GlossaryItem) => normalizedtext.includes(entry.term) || normalizedTxtWithBrackets.includes(entry.term))
                     console.log('[Api Lookup] Filtered Glossary:', filteredGlossary)
                 }
             } else {

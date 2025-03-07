@@ -161,10 +161,11 @@ async function queueJob({ prompt, userId, model }: {
 
 }
 
-function getPrompt({ glossary, language, text }: {
+function getPrompt({ glossary, language, text, model }: {
     glossary: string,
     text: string,
-    language: string
+    language: string,
+    model: 'standard' | 'b1' | 'b2'
 }) {
     const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
     const formattedGlossary = `
@@ -174,7 +175,13 @@ function getPrompt({ glossary, language, text }: {
                         Translation: ${term.translated_term}
                         `).join('')}
                     `
-    const prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} while keeping the same format, and then return me a list of special terms, skills, and people names extracted from the text. <<<\n ${text}>>>`
+    let prompt
+    if (model === 'standard') {
+        prompt = `${formattedGlossary}\n. Please use the glossary to translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the original format and maintain the same linebreaks as the original text. \n ### Text \n ${text}`
+    } else {
+        prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} while keeping the same format, and then return me a list of special terms, skills, and people names extracted from the text. <<<\n ${text}>>>`
+    }
+    
     return prompt
 
 }
@@ -207,7 +214,8 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             prompt = getPrompt({
                 glossary: glossary,
                 language: language,
-                text: text
+                text: text,
+                model: 'standard'
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
@@ -262,7 +270,8 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             prompt = getPrompt({
                 glossary: glossary,
                 text: text,
-                language: language
+                language: language,
+                model: 'b2'
             })
 
             console.log('[OpenAi] prompt 1 used', prompt)
@@ -328,7 +337,8 @@ export async function translateClaude({ text, language, glossary }: translateTxt
            prompt = getPrompt({
             glossary:glossary,
             text:text,
-            language:language
+            language:language,
+            model: 'b1'
            })
 
         } else {

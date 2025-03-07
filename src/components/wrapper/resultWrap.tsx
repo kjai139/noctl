@@ -150,7 +150,7 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
             console.log('TEXT:', displayTxt)
         }
 
-        console.log('clipboard', clipboardTxt)
+        /* console.log('clipboard', clipboardTxt) */
 
     }, [isSlotEditShowing, isRawOn, slotResultDisplay])
 
