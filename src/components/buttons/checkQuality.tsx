@@ -192,8 +192,14 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         <AlertDialogTitle>
                             Quality Check
                         </AlertDialogTitle>
-                        <AlertDialogDescription className="flex flex-col">
-                            <span>This function will use the best paid model to check the quality of the translation, looking to fix any hallucinations and errors.</span>
+                        <AlertDialogDescription className="flex flex-col gap-2">
+                            <span>When using AI to translate a large amount of text, sometimes they will hallucinate and add in text unrelated to the input.</span>
+                            <span>
+                            This function will use the best paid model to check the quality of the translation, looking to fix any hallucinations.
+                            </span>
+                            <span>
+                            Use this function if you suspect there are hallucinations, it will show the result lines in green which you can toggle on and off in the visibility tab.
+                            </span>
                             <span className="mt-2">
                                 It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform this action. {
                                     userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
