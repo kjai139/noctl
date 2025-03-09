@@ -45,7 +45,7 @@ export default function OutputSelect ({
         <div>
         <Select onValueChange={handleValueChange} defaultValue={'English'}>
         
-            <SelectTrigger disabled={isDisabled} id="outputlang-select" className="bg-background border-transparent shadow-none hover:shadow hover:border-blue-400 border-2 focus:ring-0">
+            <SelectTrigger disabled={isDisabled} id="outputlang-select" className="bg-background border-transparent shadow-none hover:shadow hover:border-blue-400 border-2 focus:ring-0 disabled:pointer-events-none">
                 <SelectValue placeholder="Select Language">
                 </SelectValue>
             </SelectTrigger>

@@ -9,6 +9,7 @@ import { TbCircleLetterRFilled } from "react-icons/tb";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { pollJobStatus } from "@/app/_utils/pollJobStatus";
 import useButtonDisabled from "@/hooks/use-disabled";
+import { MdOutlineVisibility } from "react-icons/md";
 
 
 interface CheckQualityBtnProps {
@@ -195,15 +196,16 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         <AlertDialogDescription className="flex flex-col gap-2">
                             <span>When using AI to translate a large amount of text, sometimes they will hallucinate and add in text unrelated to the input.</span>
                             <span>
-                            This function will use the best paid model to check the quality of the translation, looking to fix any hallucinations.
+                            Use this function if you suspect there are any hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if there's something out of place. This function will not change anything in the glossary.
                             </span>
-                            <span>
-                            Use this function if you suspect there are hallucinations, it will show the result lines in green which you can toggle on and off in the visibility tab.
-                            </span>
+                            
                             <span className="mt-2">
                                 It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform this action. {
                                     userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
                                 }
+                            </span>
+                            <span className="text-muted-foreground text-xs flex gap-1 mt-8">
+                            <p>You can toggle the edited version on and off with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</p>
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
