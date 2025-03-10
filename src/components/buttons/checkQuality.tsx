@@ -199,13 +199,13 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                             Use this function if you suspect there are any hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if there's something out of place. This function will not change anything in the glossary.
                             </span>
                             
-                            <span className="mt-2">
+                            <span className="mt-2 text-black">
                                 It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform this action. {
                                     userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
                                 }
                             </span>
                             <span className="text-muted-foreground text-xs flex gap-1 mt-8">
-                            <p>You can toggle the edited version on and off with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</p>
+                            <span>You can toggle the edited version on and off with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</span>
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -215,7 +215,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         </AlertDialogCancel>
                         {
                             userCurrency && userCurrency > 0 ?
-                                <AlertDialogAction onClick={() => textFunc({mode:'load'})}>
+                                <AlertDialogAction onClick={checkQuality}>
                                     Confirm
                                 </AlertDialogAction> : null
                         }

@@ -58,6 +58,7 @@ export default function MainInputForm() {
     // curResult = Standard
     const { setGlossary, slot1ModelName, slot1ResultDisplay, setSlot1ResultDisplay, glossary, isLoading, setIsLoading, chunks, setChunks, setSlot2ResultDisplay, slot2ResultDisplay, slot2Txt, setSlot2Txt, slot1Raw, setSlot1Raw, setSlot1Txt, slot1Txt, setUserCurrency, setStandardResultError, setBetter1Error, setSlot1ModelName, setSlot2ModelName, setSlot1Error, setSlot2Error, userCurrency, setIsSlot1RawOn, setIsSlot2RawOn } = useWorkState()
     const { outputLang } = useOutputContext()
+    const { setIsSlot1EditShowing, setIsSlot2EditShowing, setSlot1EditedTxt, setSlot2EditedTxt} = useEditTabContext()
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
     const isDisabled = useButtonDisabled()
 
@@ -132,6 +133,10 @@ export default function MainInputForm() {
         setStandardResultError('')
         setIsSlot1RawOn(false)
         setIsSlot2RawOn(false)
+        setSlot1EditedTxt('')
+        setSlot2EditedTxt('')
+        setIsSlot1EditShowing(false)
+        setIsSlot2EditShowing(false)
 
         try {
             if (!navigator.onLine) {
