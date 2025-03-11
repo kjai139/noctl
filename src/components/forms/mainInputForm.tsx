@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateClaude } from "@/app/action";
+import { translateGemini, translateGpt, translateClaude, testGemini } from "@/app/action";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import GlossaryTable from "../tables/glossaryTable";
 import { useEffect, useState } from "react";
@@ -204,8 +204,17 @@ export default function MainInputForm() {
             const startTime = Date.now()
             //Standard Model
             if (model === 'standard') {
-                setIsLoading(true)
                 try {
+                    const response = await testGemini(params)
+                    console.log(response)
+
+
+                } catch (err) {
+                    console.error(err)
+                    throw err
+                }
+                /* setIsLoading(true) */
+                /* try {
                     setSlot1ModelName('Free')
                     const jobId = await translateGemini(params)
                     // const jobId = `testJobId`
@@ -279,13 +288,13 @@ export default function MainInputForm() {
 
                 } catch (err: any) {
                     console.log('Error in Standard API')
-                    /* console.error(err, typeof err) */
+                    
                     if (err instanceof Error) {
                         throw new Error(err.message)
                     } else {
                         throw new Error('[Standard Model] Encountered a server error. If problem persists, try again later.')
                     }
-                }
+                } */
 
 
 

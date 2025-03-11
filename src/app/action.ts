@@ -249,6 +249,58 @@ export async function translateGemini({ text, language, glossary }: translateTxt
 
 
 
+export async function testGemini(params:any) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
+    const schema = {
+        description: "Response containing translated line of text and a dictionary",
+        type:SchemaType.OBJECT,
+        properties: {
+            lines: {
+                type:SchemaType.ARRAY,
+                description: "Each line of translated text in the response",
+                items: { type: SchemaType.STRING }
+            },
+            dictionary: {
+                type:SchemaType.ARRAY,
+                description: "A list of term and it's meaning in the response",
+                nullable: true,
+                items: {
+                    type:SchemaType.OBJECT,
+                    properties: {
+                        term: {
+                            type:SchemaType.STRING,
+                            description: 'The untranslated term in raw text'
+                        },
+                        translated_term: {
+                            type:SchemaType.STRING,
+                            description:'The translated term'
+                        }
+                    }
+
+                }
+                
+            }
+        },
+        required: ['lines', 'dictionary']
+    }
+
+
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        generationConfig: {
+            temperature: 0,
+            responseMimeType:'application/json',
+            responseSchema: schema
+        }
+    })
+    const prompt = `Please translate the following text to ${params.language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${params.language} version of the translated words if possible. \n ${params.text}`
+    const result = await model.generateContent(prompt)
+    return result.response.text()
+}
+
+
+
+
 export async function translateGpt({ text, language, glossary }: translateTxtProps) {
     try {
         const session = await auth()

@@ -15,7 +15,7 @@ export default function GlossaryInfoDialog() {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Glossary
+                        Dictionary
                     </DialogTitle>
                     <DialogDescription>
                         What's this?
