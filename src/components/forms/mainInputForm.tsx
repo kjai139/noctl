@@ -204,9 +204,42 @@ export default function MainInputForm() {
             const startTime = Date.now()
             //Standard Model
             if (model === 'standard') {
+                setIsLoading(true)
                 try {
+                    setSlot1ModelName('Free')
+                  
                     const response = await testGemini(params)
                     console.log(response)
+                    let jsonResponse
+
+                    try {
+                        jsonResponse = JSON.parse(response)
+                        const glossaryResult = jsonResponse.dictionary
+
+                        //normalized glossary is user's glossary
+                        if (normalizedGlossary && normalizedGlossary.length > 0) {
+                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
+                            glossaryResult.forEach((newentry: GlossaryItem) => {
+                                if (!termSet.has(newentry.term.toLowerCase())) {
+                                    termSet.add(newentry.term)
+                                    normalizedGlossary.unshift(newentry)
+                                } else {
+                                    console.log(`Entry ${newentry.term} already exists.`)
+                                }
+                            })
+                            setGlossary(normalizedGlossary)
+                        } else {
+                            setGlossary(glossaryResult)
+                        }
+
+                        if (jsonResponse?.lines?.length > 0) {
+                            const resultTxt = jsonResponse.lines.join('\n')
+                            setSlot1ResultDisplay(resultTxt)
+                            setSlot1Txt(resultTxt)
+                        }
+                    } catch (err) {
+                        console.error('[apiStandard] Error parsing response', err)
+                    }
 
 
                 } catch (err) {

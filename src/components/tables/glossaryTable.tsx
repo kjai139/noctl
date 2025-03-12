@@ -268,7 +268,7 @@ export default function GlossaryTable() {
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
             <div className="flex gap-1 items-center">
-              <h1 className="text-lg font-semibold pl-2">Dictionary</h1>
+              <h1 className="text-lg font-semibold pl-2">Glossary</h1>
               <GlossaryInfoDialog></GlossaryInfoDialog>
             </div>
             <span className="text-sm text-muted-foreground pl-2 min-h-[20px]">

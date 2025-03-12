@@ -12,7 +12,7 @@ export default function AppSidebar () {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel className="items-center justify-between">
-                        <span>Glossary tab</span>
+                        <span>Translation glossary tab</span>
                         <GlossSidebarBtn></GlossSidebarBtn>
                         
                        

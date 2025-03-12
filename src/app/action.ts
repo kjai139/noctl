@@ -169,7 +169,7 @@ function getPrompt({ glossary, language, text, model }: {
 }) {
     const filteredGlossary: GlossaryItem[] = JSON.parse(glossary)
     const formattedGlossary = `
-                    Glossary -
+                    Word list:
                     ${filteredGlossary.map(term => `
                         Term: ${term.term},
                         Translation: ${term.translated_term}
@@ -177,7 +177,7 @@ function getPrompt({ glossary, language, text, model }: {
                     `
     let prompt
     if (model === 'standard') {
-        prompt = `${formattedGlossary}\n. Please use the glossary to translate the following text to ${language} and extract a list of special terms, skills, and people names from the text. Keep the original format and maintain the same linebreaks as the original text. \n ### Text \n ${text}`
+        prompt = `${formattedGlossary}\n. Please use that word list to translate the following text to ${language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${language} version of the translated words if possible. \n ${text}`
     } else {
         prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} while keeping the same format, and then return me a list of special terms, skills, and people names extracted from the text. <<<\n ${text}>>>`
     }
@@ -293,8 +293,21 @@ export async function testGemini(params:any) {
             responseSchema: schema
         }
     })
-    const prompt = `Please translate the following text to ${params.language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${params.language} version of the translated words if possible. \n ${params.text}`
+
+    let prompt
+    if (params.glossary) {
+        prompt = getPrompt({
+            glossary: params.glossary,
+            text: params.text,
+            language: params.language,
+            model: 'standard'
+        })
+    } else {
+        prompt = `Please translate the following text to ${params.language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${params.language} version of the translated words if possible. \n ${params.text}`
+    }
+    
     const result = await model.generateContent(prompt)
+    console.log('[Gemini result]', result)
     return result.response.text()
 }
 
