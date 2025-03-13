@@ -207,16 +207,43 @@ export default function MainInputForm() {
                 setIsLoading(true)
                 try {
                     setSlot1ModelName('Free')
-                  
-                    const response = await testGemini(params)
-                    console.log(response)
-                    let jsonResponse
 
+                    const jobId = await translateGemini(params)
+                    console.log('[Standard Model] Job Id - ', jobId)
+                    if (!jobId) {
+                        throw new Error('[Standard Model] Missing job Id')
+                    }
+                    console.log('[Standard Model] JobId:', jobId)
+                    const pollResponse = await pollJobStatus({
+                        jobId: jobId,
+                        startTime: startTime,
+                        interval: pollInterval,
+                    })
+
+                    if (pollResponse.job.jobStatus === 'failed') {
+                        if (typeof pollResponse.job.response === 'string') {
+                            throw new Error(pollResponse.job.response)
+                        } else {
+                            throw new Error('Something went wrong *_*. Please try again later.')
+                        }
+                 
+                    }
+                    let jsonResponse
                     try {
-                        jsonResponse = JSON.parse(response)
+                        
+                        jsonResponse = JSON.parse(pollResponse.job.response)
+                        if (/^```|```$/.test(pollResponse.job.response)) {
+                            console.log("[Standard Model] *** String has triple backticks at the start or end")
+                            try {
+                                jsonResponse = jsonrepair(jsonResponse)
+                                console.log('new JSON RESPONSE', jsonResponse)
+                            } catch (err) {
+                                throw new Error('AI returned corrupted data. This is a rare bug that sometimes happen with this model if the last line of text is a dialog with single quotes.')
+                            }
+                            
+                        }
                         const glossaryResult = jsonResponse.dictionary
 
-                        //normalized glossary is user's glossary
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
                             const termSet = new Set(normalizedGlossary.map(entry => entry.term))
                             glossaryResult.forEach((newentry: GlossaryItem) => {
@@ -237,10 +264,16 @@ export default function MainInputForm() {
                             setSlot1ResultDisplay(resultTxt)
                             setSlot1Txt(resultTxt)
                         }
-                    } catch (err) {
-                        console.error('[apiStandard] Error parsing response', err)
-                    }
+                        setIsLoading(false)
 
+                    } catch (err) {
+                        setIsLoading(false)
+                        console.error('[Standard Model] Invalid response', err)
+                        throw new Error('Invalid response. Please try again later.')
+                        
+                    }
+                  
+                   
 
                 } catch (err) {
                     console.error(err)
