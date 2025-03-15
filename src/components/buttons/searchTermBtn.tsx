@@ -43,6 +43,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
     const [curContext, setCurContext] = useState('')
     const [curInterp,setCurInterp] = useState('')
     const [aLookupError, setALookupError] = useState('')
+    const [altDef, setAltDef] = useState([])
     const contextLimit = 240
 
     const termLookup = async () => {
@@ -54,6 +55,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         setALookupError('')
         setResult('')
         setALookupError('')
+        setAltDef([])
         setErrorMsg('')
         console.log(`Looking up ${term} in ${language}`)
         try {
@@ -65,9 +67,13 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             console.log(json)
             setIsLoading(false)
             const definition = json[0].explanation
-            const interp = json[0].translated_term
+            const interp = json[0].translation
+            const altDefs = json[0].alternate_translations
             if (interp && interp !== 'null') {
                 setCurInterp(interp)
+            }
+            if (altDefs.length > 0) {
+                setAltDef(altDefs)
             }
             setResult(definition)
     
@@ -101,9 +107,13 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                 console.log(json)
                 setIsLoading(false)
                 const definition = json[0].explanation
-                const interp = json[0].translated_term
+                const interp = json[0].translation
+                const altDefs = json[0].alternate_translations
                 setResult(definition)
                 setCurInterp(interp)
+                if (altDefs.length > 0) {
+                    setAltDef(altDefs)
+                }
 
 
             } catch (err) {
@@ -145,8 +155,23 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             <DialogHeader>
             <DialogTitle>{curTerm} {curInterp ? `- ${curInterp}` : ''}</DialogTitle>
             <DialogDescription>
-                Definition lookup
+            <span className="text-sm text-muted-foreground flex gap-1">
+                {
+                    altDef && altDef.length > 0 ?
+                    'Alt: ' : null
+                }
+                        {
+                            altDef && altDef.length > 0 && altDef.map((node, idx) => {
+                                return (
+                                    <span key={`altDef-${idx}`}>
+                                        {`${node.translation}${(idx + 1) < altDef.length ? ',' : ''}`}
+                                    </span>
+                                )
+                            })
+                        }
+                        </span>
             </DialogDescription>
+            
             </DialogHeader>
             {
                 
@@ -162,9 +187,11 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                 {
                     result && !isLoading ?
                     <div>
+                        
                         <span>
                         {result}
                         </span>
+                        
                         <div className="mt-4 flex flex-col gap-4">
                             <span className="text-destructive text-sm flex gap-2">
                                 <span>

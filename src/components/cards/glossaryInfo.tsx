@@ -20,7 +20,7 @@ export default function GlossaryInfo () {
                 <div>
                     <IoAlertCircleOutline size={30}></IoAlertCircleOutline>
                 </div>
-                <p>The translation glossary is used to keep the translation of terms and names consistent when needed. An editable dictionary will be auto-generated after each successful translation request when deemed necessary. Edit as needed.</p>
+                <p>The translation glossary is used to keep the translation of terms and names consistent in consecutive requests. An editable glossary will be auto-generated after each successful translation request when deemed necessary.</p>
             </div>
             <ul className="flex flex-col gap-2">
                 {notifications && notifications.map((node, idx) => {

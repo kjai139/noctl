@@ -219,7 +219,7 @@ export async function translateGemini({ text, language, glossary }: translateTxt
             })
         } else {
             console.log('[Gemini] Prompt 2 used')
-            prompt = `Please translate the following text to ${language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${language} version of the translated words if possible. \n ${text}`
+            prompt = `Please translate the following text to ${language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${language} version of the translated words if possible and the translated term in the dictionary matches the one that was used in the translated text. \n ${text}`
         }
 
         //Making job on redis and starting lambda
@@ -303,7 +303,7 @@ export async function testGemini(params:any) {
             model: 'standard'
         })
     } else {
-        prompt = `Please translate the following text to ${params.language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${params.language} version of the translated words if possible. \n ${params.text}`
+        prompt = `Please translate the following text to ${params.language} and include a list of special terms, skills, and people names from the translated text in the dictionary. Make sure you use the ${params.language} version of the translated words if possible. \n ${params.text}`
     }
     
     const result = await model.generateContent(prompt)
@@ -556,9 +556,9 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
         }
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             generationConfig: {
-                temperature: 0.75,
+                temperature: 1,
                 responseMimeType: 'application/json',
                 responseSchema: {
                     type: SchemaType.ARRAY,
@@ -569,19 +569,36 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
                                 type: SchemaType.STRING,
                                 description: 'explanation of the word'
                             },
-                            translated_term: {
+                            translation: {
                                 type: SchemaType.STRING,
-                                description: 'Meaning of the word. No brackets'
+                                description: 'Translation of the word.'
+                            },
+                            alternate_translations: {
+                                type:SchemaType.ARRAY,
+                                items: {
+                                    type:SchemaType.OBJECT,
+                                    description: 'alternate translations',
+                                    properties: {
+                                        translation: {
+                                            type:SchemaType.STRING,
+                                            description: 'alternate translation',
+
+                                        }
+                                    }
+
+                                },
+                                nullable: true
                             }
 
-                        }
+                        },
+                        required: ['explanation', 'translation', 'alternate_translations']
                     }
                 }
             },
 
         })
 
-        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''}`
+        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''} Please provide the most accurate word as its translation and  up to two Alternate translation if possible.`
 
         const result = await model.generateContent(prompt)
         console.log('gem result:', result)
