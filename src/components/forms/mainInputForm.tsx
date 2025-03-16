@@ -590,6 +590,7 @@ export default function MainInputForm() {
                 }
 
                 if (jobOneResult.status === 'fulfilled') {
+                    
                     if (jobOneResult.value.jobStatus === 'failed') {
                         const jobErrorMsg = jobOneResult.value.job.response
                         console.log('[jobOne] job status failed. Reason: ', jobErrorMsg)
@@ -597,10 +598,13 @@ export default function MainInputForm() {
                     } else if (jobOneResult.value.jobStatus === 'completed') {
                         const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
                         console.log('[Sb1] jobOneResponse', jobOneResponse)
-                        const textResult = jobOneResponse[0].translation
+                        console.log('[Sb1] jobOne Glossary', jobOneResponse.glossary)
+                        const textArr= jobOneResponse.lines
+
+                        
                         if (jobTwoResult.status !== 'fulfilled') {
 
-                            const glossaryResult = jobOneResponse[0].glossary
+                            const glossaryResult = jobOneResponse.dictionary
 
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
                                 console.log('jobOne glossary used')
@@ -619,8 +623,12 @@ export default function MainInputForm() {
                             }
 
                         }
-                        setSlot1ResultDisplay(textResult)
-                        setSlot1Txt(textResult)
+                        if (textArr && textArr.length > 0) {
+                            const textResult = textArr.join('\n')
+                            setSlot1ResultDisplay(textResult)
+                            setSlot1Txt(textResult)
+                        }
+                       
                     }
 
 
@@ -666,7 +674,7 @@ export default function MainInputForm() {
                     } else if (jobTwoResult.value.jobStatus === 'completed') {
                         const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
                         console.log('[Sb2] job2Response', jobTwoResponse)
-
+                        
                         const textResult = jobTwoResponse.text
                         const glossaryResult = jobTwoResponse.glossary
 
@@ -710,12 +718,12 @@ export default function MainInputForm() {
                     } else if (jobOneResult.value.jobStatus === 'completed') {
                         const jobOneResponse = JSON.parse(jobOneResult.value.job.response)
                         console.log('[Sb2] jobOneResponse', jobOneResponse)
-                        console.log('[Sb2] jobOne Glossary', jobOneResponse[0].glossary)
-                        const textResult = jobOneResponse[0].translation
+                        console.log('[Sb2] jobOne Glossary', jobOneResponse.glossary)
+                        const textArr= jobOneResponse.lines
 
                         if (jobTwoResult.status !== 'fulfilled') {
 
-                            const glossaryResult = jobOneResponse[0].glossary
+                            const glossaryResult = jobOneResponse.dictionary
                             if (normalizedGlossary && normalizedGlossary.length > 0) {
                                 console.log('jobOne glossary used')
                                 const termSet = new Set(normalizedGlossary.map(entry => entry.term))
@@ -733,8 +741,13 @@ export default function MainInputForm() {
                             }
 
                         }
-                        setSlot1ResultDisplay(textResult)
-                        setSlot1Txt(textResult)
+
+                        if (textArr && textArr.length > 0) {
+                            const textResult = textArr.join('\n')
+                            setSlot1ResultDisplay(textResult)
+                            setSlot1Txt(textResult)
+                        }
+                        
                     }
 
 

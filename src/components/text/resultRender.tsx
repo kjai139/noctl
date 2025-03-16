@@ -82,7 +82,7 @@ export default function ResultRender() {
                             <>
                                 <div className="border-t-2 my-8 w-full"></div>
                                 <div className="r-cont">
-                                    <span className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-center r-wrap-cont mb-20 h-full">
+                                    <span className="flex w-full justify-center gap-8 min-h-[1000px] py-8 px-2 items-start r-wrap-cont mb-20 h-full">
                                         
                                         {
                                             slot1ResultDisplay ?
