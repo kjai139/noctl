@@ -11,8 +11,8 @@ export default function AppSidebar () {
             <SidebarHeader></SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel className="items-center justify-between">
-                        <span>Translation glossary</span>
+                    <SidebarGroupLabel className="items-center justify-end">
+                        
                         <GlossSidebarBtn></GlossSidebarBtn>
                         
                        
