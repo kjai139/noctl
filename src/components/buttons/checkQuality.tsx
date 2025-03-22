@@ -60,7 +60,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
     const checkQuality = async () => {
         const lineByLine = getLinebyLineTxt()
-        const prompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n ${lineByLine}`
+        const prompt = `Please review this text line by line, make sure the translation for each line matches and there are no undefined lines. \n ${lineByLine}`
         console.log('[editText] prompt used: ', prompt)
         const txtLength = lineByLine.length
         let pollInterval = 5000
@@ -109,6 +109,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             let jsonResponse
             try {
                 jsonResponse = JSON.parse(pollResponse.job.response)
+                console.log('[qc] jsonREsponse', jsonResponse)
             } catch (err) {
                 console.error('[checkQuality] JSON parse failed:', pollResponse.job.response)
                 throw new Error('Encountered a server error. Please try again later.')
@@ -196,7 +197,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         <AlertDialogDescription className="flex flex-col gap-2">
                             <span>When using AI to translate a large amount of text, sometimes they will hallucinate and add in text unrelated to the input.</span>
                             <span>
-                            Use this function if you suspect there are any hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if there's something out of place. This function will not change anything in the glossary.
+                            Use this function if you suspect there are any hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if there's something out of place.
                             </span>
                             
                             <span className="mt-2 text-black">
@@ -204,8 +205,9 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                                     userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
                                 }
                             </span>
-                            <span className="text-muted-foreground text-xs flex gap-1 mt-8">
-                            <span>You can toggle the edited version on and off with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</span>
+                            <span className="text-muted-foreground text-xs flex gap-1 mt-8 flex-col">
+                                <span>This function will not change anything in the glossary.</span>
+                            <span>You can toggle line by line mode with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</span>
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>

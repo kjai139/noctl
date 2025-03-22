@@ -462,8 +462,8 @@ export default function MainInputForm() {
                     const result = JSON.parse(pollResponse.job.response)
 
                     if (result) {
-
-                        const textResult = result.text
+                        console.log('[b2] Result:', result)
+                        const textResult = result.lines.map((item:any) => item.line).join('\n')
                         const glossaryResult = result.glossary
 
                         if (normalizedGlossary && normalizedGlossary.length > 0) {
@@ -675,7 +675,7 @@ export default function MainInputForm() {
                         const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
                         console.log('[Sb2] job2Response', jobTwoResponse)
                         
-                        const textResult = jobTwoResponse.text
+                        const textResult = jobTwoResponse.lines.map((item:any) => item.line).join('\n')
                         const glossaryResult = jobTwoResponse.glossary
 
 

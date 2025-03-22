@@ -177,7 +177,7 @@ function getPrompt({ glossary, language, text, model }: {
                     `
     let prompt
     if (model === 'standard') {
-        prompt = `${formattedGlossary}\n. Please use that word list to translate the following text to ${language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${language} version of the translated words if possible. \n ${text}`
+        prompt = `${formattedGlossary}\n. Please use that translation glossary to translate the following text to ${language} and include a list of special terms, skills, and people names from the text in the dictionary. Make sure you use the ${language} version of the translated words if possible. Make sure you follow the translation glossary. \n ${text}`
     } else {
         prompt = `${formattedGlossary} \n. Please use that glossary to translate the text in <<< >>> to ${language} while keeping the same format, and then return me a list of special terms, skills, and people names extracted from the text. <<<\n ${text}>>>`
     }

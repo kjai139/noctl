@@ -144,10 +144,10 @@ export default function ResultWrap({ slotModelName, slotMergedLines, setSlotMerg
                     return line.text
                 }
             }).join('\n')
-            console.log('clipboardTxt', clipboardTxt)
+            /* console.log('clipboardTxt', clipboardTxt) */
             setDisplaytxt(text)
             setClipboardTxt(clipboardTxt)
-            console.log('TEXT:', displayTxt)
+            /* console.log('TEXT:', displayTxt) */
         }
 
         /* console.log('clipboard', clipboardTxt) */
