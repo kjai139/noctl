@@ -7,13 +7,13 @@ const models = [
     {
         name: "Free",
         accuracy: 3.5,
-        info: "Better than Google Translate & DeepL. Occasional speaker attribution errors and formatting issues.",
+        info: "Better than Google Translate & DeepL. Occasional speaker attribution errors.",
         pricing: `Free, ${standardModelLimit} requests every 10 min`
     },
     {
         name: "Better-1",
         accuracy: 4.7,
-        info: "This model generally performs the best. It has better reading comprehension, higher accuracy, fewer speaker attribution errors compared to the free model, and more consistent formatting.",
+        info: "This model generally performs the best. It has better reading comprehension, higher accuracy, fewer speaker attribution errors compared to the free model.",
         pricing: "50 requests @ $5 USD"
     },
     {
@@ -25,8 +25,8 @@ const models = [
     {
         name: "Duo modes",
         accuracy: 'N/A',
-        info: "Uses 2 models at the same time.",
-        pricing: 'The total cost of the two chosen models.'
+        info: "Uses 2 models at the same time for side by side comparisons.",
+        pricing: 'The total cost of the two models.'
     },
 
 ]
@@ -56,7 +56,7 @@ export default function ModelsDialog() {
                             <span className="text-foreground font-semibold">
                             Signing in with Gmail is required to prevent abuse.
                             </span>
-                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts, requiring separate requests.
+                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts, each requiring separate requests.
                             </span>
                         </span>
 

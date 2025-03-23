@@ -24,9 +24,9 @@ export default async function TopNav({ products, session }: TopNavProps) {
 
                     </Image>
                     <div className="flex gap-4 items-center">
-                        <div className="font-semibold text-lg hidden sm:block leading-none">
+                        {/* <div className="font-semibold text-lg hidden sm:block leading-none">
                             MachinaX
-                        </div>
+                        </div> */}
                         <div>
                             <ModelsDialog></ModelsDialog>
                         </div>

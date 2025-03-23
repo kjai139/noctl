@@ -10,7 +10,10 @@ export default function TopNavInfo () {
             <div className="mw w-full flex gap-4 nv-item">
             <div className="flex-1 flex justify-center">
                 <div className="p-8 ta-mw">
-                <h1 className="text-5xl font-semibold text-center">Machinax</h1>
+                    <div className="flex flex-col justify-center items-center">
+                <h1 className="text-5xl font-semibold text-center">Metia</h1>
+                <h6 className="font-bold">ミーティア</h6>
+                </div>
                 <div className="flex flex-col mt-1 items-center">
                 <p className="text-xl text-center">
                     Translating literature using the most accurate modern LLMs. 

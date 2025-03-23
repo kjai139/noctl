@@ -22,8 +22,8 @@ export default function MainTextArea ({
 
     const placeholderTexts = [
         "Paste some text here...",
-        "Paste a novel chapter here...",
-        "Paste a news article here...",
+        "Paste a web novel chapter here...",
+        "Paste an article here...",
     ]
 
     useEffect(() => {

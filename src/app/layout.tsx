@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Machina | Modern AI translator",
-  description: "Modern AI translator",
+  title: "Metia AI Translator | Modern AI Language Translation Tool",
+  description: "Modern AI Language translation tool",
 };
 
 export default function RootLayout({
