@@ -19,7 +19,7 @@ const models = [
     {
         name: "Better-2",
         accuracy: 4.5,
-        info: "About the same as Better-1. Sometimes better sometimes worse.",
+        info: "Generally a bit worse than Better-1. Sometimes it can be better.",
         pricing: "50 requests @ $5 USD"
     },
     {

@@ -805,7 +805,7 @@ export default function MainInputForm() {
                             const jobTwoResponse = JSON.parse(jobTwoResult.value.job.response)
                             console.log('[Sb2] job2Response', jobTwoResponse)
 
-                            const textResult = jobTwoResponse.text
+                            const textResult = jobTwoResponse.lines.map((item:any) => item.translated_line).join('\n')
                             const glossaryResult = jobTwoResponse.glossary
 
 
