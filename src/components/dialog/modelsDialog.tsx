@@ -11,15 +11,15 @@ const models = [
         pricing: `Free, ${standardModelLimit} requests every 10 min`
     },
     {
-        name: "Better-1",
+        name: "P-1",
         accuracy: 4.7,
-        info: "This model generally performs the best. It has better reading comprehension, higher accuracy, fewer speaker attribution errors compared to the free model.",
+        info: "The best model. Better reading comprehension, higher accuracy, less speaker attribution errors.",
         pricing: "50 requests @ $5 USD"
     },
     {
-        name: "Better-2",
+        name: "P-2",
         accuracy: 4.5,
-        info: "Generally a bit worse than Better-1. Sometimes it can be better.",
+        info: "A bit worse than P-1, but sometimes can be better.",
         pricing: "50 requests @ $5 USD"
     },
     {

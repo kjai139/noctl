@@ -32,6 +32,7 @@ import { useWorkState } from "@/app/_contexts/workStateContext";
 import EditGlossaryTLPopover from "../popover/glossaryTl";
 import TButton from "../buttons/translationBtn";
 import Papa from 'papaparse'
+import ErrorResultAlert from "../dialog/errorResult";
 
 
 interface GlossaryTableTypes {
@@ -139,7 +140,7 @@ export default function GlossaryTable() {
           setGlossary(json)
           
         } catch (err) {
-          setErrorMsg('Invalid JSON format. Please double-check its content and reupload.')
+          setErrorMsg('Invalid file format. Please double-check its content and try again.')
         }
       }
       reader.readAsText(selectedFile)
@@ -165,24 +166,25 @@ export default function GlossaryTable() {
 
           if (result.errors.length) {
             console.error('Error parsing CSV')
+            console.error(result.errors)
             throw new Error('Error parsing CSV.')
           }
           console.log('CSV uploaded:', result.data)
 
-          setUpLoadedFile(selectedFile)
+          
           
           const isJsonValid = checkValidJson(result.data)
           if (!isJsonValid) {
             throw new Error('Invalid CSV')
           }
             
-          
+          setUpLoadedFile(selectedFile)
           setGlossary(result.data as GlossaryItem[])
 
           
           
         } catch (err) {
-          setErrorMsg('Invalid CSV file format. Please double-check its content and reupload.')
+          setErrorMsg('Invalid CSV file format. Please double-check its content and try again.')
         }
       }
       reader.readAsText(selectedFile)
@@ -252,6 +254,12 @@ export default function GlossaryTable() {
   }, [lang, glossary])
 
   return (
+    <>
+    {
+      errorMsg &&
+      <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
+    }
+    
     <div className="flex flex-col gap-4 lg:max-w-[560px] max-w-none flex-1 mt-2">
       {/* <div>
         <div className="flex justify-end">
@@ -379,5 +387,6 @@ export default function GlossaryTable() {
       </div>
 
     </div>
+    </>
   )
 }

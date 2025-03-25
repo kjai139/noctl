@@ -15,11 +15,11 @@ const models = [
         model: 'standard'
     },
     {
-        name: 'Better-1',
+        name: 'P-1',
         model: 'b1'
     },
     {
-        name: 'Better-2',
+        name: 'P-2',
         model: 'b2'
     }
 
@@ -31,15 +31,15 @@ const models = [
 
 const duoModels = [
     {
-        name: 'Free / Better-1',
+        name: 'Free & P-1',
         model: 'sb1'
     },
     {
-        name: 'Free / Better-2',
+        name: 'Free & P-2',
         model: 'sb2'
     },
     {
-        name: 'Better-1 / Better-2',
+        name: 'P-1 & P-2',
         model: 'b12'
     },
 
