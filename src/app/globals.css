@@ -367,6 +367,16 @@ body {
       animation: pulse 1.5s infinite;
 }
 
+.gt-span {
+      overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    white-space: normal;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}
+
 .tab-b {
       border-radius: 10px 10px 0 0;
 }

@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Input } from "../ui/input"
 import { FaFileUpload } from "react-icons/fa";
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
@@ -33,6 +33,8 @@ import EditGlossaryTLPopover from "../popover/glossaryTl";
 import TButton from "../buttons/translationBtn";
 import Papa from 'papaparse'
 import ErrorResultAlert from "../dialog/errorResult";
+import { FixedSizeList as List } from 'react-window'
+import VirtualTable from "./virtaulTable";
 
 
 interface GlossaryTableTypes {
@@ -253,6 +255,45 @@ export default function GlossaryTable() {
     console.log('Glossary set:', glossary)
   }, [lang, glossary])
 
+  const OuterTbody = React.forwardRef(({children, ...props}, ref) => (
+    <TableBody ref={ref} {...props}>
+      {children}
+    </TableBody>
+  ))
+  OuterTbody.displayName = "OuterTbody"
+
+  const Row = ({index, style, data}) => {
+    const item = glossary[index]
+    return (
+      <TableRow key={`tb-${index}`}>
+                <TableCell className="font-medium">
+                  <span className="gt-span">
+                    {item.term}
+                  </span>
+                </TableCell>
+
+                <TableCell className="flex gap-4">
+                  <div className="flex-1 overflow-hidden">
+                  <EditGlossaryTLPopover translation={item.translated_term} idx={index} handleSave={handleSaveChanges}>
+
+                  </EditGlossaryTLPopover>
+                  </div>
+
+                 
+
+                  <div className="flex items-center justify-center flex-1">
+
+
+                    <SearchTermBtn term={item.term} language={lang}></SearchTermBtn>
+                    <DeleteTermBtn onClick={() => deleteTerm(item.term)}></DeleteTermBtn>
+                  </div>
+                </TableCell>
+
+
+              </TableRow>
+    )
+  }
+
   return (
     <>
     {
@@ -306,8 +347,15 @@ export default function GlossaryTable() {
 
           </div>
         </div>
+        {
+          glossary && glossary.length > 0 ?
+          <VirtualTable row={Row} itemCount={glossary.length} itemSize={53} height={650} width={'100%'}>
+          
+        </VirtualTable> : null
+        }
+        
 
-        <Table>
+        {/* <Table>
           {
             glossary && glossary.length > 0 ?
               <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
@@ -315,7 +363,6 @@ export default function GlossaryTable() {
 
           <TableHeader className="sticky top-0 bg-muted shadow">
             <TableRow>
-              {/* <TableHead className="w-[60px]">Type</TableHead> */}
               <TableHead className="w-[100px]">Term</TableHead>
               <TableHead>Translation</TableHead>
 
@@ -324,48 +371,16 @@ export default function GlossaryTable() {
 
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {glossary && glossary.map((node: GlossaryItem, idx: number) => (
-              <TableRow key={`tb-${idx}`}>
-                {/* <TableCell>
-                  {node.term_type === 'name' ? 'N' : null}
-                  {node.term_type === 'term' || node.term_type === 'skill' ? 'T' : null}
-                </TableCell> */}
-                <TableCell className="font-medium">
-                  <span>
-                    {node.term}
-                  </span>
-                </TableCell>
-
-                <TableCell className="flex gap-4">
-                  <div className="flex-1 overflow-hidden">
-                  <EditGlossaryTLPopover translation={node.translated_term} idx={idx} handleSave={handleSaveChanges}>
-
-                  </EditGlossaryTLPopover>
-                  </div>
-
-                 
-
-                  <div className="flex items-center justify-center flex-1">
-
-
-                    <SearchTermBtn term={node.term} language={lang}></SearchTermBtn>
-                    <DeleteTermBtn onClick={() => deleteTerm(node.term)}></DeleteTermBtn>
-                  </div>
-                </TableCell>
-
-
-              </TableRow>
-            ))}
-          </TableBody>
-          {/* <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>"T" stands for term and "N" for name</TableCell>
-
-            </TableRow>
+          
+          { glossary && glossary.length > 0 ?
+          <List height={400} itemCount={glossary.length} itemSize={50} width={"100%"} itemData={glossary} innerElementType={OuterTbody}>
+            {Row}
+          </List>
+          : null
+          }
             
-          </TableFooter> */}
-        </Table>
+     
+        </Table> */}
 
         <div className="flex gap-4 ml-auto px-2">
 
