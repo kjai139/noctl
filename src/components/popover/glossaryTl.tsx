@@ -9,17 +9,18 @@ import TButton from "../buttons/translationBtn";
 
 
 
-
 interface EditGlossaryTLPopoverProps {
     handleSave: (newDef: string, id: number) => void,
     idx: number,
-    translation: string
+    translation: string,
+    term: string
 }
 
 export default function EditGlossaryTLPopover({
     handleSave,
     idx,
-    translation
+    translation,
+    term
 }: EditGlossaryTLPopoverProps) {
 
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -43,11 +44,13 @@ export default function EditGlossaryTLPopover({
 
     
     const saveEntryupdate = () => {
-        if (inputRef.current) {
+        if (inputRef.current && inputRef.current.value.trim()) {
             const input = inputRef.current.value
             handleSave(input, idx)
             setIsModalOpen(false)
-        } 
+        } else {
+        setIsModalOpen(false)
+        }
     }
 
 
@@ -71,11 +74,17 @@ export default function EditGlossaryTLPopover({
             </Tooltip>
             <PopoverContent>
                 <div className="flex flex-col gap-2">
+                    <span>
+                        {term}
+                    </span>
                     <Input type="text" maxLength={30} ref={inputRef} required placeholder={translation}>
 
                     </Input>
                     <Button type="button" onClick={saveEntryupdate}>
                         Save
+                    </Button>
+                    <Button type="button" onClick={() => setIsModalOpen(false)}>
+                        Close
                     </Button>
 
                 </div>

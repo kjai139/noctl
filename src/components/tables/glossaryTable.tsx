@@ -35,6 +35,7 @@ import Papa from 'papaparse'
 import ErrorResultAlert from "../dialog/errorResult";
 import { FixedSizeList as List } from 'react-window'
 import VirtualTable from "./virtaulTable";
+import ValidationError from "@/errors/ValidationError";
 
 
 interface GlossaryTableTypes {
@@ -66,14 +67,14 @@ export default function GlossaryTable() {
   const [upLoadedFile, setUpLoadedFile] = useState<File | null>()
   const [errorMsg, setErrorMsg] = useState('')
   const [lang, setLang] = useState<LanguagesType>('English')
-  const [editedGlossEntries, setEditedGlossEntries] = useState<{[id: number]: string}>({})
+  const [editedGlossEntries, setEditedGlossEntries] = useState<{ [id: number]: string }>({})
 
 
-  const handleTempChange = (id: number, newValue:string) => {
-    setEditedGlossEntries((prev) =>  ({...prev, [id]: newValue}))
+  const handleTempChange = (id: number, newValue: string) => {
+    setEditedGlossEntries((prev) => ({ ...prev, [id]: newValue }))
   }
 
-  const handleSaveChanges = (newDef: string, id:number) => {
+  const handleSaveChanges = (newDef: string, id: number) => {
     const updatedData = glossary.map((node, idx) => {
       if (id === idx) {
         return (
@@ -109,7 +110,7 @@ export default function GlossaryTable() {
     console.log('glossary:', glossary)
   }
 
-  const checkValidJson = (arr:any[]) => {
+  const checkValidJson = (arr: any[]) => {
     const requiredFields = ['term', 'translated_term']
     const jsonValid = arr.every(obj => {
       const keys = Object.keys(obj)
@@ -136,13 +137,18 @@ export default function GlossaryTable() {
           console.log('JSON uploaded:', json)
           const isJsonValid = checkValidJson(json)
           if (!isJsonValid) {
-            throw new Error('Invalid JSON')
+            throw new ValidationError('Invalid JSON')
           }
           setUpLoadedFile(selectedFile)
           setGlossary(json)
-          
+
         } catch (err) {
-          setErrorMsg('Invalid file format. Please double-check its content and try again.')
+          if (err instanceof ValidationError) {
+            setErrorMsg("Invalid fields. Please make sure they are 'term' and 'translated_term'")
+          } else {
+            setErrorMsg("Invalid file format. Please make sure it's valid JSON or CSV.")
+          }
+
         }
       }
       reader.readAsText(selectedFile)
@@ -173,20 +179,26 @@ export default function GlossaryTable() {
           }
           console.log('CSV uploaded:', result.data)
 
-          
-          
+
+
           const isJsonValid = checkValidJson(result.data)
           if (!isJsonValid) {
-            throw new Error('Invalid CSV')
+            const error = new ValidationError("Invalid Headers. Please make sure they are 'term' and 'translated_term'.")
+            throw error
           }
-            
+
           setUpLoadedFile(selectedFile)
           setGlossary(result.data as GlossaryItem[])
 
-          
-          
+
+
         } catch (err) {
-          setErrorMsg('Invalid CSV file format. Please double-check its content and try again.')
+          if (err instanceof ValidationError) {
+            setErrorMsg(err.message)
+          } else {
+            setErrorMsg("Invalid file format. Please make sure it's in valid .csv format.")
+          }
+
         }
       }
       reader.readAsText(selectedFile)
@@ -208,7 +220,7 @@ export default function GlossaryTable() {
 
     console.log('[dlcsv] Csv Content:', csvContent)
 
-    const blob = new Blob([csvContent], { type: 'text/csv'})
+    const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
 
     const link = document.createElement('a')
@@ -255,54 +267,54 @@ export default function GlossaryTable() {
     console.log('Glossary set:', glossary)
   }, [lang, glossary])
 
-  const OuterTbody = React.forwardRef(({children, ...props}, ref) => (
+  const OuterTbody = React.forwardRef(({ children, ...props }, ref) => (
     <TableBody ref={ref} {...props}>
       {children}
     </TableBody>
   ))
   OuterTbody.displayName = "OuterTbody"
 
-  const Row = ({index, style, data}) => {
+  const Row = ({ index, style, data }) => {
     const item = glossary[index]
     return (
       <TableRow key={`tb-${index}`}>
-                <TableCell className="font-medium">
-                  <span className="gt-span">
-                    {item.term}
-                  </span>
-                </TableCell>
+        <TableCell className="font-medium">
+          <span className="gt-span w-[54px]">
+            {item.term}
+          </span>
+        </TableCell>
 
-                <TableCell className="flex gap-4">
-                  <div className="flex-1 overflow-hidden">
-                  <EditGlossaryTLPopover translation={item.translated_term} idx={index} handleSave={handleSaveChanges}>
+        <TableCell className="flex gap-4">
+          <div className="flex-1 overflow-hidden">
+            <EditGlossaryTLPopover term={item.term} translation={item.translated_term} idx={index} handleSave={handleSaveChanges}>
 
-                  </EditGlossaryTLPopover>
-                  </div>
-
-                 
-
-                  <div className="flex items-center justify-center flex-1">
+            </EditGlossaryTLPopover>
+          </div>
 
 
-                    <SearchTermBtn term={item.term} language={lang}></SearchTermBtn>
-                    <DeleteTermBtn onClick={() => deleteTerm(item.term)}></DeleteTermBtn>
-                  </div>
-                </TableCell>
+
+          <div className="flex items-center justify-center flex-1">
 
 
-              </TableRow>
+            <SearchTermBtn term={item.term} language={lang}></SearchTermBtn>
+            <DeleteTermBtn onClick={() => deleteTerm(item.term)}></DeleteTermBtn>
+          </div>
+        </TableCell>
+
+
+      </TableRow>
     )
   }
 
   return (
     <>
-    {
-      errorMsg &&
-      <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
-    }
-    
-    <div className="flex flex-col gap-4 lg:max-w-[560px] max-w-none flex-1 mt-2">
-      {/* <div>
+      {
+        errorMsg &&
+        <ErrorResultAlert errorMsg={errorMsg} setErrorMsg={setErrorMsg}></ErrorResultAlert>
+      }
+
+      <div className="flex flex-col gap-4 lg:max-w-[560px] max-w-none flex-1 mt-2">
+        {/* <div>
         <div className="flex justify-end">
 
             {
@@ -312,50 +324,61 @@ export default function GlossaryTable() {
 
           </div>
         </div> */}
-      <div className="gloss-wrap flex flex-col gap-4">
+        <div className="gloss-wrap flex flex-col gap-4">
 
-        <div className="flex justify-between items-center">
-          <div className="flex flex-col">
-            <div className="flex gap-1 items-center">
-              <h1 className="text-sm pl-2 text-muted-foreground">Translation Glossary</h1>
-              <GlossaryInfoDialog></GlossaryInfoDialog>
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col">
+              <div className="flex gap-1 items-center">
+                <h1 className="text-sm pl-2 text-muted-foreground">Translation Glossary</h1>
+                <GlossaryInfoDialog></GlossaryInfoDialog>
+              </div>
+              <span className="text-sm text-muted-foreground pl-2 h-[40px]">
+                {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
+              </span>
             </div>
-            <span className="text-sm text-muted-foreground pl-2 min-h-[20px]">
-              {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
-            </span>
-          </div>
-          <div className="px-2">
-            <label htmlFor="file-upload" className="cTwoBtn text-primary-foreground shadow h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
-              <FaFileUpload></FaFileUpload><span>Upload</span>
-            </label>
-            <Input className="hidden" id="file-upload" type="file" accept=".json, .csv" onChange={handleUploadChange} disabled={isLoading}></Input>
+            <div className="px-2">
+              <label htmlFor="file-upload" className="cTwoBtn text-primary-foreground shadow h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 gap-1">
+                <FaFileUpload></FaFileUpload><span>Upload</span>
+              </label>
+              <Input className="hidden" id="file-upload" type="file" accept=".json, .csv" onChange={handleUploadChange} disabled={isLoading}></Input>
 
+            </div>
           </div>
-        </div>
 
-        <div className="flex justify-between items-center px-2">
+          <div className="flex justify-between items-center px-2 min-h-[52px]">
+            <div>
+
+              {
+                glossary && glossary.length > 0 ?
+                  <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect> : null
+              }
+            </div>
+            <div>
+
+              <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
+
+            </div>
+          </div>
           <div>
+          <Table>
+            <TableHeader className="bg-muted shadow">
+              <TableRow>
+                
+                <TableHead className="w-[100px]">Term</TableHead>
+                <TableHead>Translation</TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
+          {
+            glossary && glossary.length > 0 ?
+              <VirtualTable row={Row} itemCount={glossary.length} itemSize={53} height={610} width={'100%'}>
 
-            {
-              glossary && glossary.length > 0 ?
-                <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect> : null
-            }
+              </VirtualTable> : null
+          }
           </div>
-          <div>
 
-            <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
-          </div>
-        </div>
-        {
-          glossary && glossary.length > 0 ?
-          <VirtualTable row={Row} itemCount={glossary.length} itemSize={53} height={650} width={'100%'}>
-          
-        </VirtualTable> : null
-        }
-        
-
-        {/* <Table>
+          {/* <Table>
           {
             glossary && glossary.length > 0 ?
               <TableCaption>Use Ctrl + F to find terms quickly</TableCaption> : null
@@ -382,26 +405,26 @@ export default function GlossaryTable() {
      
         </Table> */}
 
-        <div className="flex gap-4 ml-auto px-2">
+          <div className="flex gap-4 ml-auto px-2">
 
-          {glossary && glossary.length > 0 ?
-            <>
-              <Button variant={'glossary'} className="gap-2" onClick={resetGlossary}>
-                <RiDeleteBin2Line></RiDeleteBin2Line>
-                <span>Clear All</span>
-              </Button>
-              <Button variant={'glossary'} onClick={downloadAsCsv} className="gap-2">
-                <GrDocumentDownload></GrDocumentDownload>
-                <span>Save File</span></Button>
-            </>
-            : null
-          }
+            {glossary && glossary.length > 0 ?
+              <>
+                <Button variant={'glossary'} className="gap-2" onClick={resetGlossary}>
+                  <RiDeleteBin2Line></RiDeleteBin2Line>
+                  <span>Clear All</span>
+                </Button>
+                <Button variant={'glossary'} onClick={downloadAsCsv} className="gap-2">
+                  <GrDocumentDownload></GrDocumentDownload>
+                  <span>Save File</span></Button>
+              </>
+              : null
+            }
 
 
+          </div>
         </div>
-      </div>
 
-    </div>
+      </div>
     </>
   )
 }

@@ -34,15 +34,18 @@ const VirtualTable = ({
                 <div {...rest} ref={ref}>
                     <Table style={{
                         top: top,
-                        position:'relative',
+                        position:'absolute',
+                        width: '100%'
                     }}>
-                        <TableHeader className="sticky top-0 bg-muted shadow">
+                        {/* <TableHeader className="sticky top-0 bg-muted shadow" style={{
+                            willChange: 'transform'
+                        }}>
                             <TableRow>
-                                {/* <TableHead className="w-[60px]">Type</TableHead> */}
+                                
                                 <TableHead className="w-[100px]">Term</TableHead>
                                 <TableHead>Translation</TableHead>
                             </TableRow>
-                        </TableHeader>
+                        </TableHeader> */}
                         <TableBody>
                             {children}
                         </TableBody>
