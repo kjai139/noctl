@@ -36,6 +36,7 @@ import ErrorResultAlert from "../dialog/errorResult";
 import { FixedSizeList as List } from 'react-window'
 import VirtualTable from "./virtaulTable";
 import ValidationError from "@/errors/ValidationError";
+import EditGlossEntryBtn from "../buttons/editGlossEntryBtn";
 
 
 interface GlossaryTableTypes {
@@ -328,10 +329,10 @@ export default function GlossaryTable() {
 
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="flex gap-1 items-center">
+              {/* <div className="flex gap-1 items-center">
                 <h1 className="text-sm pl-2 text-muted-foreground">Translation Glossary</h1>
                 <GlossaryInfoDialog></GlossaryInfoDialog>
-              </div>
+              </div> */}
               <span className="text-sm text-muted-foreground pl-2 h-[40px]">
                 {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
               </span>
@@ -354,7 +355,7 @@ export default function GlossaryTable() {
               }
             </div>
             <div>
-
+              <EditGlossEntryBtn></EditGlossEntryBtn>
               <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
             </div>

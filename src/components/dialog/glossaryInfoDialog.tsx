@@ -9,7 +9,7 @@ export default function GlossaryInfoDialog() {
         <Dialog>
             <DialogTrigger asChild>
                 <Button size={'icon'} variant={'outline'} className="shadow-none rounded-full border-none w-auto h-auto p-1 bg-inherit">
-                    <RxQuestionMarkCircled color="blue" size={20}></RxQuestionMarkCircled>
+                    <RxQuestionMarkCircled color="gray" size={18}></RxQuestionMarkCircled>
                 </Button>
             </DialogTrigger>
             <DialogContent>
