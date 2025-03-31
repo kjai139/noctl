@@ -354,8 +354,12 @@ export default function GlossaryTable() {
                   <GlossaryLanguageSelect setLang={setLang}></GlossaryLanguageSelect> : null
               }
             </div>
-            <div>
-              <EditGlossEntryBtn></EditGlossEntryBtn>
+            <div className="flex flex-col">
+              {
+                glossary && glossary.length > 0  &&
+                <EditGlossEntryBtn glossary={glossary} setGlossary={setGlossary}></EditGlossEntryBtn> 
+              }
+              
               <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
             </div>

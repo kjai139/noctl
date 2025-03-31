@@ -910,7 +910,7 @@ export default function MainInputForm() {
 
             if (err.message) {
                 if (err.message === 'Failed to fetch') {
-                    setErrorMsg('Network Error. The server might be unreachable or your internet connection may be unstable.')
+                    setErrorMsg('Network Error. Your internet connection may be unstable.')
                 } else {
                     setErrorMsg(err.message)
                 }
