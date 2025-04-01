@@ -93,7 +93,7 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
 
     return (
         <>
-            <Tooltip>
+            {/* <Tooltip>
                 <TooltipTrigger asChild>
 
                     <Button variant={'ghost'} onClick={openDialog}>
@@ -109,7 +109,8 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
                 <TooltipContent>
                     Search Glossary
                 </TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
+            <Button variant={'ghost'} onClick={openDialog}></Button>
             <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
                 <DialogContent>
                     <DialogHeader>
@@ -117,7 +118,7 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
                             Glossary lookup
                         </DialogTitle>
                         <DialogDescription>
-                            Quick lookup and edit
+                            Lookup and edit
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col gap-2">
@@ -129,7 +130,7 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
 
                             </div>
                             <div>
-                                <Button disabled={isLoading} onClick={searchGlossary}>{ isLoading ? <Loader2 className="animate-spin"></Loader2> : <GoSearch></GoSearch>}</Button>
+                                <Button disabled={isLoading} onClick={searchGlossary}>{ isLoading ? <Loader2 className="animate-spin"></Loader2> : <IoSearchSharp size={20}></IoSearchSharp>}</Button>
                             </div>
                         </div>
                         {

@@ -377,6 +377,16 @@ body {
     -webkit-box-orient: vertical;
 }
 
+.ft {
+      display: -webkit-box;
+      line-clamp: 2;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    max-width: 200px;
+    word-break: break-word;
+}
+
 .tab-b {
       border-radius: 10px 10px 0 0;
 }

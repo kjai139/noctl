@@ -161,7 +161,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
                     'Alt: ' : null
                 }
                         {
-                            altDef && altDef.length > 0 && altDef.map((node, idx) => {
+                            altDef && altDef.length > 0 && altDef.map((node:{translation: string}, idx) => {
                                 return (
                                     <span key={`altDef-${idx}`}>
                                         {`${node.translation}${(idx + 1) < altDef.length ? ',' : ''}`}

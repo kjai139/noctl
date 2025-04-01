@@ -14,7 +14,6 @@ import SuccessAnimatedIcon from "../animatedIcons/successAnimated";
 import { useWorkState } from "@/app/_contexts/workStateContext";
 import { type Session } from 'next-auth'
 import { UpdateUserCurrency } from "@/app/_utils/updateUserCurrency";
-import { fiveDollarCurAmt, oneDollarCurAmt, tenDollarsCurAmt, twentyDollarCurAmt } from "@/lib/currencyPrice";
 import { createTransactionEntry } from "@/app/action";
 import UpdateTransStatus from "@/app/_utils/updateTransStatus";
 
@@ -98,7 +97,7 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                 try {
                     await UpdateTransStatus(product.pId)
                 } catch (err) {
-                    setDbErrorMsg(`However, we encountered a possible connection issue. Check the payment history tab and your balance. Contact support if needed.`)
+                    setDbErrorMsg(`There was a possible connection issue. Check the payment history tab and your balance.`)
                     
                 }
 

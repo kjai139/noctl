@@ -333,7 +333,7 @@ export default function GlossaryTable() {
                 <h1 className="text-sm pl-2 text-muted-foreground">Translation Glossary</h1>
                 <GlossaryInfoDialog></GlossaryInfoDialog>
               </div> */}
-              <span className="text-sm text-muted-foreground pl-2 h-[40px]">
+              <span className="text-sm text-muted-foreground pl-2 h-[40px] ft">
                 {upLoadedFile ? `Using: ${upLoadedFile.name}` : null}
               </span>
             </div>

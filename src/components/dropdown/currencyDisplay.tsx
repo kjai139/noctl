@@ -69,12 +69,12 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
 
 
         } catch (err) {
-            console.error(err)
+            console.error('[getUserCurrency] Error', err)
             setUserCurrency(null)
-            if (err instanceof Error) {
-                setErrorMsg(err.message)
+            if (!navigator.onLine) {
+                setErrorMsg('No internet connection. Please check your network.')
             } else {
-                setErrorMsg('Encountered an unexpected error while retrieving your balance.')
+                setErrorMsg('Something went wrong. Please try again later.')
             }
         }
     }
