@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event
     try {
         event = stripe.webhooks.constructEvent(body, sig as string, ngrokSecret as string)
-        
+
         console.log('[Stripe] Listening to Webhook events')
     } catch (err) {
         console.error(err)
@@ -93,35 +93,33 @@ export async function POST(req: NextRequest) {
                             success: true
                         })
                     } else {
-                        /* if (existingTransaction.statusVerified) {
-                            console.log('[Stripe Webhook] New Event but statusVerified')
 
-                            return NextResponse.json({
-                                success:true
-                            })
-                        } */
                         //New event
                         console.log(`[Stripe Webhook] New payment succeed Event ${event.id}`)
                         console.log(`[Stripe Webhook] Transaction status: ${existingTransaction.status}`)
 
-                        //if names and amount did not match
-                        if (existingTransaction.userId.toString() !== session4.metadata.userId || existingTransaction.amount !== session4.amount) {
-                            console.log(`[Stripe Webhook] ${existingTransaction.paymentId} ***user or amount did not match***`)
-                            existingTransaction.amount = session4.amount
-                            existingTransaction.userId = session4.metadata.userId
-                            
-                        }
-                        existingTransaction.eventId = event.id
-                        console.log(`[Stripe Webhook] EventId updated`)
-                        existingTransaction.status = 'completed'
-                        existingTransaction.expiresAt = null
+
 
                         const dbSess = await mongoose.startSession()
                         dbSess.startTransaction()
 
 
                         try {
-                            await existingTransaction.save({
+                            const sessionTrans = await TransactiionModel.findOne({
+                                paymentId: session4.id
+                            })
+                            //if names and amount did not match
+                            if (sessionTrans.userId.toString() !== session4.metadata.userId || sessionTrans.amount !== session4.amount) {
+                                console.log(`[Stripe Webhook] ${sessionTrans.paymentId} ***user or amount did not match***`)
+                                sessionTrans.amount = session4.amount
+                                sessionTrans.userId = session4.metadata.userId
+
+                            }
+                            sessionTrans.eventId = event.id
+                            console.log(`[Stripe Webhook] EventId updated`)
+                            sessionTrans.status = 'completed'
+                            sessionTrans.expiresAt = null
+                            await sessionTrans.save({
                                 session: dbSess
                             })
                             console.log('[Stripe webhook] Trasnaction updated to completed')
@@ -147,9 +145,9 @@ export async function POST(req: NextRequest) {
                             await dbSess.commitTransaction()
                             console.log('[Stripe webhook] Pending Transaction -> Complete')
                             return NextResponse.json({
-                                success:true
+                                success: true
                             })
-                            
+
 
                         } catch (err) {
                             console.error(err)

@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -21,6 +21,8 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
     const [transArr, setTransArr] = useState<[] | null>()
     const [isLoading, setIsLoading] = useState(false)
     const [isVerifying, setIsVerifying] = useState(false)
+
+    
 
     const fetchPhistory = async () => {
         setIsLoading(true)
@@ -52,7 +54,16 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
     const verifyPiStatus = async (pId: string) => {
         try {
             setIsVerifying(true)
-            const response = await fetch(`/api/purchase/verify?pId=${pId}`)
+            const data = {
+                pId: pId
+            }
+            const response = await fetch(`/api/purchase/verify`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
             if (response.ok) {
                 const data = await response.json()
                 console.log(data)
@@ -101,7 +112,7 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                 {!errorMsg && !isLoading ?
                     <div className="h-auto md:h-[330px] flex flex-col justify-between">
                         <Table>
-                            
+
                             <TableHeader className="hidden md:table-header-group">
                                 <TableRow>
                                     <TableHead>Item</TableHead>
@@ -147,9 +158,19 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                                                 {trans.status}
                                                 </span>
                                                 } */}
+                                                <div>
                                                     <span className={`${trans.status === 'completed' ? 'text-green-600' : ''}`}>
                                                         {trans.status}
                                                     </span>
+                                                    {
+                                                        trans.status === 'pending' || trans.status === 'incomplete' ?
+                                                            <span>
+                                                                <Button variant={'ghost'} onClick={() => verifyPiStatus(trans.paymentId)} disabled={isVerifying} size={'sm'} className="rounded">{isVerifying ? <Loader2 className="animate-spin"></Loader2> : 'Check Status'}
+                                                                    
+                                                                </Button>
+                                                            </span> : null
+                                                    }
+                                                </div>
                                                 </TableCell>
                                             </TableRow>
                                         )
