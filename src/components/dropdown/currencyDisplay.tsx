@@ -136,6 +136,13 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         }
     }, [isDialogOpen, hasMounted])
 
+    useEffect(() => {
+        if (!isPhOpen) {
+            console.log('Purchase History closed. Updating user currency...')
+            getUserCurrency()
+        }
+    }, [isPhOpen])
+
     const handleSelectItem = (idx:number) => {
 
         switch (idx) {

@@ -24,13 +24,14 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
 
     
 
-    const fetchPhistory = async () => {
+    const fetchPhistory = async (key?:string) => {
         setIsLoading(true)
         try {
             const response = await fetch('/api/purchase/getHistory', {
                 next: {
                     tags: ['purchaseH']
-                }
+                },
+                
             })
             setIsLoading(false)
             if (response.ok) {
@@ -67,6 +68,10 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
             if (response.ok) {
                 const data = await response.json()
                 console.log(data)
+                if (isDialogOpen) {
+                    console.log('[Refetching purchase history]...')
+                    fetchPhistory()
+                }
             }
             setIsVerifying(false)
         } catch (err) {
