@@ -35,7 +35,7 @@ export default function VisibilityDropDown({
     return (
         <DropdownMenu>
             <Tooltip>
-                <TooltipTrigger onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)} asChild>
+                <TooltipTrigger onPointerEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)} asChild>
                     <DropdownMenuTrigger asChild>
                         <Button variant={'outline'} disabled={isSlotEditing} size={'icon'}>
                             <MdOutlineVisibility size={toolbarIconSize}></MdOutlineVisibility>

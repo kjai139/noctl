@@ -21,7 +21,11 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
     const [transArr, setTransArr] = useState<[] | null>()
     const [isLoading, setIsLoading] = useState(false)
     const [isVerifying, setIsVerifying] = useState(false)
+    const isMounted = useRef(true)
 
+    useEffect(() => {
+        isMounted.current = isDialogOpen
+    }, [isDialogOpen])
     
 
     const fetchPhistory = async (key?:string) => {
@@ -68,9 +72,11 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
             if (response.ok) {
                 const data = await response.json()
                 console.log(data)
-                if (isDialogOpen) {
+                if (isMounted.current) {
                     console.log('[Refetching purchase history]...')
                     fetchPhistory()
+                } else {
+                    console.log('[VerifyApi] Dialog closed. did not refetch')
                 }
             }
             setIsVerifying(false)
@@ -115,9 +121,9 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                         </div> : null
                 }
                 {!errorMsg && !isLoading ?
-                    <div className="h-auto md:h-[330px] flex flex-col justify-between">
+                    <div className="h-auto md:h-[330px] flex flex-col justify-between max-h-[400px] overflow-auto">
                         <Table>
-
+                            
                             <TableHeader className="hidden md:table-header-group">
                                 <TableRow>
                                     <TableHead>Item</TableHead>
@@ -163,12 +169,12 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                                                 {trans.status}
                                                 </span>
                                                 } */}
-                                                <div>
+                                                <div className="justify-between flex items-center">
                                                     <span className={`${trans.status === 'completed' ? 'text-green-600' : ''}`}>
                                                         {trans.status}
                                                     </span>
                                                     {
-                                                        trans.status === 'pending' || trans.status === 'incomplete' ?
+                                                        trans.status === 'pending' || trans.status === 'incomplete' || trans.status === 'completed' ?
                                                             <span>
                                                                 <Button variant={'ghost'} onClick={() => verifyPiStatus(trans.paymentId)} disabled={isVerifying} size={'sm'} className="rounded">{isVerifying ? <Loader2 className="animate-spin"></Loader2> : 'Check Status'}
                                                                     
@@ -193,18 +199,19 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
 
                             </div>
                         }
-                        {
+                        
+                    </div>
+                    : null
+                }
+
+{
                             transArr && transArr.length > 0 &&
                             <span className="text-muted-foreground text-sm text-center">
                                 For payment assistance, contact <strong>{supportEmail}</strong> with the payment ID.
                             </span>
                         }
-                    </div>
-                    : null
-                }
-
-
             </DialogContent>
+            
         </Dialog>
     )
 }

@@ -166,9 +166,9 @@ export default function CurrencyDisplay ({session, products}:CurrencyDisplayProp
         <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             
                 <Tooltip>
-                    <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+                    <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button variant={'ghost'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow currencyBtn hover:brightness-90'>
+                        <Button variant={'ghost'} className='flex gap-1 items-center border-0 shadow-none hover:border-1 hover:shadow currencyBtn hover:brightness-90' onPointerEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)}>
                             {/* <TbHexagonLetterRFilled size={30} /> */}
                             <TbCircleLetterRFilled size={30}></TbCircleLetterRFilled>
                             <span className='text-lg text-foreground'>{userCurrency !== null && userCurrency !== undefined ? userCurrency : 'N/A'}</span>

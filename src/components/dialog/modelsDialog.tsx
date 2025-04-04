@@ -56,7 +56,7 @@ export default function ModelsDialog() {
                             <span className="text-foreground font-semibold">
                             Signing in with Gmail is required to prevent abuse.
                             </span>
-                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts, each requiring separate requests.
+                            <span>Each translation request handles up to 2000 characters max. Text longer than that will be broken up into parts, each requiring a separate request.
                             </span>
                         </span>
 

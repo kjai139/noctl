@@ -53,7 +53,7 @@ export default function CopyTextBtn ({text, clipboardTxt, isSlotEditing, mode, s
 
     return (
         <Tooltip>
-            <TooltipTrigger asChild onMouseEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+            <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)}>
             <Button onClick={handleCopy} disabled={isCopied || isSlotEditing} className={`disabled:opacity-100 ${isCopied ? 'color-green-400' : null}`} variant={'outline'} size={'icon'}>
                 {
                     isCopied ?

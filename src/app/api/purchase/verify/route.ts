@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
                         throw new Error('user update failed.')
                     }
 
-                    mongoSession.commitTransaction()
+                    await mongoSession.commitTransaction()
 
                     return NextResponse.json({
                         updatedTrans: transaction,

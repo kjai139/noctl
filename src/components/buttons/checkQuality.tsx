@@ -171,7 +171,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
 
                 <Tooltip>
 
-                    <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+                    <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)}>
 
 
                         <AlertDialogTrigger asChild>

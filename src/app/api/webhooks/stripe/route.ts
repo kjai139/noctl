@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
                             const sessionTrans = await TransactiionModel.findOne({
                                 paymentId: session4.id
                             })
-                            //if names and amount did not match
+                            //if names and amount did not match - not sure if needed
                             if (sessionTrans.userId.toString() !== session4.metadata.userId || sessionTrans.amount !== session4.amount) {
                                 console.log(`[Stripe Webhook] ${sessionTrans.paymentId} ***user or amount did not match***`)
                                 sessionTrans.amount = session4.amount
@@ -152,9 +152,9 @@ export async function POST(req: NextRequest) {
                         } catch (err) {
                             console.error(err)
                             await dbSess.abortTransaction()
-                            console.log('[Stripe webhook] Error updating database, transaction aborted')
+                            console.log('[Stripe webhook] Error updating database, transaction update aborted')
                             return NextResponse.json({
-                                message: '[Stripe webhook] Error updating database, transaction aborted'
+                                message: '[Stripe webhook] Error updating database, transaction update aborted'
                             }, {
                                 status: 500
                             })

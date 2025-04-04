@@ -46,6 +46,9 @@ const TransactionModel = new Schema({
         type:Boolean,
         default:false
     },
+    receipt: {
+        type:String
+    }
 }, {
     timestamps: true
 })

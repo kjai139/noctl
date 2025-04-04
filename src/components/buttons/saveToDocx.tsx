@@ -96,7 +96,7 @@ export default function SaveFileDocx({ clipboardTxt, slotRaw, slotTranslatedTxt,
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <Tooltip>
-        <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+        <TooltipTrigger asChild onPointerEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)}>
             <DialogTrigger asChild>
                 <Button variant={'outline'} size={'icon'} disabled={isSlotEditing}>
                     <FaFileDownload size={toolbarIconSize}></FaFileDownload>

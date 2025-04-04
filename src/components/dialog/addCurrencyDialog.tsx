@@ -40,8 +40,8 @@ export default function AddCurrencyDialog ({isDialogOpen, setIsDialogOpen, produ
         console.log('GETTING PAYMENT INT FOR ID', itemId)
         const item = {
             id:itemId,
-            userId: session?.user.id || '',
-            userEmail: session?.user.email
+            /* userId: session?.user.id || '',
+            userEmail: session?.user.email */
         }
         try {
             const response = await fetch('/api/create-paymentIntent/', {

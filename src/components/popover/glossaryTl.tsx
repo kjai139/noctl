@@ -61,7 +61,7 @@ export default function EditGlossaryTLPopover({
         <Popover open={isModalOpen} onOpenChange={setIsModalOpen}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <PopoverTrigger asChild onMouseEnter={() => setIsTooltipAllowed(true)} onMouseLeave={() => setIsTooltipAllowed(false)}>
+                    <PopoverTrigger asChild onMouseEnter={() => setIsTooltipAllowed(true)} onPointerLeave={() => setIsTooltipAllowed(false)}>
                         <TButton>
                             <span className="max-w-[0px] whitespace-nowrap">{translation}
                                 </span>
