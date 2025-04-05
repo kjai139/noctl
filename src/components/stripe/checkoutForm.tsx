@@ -97,7 +97,7 @@ export default function CheckoutForm({ dpmCheckerLink, product, isDialogOpen, cl
                 try {
                     await UpdateTransStatus(product.pId)
                 } catch (err) {
-                    setDbErrorMsg(`There was a possible connection issue. Check the payment history tab and your balance.`)
+                    setDbErrorMsg(`Encountered a server issue. Check your purchase history tab.`)
                     
                 }
 

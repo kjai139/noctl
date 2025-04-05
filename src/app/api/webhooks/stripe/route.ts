@@ -170,13 +170,16 @@ export async function POST(req: NextRequest) {
                     console.log(`[Stripe Webhook] Transaction not found, creating transaction for eventId ${event.id}...`)
                     let productName
                     if (session4.amount === 500) {
-                        productName = '100 requests'
+                        productName = '50 requests'
                     } else if (session4.amount === 1000) {
-                        productName = '200 requests'
+                        productName = '100 requests'
                     } else if (session4.amount === 2000) {
-                        productName = '425 requests'
+                        productName = '200 requests'
                     } else {
-                        productName = 'N/A'
+                        console.error('[Stripe webhook] unknown amount')
+                        return NextResponse.json({
+                            success: true
+                        })
                     }
                     const dbSess = await mongoose.startSession()
                     dbSess.startTransaction()

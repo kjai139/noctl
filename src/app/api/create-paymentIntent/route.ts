@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
             amount: unitPrice,
             currency: currency,
             receipt_email: session.user.email,
+            description: `Purchase of ${product.name}`,
             metadata: {
                 userId: session.user.id
             },

@@ -6,6 +6,7 @@ import { TransactionObjModel } from "@/app/_types/transactionType";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import { supportEmail } from "@/lib/supportEmail";
+import { format, parseISO } from 'date-fns'
 
 interface PurchaseHistoryDialogProps {
     isDialogOpen: boolean,
@@ -137,8 +138,8 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                                 {
                                     transArr && transArr.length > 0 && transArr.map((trans: TransactionObjModel, idx) => {
                                         let formatAmt = (trans.amount / 100).toFixed(2)
-                                        let date = new Date(trans.createdAt)
-                                        let formatDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+                                        let date = parseISO(trans.createdAt)
+                                        let formattedDate = `${format(date, 'yyyy-MM-dd')} \n${format(date, 'HH:mm a')}`
 
                                         return (
                                             <TableRow key={`trans-${idx}`} className="flex flex-col md:table-row">
@@ -153,7 +154,9 @@ export default function PurchaseHistoryDialog({ isDialogOpen, onOpenChange }: Pu
                                                     ${formatAmt}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {formatDate}
+                                                    {format(date, 'yyyy-MM-dd')}
+                                                    <br />
+                                                    {format(date, 'hh:mm a')}
                                                 </TableCell>
                                                 <TableCell>
                                                     {/* {trans.status === 'pending' && !trans.statusVerified || trans.status === 'incomplete' && !trans.statusVerified ?
