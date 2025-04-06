@@ -69,7 +69,8 @@ export default function GlossaryTable() {
   const [errorMsg, setErrorMsg] = useState('')
   const [lang, setLang] = useState<LanguagesType>('English')
   const [editedGlossEntries, setEditedGlossEntries] = useState<{ [id: number]: string }>({})
-
+  const MAX_SIZE_BYTES = 1 * 1024 * 1024
+  //1MB
 
   const handleTempChange = (id: number, newValue: string) => {
     setEditedGlossEntries((prev) => ({ ...prev, [id]: newValue }))
@@ -114,6 +115,9 @@ export default function GlossaryTable() {
   const checkValidJson = (arr: any[]) => {
     const requiredFields = ['term', 'translated_term']
     const jsonValid = arr.every(obj => {
+      if (!obj.term || !obj.translated_term) {
+        return false
+      }
       const keys = Object.keys(obj)
       return requiredFields.every(field => keys.includes(field))
     })
@@ -126,6 +130,11 @@ export default function GlossaryTable() {
     if (e.target.files && e.target.files[0].type === 'application/json') {
       const selectedFile = e.target.files[0]
       console.log('Uploaded File: ', selectedFile)
+      console.log('File Size:', selectedFile.size)
+      if (selectedFile.size > MAX_SIZE_BYTES) {
+        setErrorMsg('File is too large. Max: 1MB')
+        return
+      }
       const reader = new FileReader()
       //onload is triggered once reading is complete
       reader.onload = (e) => {
@@ -159,6 +168,11 @@ export default function GlossaryTable() {
     } else if (e.target.files && e.target.files[0].type === 'text/csv') {
       const selectedFile = e.target.files[0]
       console.log('Uploaded File: ', selectedFile)
+      console.log('File Size:', selectedFile.size)
+      if (selectedFile.size > MAX_SIZE_BYTES) {
+        setErrorMsg('File is too large. Max: 1MB')
+        return
+      }
       const reader = new FileReader()
       reader.onload = (e) => {
 
@@ -168,28 +182,32 @@ export default function GlossaryTable() {
           }
           const csv = e.target.result as string
 
-          const result = Papa.parse(csv, {
+          const result = Papa.parse<GlossaryItem>(csv, {
             header: true,
-            /* skipEmptyLines: true */
+            skipEmptyLines: true,
+            complete: (result) => {
+              console.log(result)
+              const isJsonValid = checkValidJson(result.data)
+              if (!isJsonValid) {
+                const error = new ValidationError("Invalid format. Please make sure there are no empty fields and the headers are 'term' and 'translated_term'.")
+                throw error
+              }
+              setUpLoadedFile(selectedFile)
+              setGlossary(result.data as GlossaryItem[])
+
+            },
+            error: (err: any) => {
+              console.error('Parsing Error', err)
+              throw new Error('Error parsing CSV.')
+            }
           })
 
-          if (result.errors.length) {
-            console.error('Error parsing CSV')
-            console.error(result.errors)
-            throw new Error('Error parsing CSV.')
-          }
-          console.log('CSV uploaded:', result.data)
 
 
 
-          const isJsonValid = checkValidJson(result.data)
-          if (!isJsonValid) {
-            const error = new ValidationError("Invalid Headers. Please make sure they are 'term' and 'translated_term'.")
-            throw error
-          }
 
-          setUpLoadedFile(selectedFile)
-          setGlossary(result.data as GlossaryItem[])
+
+
 
 
 
@@ -356,30 +374,31 @@ export default function GlossaryTable() {
             </div>
             <div className="flex flex-col">
               {
-                glossary && glossary.length > 0  &&
-                <EditGlossEntryBtn glossary={glossary} setGlossary={setGlossary}></EditGlossEntryBtn> 
+                glossary && glossary.length > 0 ?
+                  <EditGlossEntryBtn glossary={glossary} setGlossary={setGlossary}></EditGlossEntryBtn> :
+                  <div className="h-[36px]"></div>
               }
-              
+
               <AddGlossEntryBtn setGlossary={setGlossary} glossary={glossary}></AddGlossEntryBtn>
 
             </div>
           </div>
           <div>
-          <Table>
-            <TableHeader className="bg-muted shadow">
-              <TableRow>
-                
-                <TableHead className="w-[100px]">Term</TableHead>
-                <TableHead>Translation</TableHead>
-              </TableRow>
-            </TableHeader>
-          </Table>
-          {
-            glossary && glossary.length > 0 ?
-              <VirtualTable row={Row} itemCount={glossary.length} itemSize={53} height={610} width={'100%'}>
+            <Table>
+              <TableHeader className="bg-muted shadow">
+                <TableRow>
 
-              </VirtualTable> : null
-          }
+                  <TableHead className="w-[100px]">Term</TableHead>
+                  <TableHead>Translation</TableHead>
+                </TableRow>
+              </TableHeader>
+            </Table>
+            {
+              glossary && glossary.length > 0 ?
+                <VirtualTable row={Row} itemCount={glossary.length} itemSize={53} height={610} width={'100%'}>
+
+                </VirtualTable> : null
+            }
           </div>
 
 

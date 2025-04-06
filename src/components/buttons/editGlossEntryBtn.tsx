@@ -110,7 +110,14 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
                     Search Glossary
                 </TooltipContent>
             </Tooltip> */}
-            <Button variant={'ghost'} onClick={openDialog}></Button>
+            <Button variant={'ghost'} onClick={openDialog}>
+            <div className="flex items-center w-full">
+                        <div className="w-[30px] h-[30px] flex items-center justify-center">
+                        <IoSearchSharp size={15}></IoSearchSharp>
+                        </div>
+                        <span>Search</span>
+                        </div>
+            </Button>
             <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
                 <DialogContent>
                     <DialogHeader>
