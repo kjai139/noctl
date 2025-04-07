@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Input } from "../ui/input"
 import { FaFileUpload } from "react-icons/fa";
-import React, { useEffect, useState } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { GrDocumentDownload } from "react-icons/gr";
 import { RiDeleteBin2Line } from "react-icons/ri";
@@ -33,7 +33,7 @@ import EditGlossaryTLPopover from "../popover/glossaryTl";
 import TButton from "../buttons/translationBtn";
 import Papa from 'papaparse'
 import ErrorResultAlert from "../dialog/errorResult";
-import { FixedSizeList as List } from 'react-window'
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 import VirtualTable from "./virtaulTable";
 import ValidationError from "@/errors/ValidationError";
 import EditGlossEntryBtn from "../buttons/editGlossEntryBtn";
@@ -189,7 +189,7 @@ export default function GlossaryTable() {
               console.log(result)
               const isJsonValid = checkValidJson(result.data)
               if (!isJsonValid) {
-                const error = new ValidationError("Invalid format. Please make sure there are no empty fields and the headers are 'term' and 'translated_term'.")
+                const error = new ValidationError("Invalid csv format. Please make sure there are no empty fields and the headers are 'term' and 'translated_term'.")
                 throw error
               }
               setUpLoadedFile(selectedFile)
@@ -286,14 +286,14 @@ export default function GlossaryTable() {
     console.log('Glossary set:', glossary)
   }, [lang, glossary])
 
-  const OuterTbody = React.forwardRef(({ children, ...props }, ref) => (
+  /* const OuterTbody = React.forwardRef(({ children, ...props }:{children: ReactNode}, ref:any) => (
     <TableBody ref={ref} {...props}>
       {children}
     </TableBody>
   ))
-  OuterTbody.displayName = "OuterTbody"
+  OuterTbody.displayName = "OuterTbody" */
 
-  const Row = ({ index, style, data }) => {
+  const Row = ({ index, style, data }:ListChildComponentProps) => {
     const item = glossary[index]
     return (
       <TableRow key={`tb-${index}`}>

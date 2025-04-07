@@ -147,15 +147,17 @@ export default function EditGlossEntryBtn({ glossary, setGlossary }: EditGlossar
                         {
                             searchResult && searchResult !== 'empty' &&
                             <div className="mt-4">
-                                <div className="flex w-full gap-4">
-                                <span className="flex-1">
-                                    {searchResult.term}
+                                <div className="flex w-full gap-4 flex-col sm:flex-row">
+                                <span className="flex-1 flex-col flex justify-between">
+                                    <span className="text-muted-foreground font-semibold text-sm">Term</span>
+                                    <span className="h-[36px]">{searchResult.term}</span>
                                 </span>
                                 <span>
+                                    <span className="text-muted-foreground font-semibold text-sm flex flex-col justify-between">Translation</span>
                                     <Input key={`${searchResult.translated_term}-inp`} ref={editInputRef} type="text" defaultValue={searchResult.translated_term}></Input>
                                     
                                 </span>
-                                <Button type="button" onClick={updateGlossaryEntry}>Update</Button>
+                                <Button className="self-end" type="button" onClick={updateGlossaryEntry}>Update</Button>
                                 </div>
                                 
                             </div>

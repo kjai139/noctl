@@ -1,9 +1,17 @@
 'use client'
-import React, { useContext, useRef, useState } from "react";
+import React, { ReactElement, ReactNode, SetStateAction, useContext, useRef, useState } from "react";
 import { FixedSizeList, FixedSizeListProps } from "react-window"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-const VirtualTableContext = React.createContext({
+
+type VirtualTableContextType = {
+    top: number;
+    setTop: (top: number) => void
+    header?: ReactNode;
+    footer?: ReactNode;
+  };
+
+const VirtualTableContext = React.createContext<VirtualTableContextType>({
     top: 0,
     setTop: (top: number) => { },
     header: <></>,
@@ -13,8 +21,8 @@ const VirtualTableContext = React.createContext({
 
 interface VirtualTableProps extends Omit<FixedSizeListProps, "children" | "innerElementType"> {
     row: FixedSizeListProps["children"];
-    header?: React.ReactNode;
-    footer?: React.ReactNode;
+    header?: ReactNode
+    footer?: ReactNode
 
 }
 
@@ -37,15 +45,6 @@ const VirtualTable = ({
                         position:'absolute',
                         width: '100%'
                     }}>
-                        {/* <TableHeader className="sticky top-0 bg-muted shadow" style={{
-                            willChange: 'transform'
-                        }}>
-                            <TableRow>
-                                
-                                <TableHead className="w-[100px]">Term</TableHead>
-                                <TableHead>Translation</TableHead>
-                            </TableRow>
-                        </TableHeader> */}
                         <TableBody>
                             {children}
                         </TableBody>
@@ -55,7 +54,9 @@ const VirtualTable = ({
         }
     )
 
-    
+    const handleRef: React.LegacyRef<FixedSizeList> = (el) => {
+        listRef.current = el;
+      };
 
     return (
         <VirtualTableContext.Provider value={{ top, setTop, header, footer }}>
@@ -69,7 +70,7 @@ const VirtualTable = ({
                     setTop((style && style.top) || 0)
                     rest.onItemsRendered && rest.onItemsRendered(props)
                 }}
-                ref={el => (listRef.current = el)}
+                ref={handleRef}
             >
                 {row}
 
