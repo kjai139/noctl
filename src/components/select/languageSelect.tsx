@@ -2,7 +2,7 @@ import { SetStateAction } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
 import { LanguagesType } from "@/app/_types/glossaryType"
 import { Label } from "../ui/label"
-
+import outputLanguages from "./outputLanguages"
 
 interface GlossaryLangSelectProps {
     setLang: React.Dispatch<SetStateAction<LanguagesType>>
@@ -44,7 +44,7 @@ export default function GlossaryLangSelect({setLang}:GlossaryLangSelectProps) {
         
             <SelectContent>
                 {
-                    language.map((node, idx) => {
+                    outputLanguages.map((node, idx) => {
                         return (
                             <SelectItem value={node.name} key={`glosslang-${idx}`}>
                                     {node.name} 

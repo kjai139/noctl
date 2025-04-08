@@ -21,6 +21,7 @@ import { TermLookup } from "@/app/action"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { LanguagesType } from "@/app/_types/glossaryType"
+import { pollJobStatus } from "@/app/_utils/pollJobStatus"
   
 
 interface searchTermBtnProps {
@@ -59,11 +60,31 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         setErrorMsg('')
         console.log(`Looking up ${term} in ${language}`)
         try {
-            const response = await TermLookup({
-                term: term,
+
+            const jobId = await TermLookup({
+                term:term,
                 language: language
             })
-            const json = JSON.parse(response)
+
+            console.log('[Standard Model] JobId:', jobId)
+            const startTime = Date.now()
+            const pollInterval = 3000
+            const pollResponse = await pollJobStatus({
+                jobId: jobId,
+                startTime: startTime,
+                interval: pollInterval,
+            })
+
+            if (pollResponse.job.jobStatus === 'failed') {
+                if (typeof pollResponse.job.response === 'string') {
+                    throw new Error(pollResponse.job.response)
+                } else {
+                    throw new Error('Something went wrong *_*. Please try again later.')
+                }
+         
+            }
+            const json = JSON.parse(pollResponse.job.response)
+           
             console.log(json)
             setIsLoading(false)
             const definition = json[0].explanation
@@ -80,7 +101,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
 
         } catch (err) {
             setIsLoading(false)
-            console.error('Error looking up term.')
+            console.error('Error looking up term.', err)
             if (err instanceof Error) {
                 setErrorMsg(err.message)
             } else {
@@ -153,7 +174,7 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
         
         <DialogContent>
             <DialogHeader>
-            <DialogTitle>{curTerm} {curInterp ? `- ${curInterp}` : ''}</DialogTitle>
+            <DialogTitle className="leading-normal pt-6">{curTerm} {curInterp ? `- ${curInterp}` : ''}</DialogTitle>
             <DialogDescription>
             <span className="text-sm text-muted-foreground flex gap-1">
                 {

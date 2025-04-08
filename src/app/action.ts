@@ -541,6 +541,7 @@ interface TermLookupProps {
     language: string,
 }
 
+//gemini term lookup
 export async function TermLookup({ term, context, language }: TermLookupProps) {
     try {
         
@@ -554,7 +555,24 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
         if (!success) {
             throw new Error(`You're doing too much! Please wait a few seconds before trying again!`)
         }
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
+
+        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''} Please provide the most accurate word as its translation and  up to two Alternate translation if possible. Please answer in ${language}.`
+
+        const params: {
+            model: ModelsType,
+            prompt: string,
+            userId: string
+        } = {
+            model: 'd1',
+            prompt: prompt,
+            userId: session.user.id
+        }
+        const jobId = await queueJob(params)
+        return jobId
+
+
+
+        /* const genAI = new GoogleGenerativeAI(process.env.GEMINI_API as string)
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.0-flash',
             generationConfig: {
@@ -598,12 +616,12 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
 
         })
 
-        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''} Please provide the most accurate word as its translation and  up to two Alternate translation if possible.`
+        const prompt = `What is "${term}" in ${language} ? ${context ? `in this context? ${context}` : ''} Please provide the most accurate word as its translation and  up to two Alternate translation if possible. Please answer in ${language}.`
 
         const result = await model.generateContent(prompt)
         console.log('gem result:', result)
 
-        return result.response.text()
+        return result.response.text() */
     } catch (err) {
         console.error('[Termlookup] Error' , err)
         throw err

@@ -272,98 +272,13 @@ export default function MainInputForm() {
                         throw new Error('Invalid response. Please try again later.')
                         
                     }
-                  
-                   
+                             
 
                 } catch (err) {
                     console.error(err)
                     throw err
                 }
-                /* setIsLoading(true) */
-                /* try {
-                    setSlot1ModelName('Free')
-                    const jobId = await translateGemini(params)
-                    // const jobId = `testJobId`
-                    console.log('[Standard Model] Job Id - ', jobId)
-                    if (!jobId) {
-                        throw new Error('[Standard Model] Missing job Id')
-                    }
-                    console.log('[Standard Model] JobId:', jobId)
-                    const pollResponse = await pollJobStatus({
-                        jobId: jobId,
-                        startTime: startTime,
-                        interval: pollInterval,
-                    })
-                    
-
-                    console.log(`[Standard Model] pollResponse for id ${jobId}`, pollResponse)
-                    if (pollResponse.job.jobStatus === 'failed') {
-                       
-                        if (typeof pollResponse.job.response === 'string') {
-                            throw new Error(pollResponse.job.response)
-                        } else {
-                            throw new Error('Something went wrong *_*. Please try again later.')
-                        }
-                       
-
-                        
-                    }
-                    let jsonResponse = pollResponse.job.response
-                    if (/^```|```$/.test(pollResponse.job.response)) {
-                        console.log("String has triple backticks at the start or end")
-                        try {
-                            jsonResponse = jsonrepair(jsonResponse)
-                            console.log('new JSON RESPONSE', jsonResponse)
-                        } catch (err) {
-                            throw new Error('AI returned corrupted data. This is a rare bug that seems to happen with this model if the last line of text is a dialog with single quotes.')
-                        }
-                        
-                    }
-                    const response = JSON.parse(jsonResponse)
-                    console.log(response)
-                    if (response[0].glossary?.terms) {
-                        const glossaryResult = response[0].glossary.terms
-
-                        //normalized glossary is user's glossary
-                        if (normalizedGlossary && normalizedGlossary.length > 0) {
-                            const termSet = new Set(normalizedGlossary.map(entry => entry.term))
-                            glossaryResult.forEach((newentry: GlossaryItem) => {
-                                if (!termSet.has(newentry.term.toLowerCase())) {
-                                    termSet.add(newentry.term)
-                                    normalizedGlossary.unshift(newentry)
-                                } else {
-                                    console.log(`Entry ${newentry.term} already exists.`)
-                                }
-                            })
-                            setGlossary(normalizedGlossary)
-                        } else {
-                            setGlossary(glossaryResult)
-                        }
-                    }
-
-                    if (!response[0].translation && text) {
-                        setSlot1ResultDisplay(text)
-                        setSlot1Txt(text)
-                    } else {
-                        setSlot1ResultDisplay(response[0].translation)
-                        setSlot1Txt(response[0].translation)
-                    }
-
-
-
-
-                } catch (err: any) {
-                    console.log('Error in Standard API')
-                    
-                    if (err instanceof Error) {
-                        throw new Error(err.message)
-                    } else {
-                        throw new Error('[Standard Model] Encountered a server error. If problem persists, try again later.')
-                    }
-                } */
-
-
-
+     
             } else if (model === 'b1') {
 
                 if (userCurrency && userCurrency < claudeCost) {

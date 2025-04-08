@@ -92,7 +92,7 @@ export default function GlossaryTable() {
   }
 
 
-  const handleInputchange = (newDef: string, id: number) => {
+  /* const handleInputchange = (newDef: string, id: number) => {
     const updatedData = glossary.map((node, idx) => {
       if (id === idx) {
         return (
@@ -103,14 +103,14 @@ export default function GlossaryTable() {
       }
     })
 
-    /* setTestGloss(updatedData) */
+    
     setGlossary(updatedData)
   }
 
   const testGlossary = () => {
     setGlossary(glossary1)
     console.log('glossary:', glossary)
-  }
+  } */
 
   const checkValidJson = (arr: any[]) => {
     const requiredFields = ['term', 'translated_term']
@@ -277,9 +277,7 @@ export default function GlossaryTable() {
     setGlossary((prev) => prev!.filter((entry: GlossaryItem) => entry.term !== term))
   }
 
-  const termLookup = (term: string) => {
-    console.log('Looking up', term)
-  }
+ 
 
   useEffect(() => {
     console.log('gloss lang set to :', lang)
@@ -298,9 +296,16 @@ export default function GlossaryTable() {
     return (
       <TableRow key={`tb-${index}`}>
         <TableCell className="font-medium">
+          <Tooltip>
+            <TooltipTrigger>
           <span className="gt-span w-[54px]">
             {item.term}
           </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{item.term}</p>
+          </TooltipContent>
+          </Tooltip>
         </TableCell>
 
         <TableCell className="flex gap-4">
