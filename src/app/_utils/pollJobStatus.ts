@@ -3,13 +3,19 @@ async function delay(ms:number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function pollJobStatus({ jobId, startTime, interval }: {
+export async function pollJobStatus({ jobId, startTime, interval, maxTimer }: {
     jobId: string,
     startTime:number,
     interval: number
+    maxTimer?:number
 }) {
     const elapsedTime = Date.now() - startTime
-    const maxTime = 90000
+    let maxTime
+    if (!maxTimer) {
+        maxTime = 90000
+    } else {
+        maxTime = maxTimer
+    }
     if (elapsedTime > maxTime) {
         throw new Error('Server timed out. Please try again later.')
     }

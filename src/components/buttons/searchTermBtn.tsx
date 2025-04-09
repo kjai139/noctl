@@ -69,13 +69,15 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             console.log('[Standard Model] JobId:', jobId)
             const startTime = Date.now()
             const pollInterval = 3000
+            const timeOut = 10000
             const pollResponse = await pollJobStatus({
                 jobId: jobId,
                 startTime: startTime,
                 interval: pollInterval,
+                maxTimer: timeOut
             })
 
-            if (pollResponse.job.jobStatus === 'failed') {
+            if (pollResponse.jobStatus === 'failed') {
                 if (typeof pollResponse.job.response === 'string') {
                     throw new Error(pollResponse.job.response)
                 } else {
@@ -118,13 +120,34 @@ export default function SearchTermBtn ({term, language}:searchTermBtnProps) {
             setErrorMsg('')
             setIsLoading(true)
             try {
-                const response = await TermLookup({
-                    term: curTerm,
-                    context: context,
-                    language: language
+
+                const jobId = await TermLookup({
+                    term:term,
+                    language: language,
+                    context: context
+                })
+                const startTime = Date.now()
+                const pollInterval = 3000
+                const timeOut = 10000
+                const pollResponse = await pollJobStatus({
+                    jobId: jobId,
+                    startTime: startTime,
+                    interval: pollInterval,
+                    maxTimer: timeOut
                 })
 
-                const json = JSON.parse(response)
+                if (pollResponse.jobStatus === 'failed') {
+                    if (typeof pollResponse.job.response === 'string') {
+                        throw new Error(pollResponse.job.response)
+                    } else {
+                        throw new Error('Something went wrong *_*. Please try again later.')
+                    }
+            
+                }
+
+                
+
+                const json = JSON.parse(pollResponse.job.response)
                 console.log(json)
                 setIsLoading(false)
                 const definition = json[0].explanation

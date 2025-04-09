@@ -220,7 +220,7 @@ export default function MainInputForm() {
                         interval: pollInterval,
                     })
 
-                    if (pollResponse.job.jobStatus === 'failed') {
+                    if (pollResponse.jobStatus === 'failed') {
                         if (typeof pollResponse.job.response === 'string') {
                             throw new Error(pollResponse.job.response)
                         } else {
