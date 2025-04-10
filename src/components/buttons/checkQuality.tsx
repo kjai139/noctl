@@ -10,6 +10,7 @@ import { useWorkState } from "@/app/_contexts/workStateContext";
 import { pollJobStatus } from "@/app/_utils/pollJobStatus";
 import useButtonDisabled from "@/hooks/use-disabled";
 import { MdOutlineVisibility } from "react-icons/md";
+import { editCost } from "@/lib/modelPrice";
 
 
 interface CheckQualityBtnProps {
@@ -28,7 +29,7 @@ interface CheckQualityBtnProps {
 export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, setSlotDisplay, setSlotEditedText, isSlotEditing, setIsSlotEditShowing, setSlotEditErrorMsg }: CheckQualityBtnProps) {
 
     const [isTooltipAllowed, setIsTooltipAllowed] = useState(false)
-    const { userCurrency } = useWorkState()
+    const { userCurrency, setUserCurrency } = useWorkState()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const isDisabled = useButtonDisabled()
 
@@ -85,7 +86,15 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                 console.error('[e-1] Missing job Id')
                 throw new Error('Something went wrong -_-, please try again later.')
             }
-            console.log('[B1 Model] JobId:', jobId)
+            setUserCurrency((prev) => {
+                if (prev !== null && prev !== undefined) {
+                    return prev - editCost
+                }
+                return prev
+            })
+    
+            console.log('[QC]] JobId:', jobId)
+            console.log('[QC] new currency ->', userCurrency, '-', editCost)
             const pollResponse = await pollJobStatus({
                 jobId: jobId,
                 startTime: startTime,
@@ -95,16 +104,16 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             console.log('[editText] jobId', jobId)
 
             if (pollResponse.job.jobStatus === 'failed') {
-                       
+
                 if (typeof pollResponse.job.response === 'string') {
                     console.error('Error from poll in str:', pollResponse.job.response)
                     throw new Error('Encountered a server error. Please try again later.')
                 } else {
                     throw new Error('Something went wrong *_*. Please try again later.')
                 }
-               
 
-                
+
+
             }
             let jsonResponse
             try {
@@ -118,6 +127,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             const linesArr = jsonResponse[0].input.result_array
             console.log('[QC] Edited text array', linesArr)
             const formattedTextResult = linesArr.map((line: any) => line.translated_line).join('\n')
+            
             setSlotEditedText(formattedTextResult)
             setIsSlotEditShowing(true)
             setIsSlotEditing(false)
@@ -132,12 +142,12 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             }
             setIsSlotEditing(false)
             console.error('[CheckQuality] error', err)
-            
+
         }
 
     }
 
-    const textFunc = ({mode}: {
+    /* const textFunc = ({mode}: {
         mode: 'error' | 'load'
     }) => {
         setIsDialogOpen(false)
@@ -155,7 +165,7 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
             }, 5000)
         }
                 
-    }
+    } */
 
     useEffect(() => {
         console.log('IS SLOT EIDITNG', isSlotEditing)
@@ -197,19 +207,19 @@ export default function CheckQualityBtn({ slotRaw, slotTxt, setIsSlotEditing, se
                         <AlertDialogDescription className="flex flex-col gap-2">
                             <span>When using AI to translate a large amount of text, sometimes they will hallucinate and add in text unrelated to the input.</span>
                             <span>
-                            Use this function if you suspect there are any hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if there's something out of place.
+                                Use this function if you suspect hallucinations. It will use the best paid model to check the lines one by one, and then you can compare the lines to check if something feels out of place.
                             </span>
                             <span className="text-muted-foreground text-sm flex gap-1 flex-col">
                                 <span>This function will not change anything in the glossary.</span>
-                            <span>You can toggle line by line mode with the <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> visibility button.</span>
+                                <span>Use the eye icon <MdOutlineVisibility className="inline" size={20}></MdOutlineVisibility> to toggle visibility.</span>
                             </span>
-                            
+
                             <span className="mt-2 text-black">
                                 It costs <strong>1</strong> <TbCircleLetterRFilled size={18} className="inline text-primary"></TbCircleLetterRFilled> credit to perform this action. {
                                     userCurrency && userCurrency > 0 ? 'Proceed?' : 'You do not have enough request currency, please add more at the currency tab.'
                                 }
                             </span>
-                            
+
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

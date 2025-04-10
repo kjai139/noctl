@@ -3,11 +3,12 @@ async function delay(ms:number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export async function pollJobStatus({ jobId, startTime, interval, maxTimer }: {
+export async function pollJobStatus({ jobId, startTime, interval, maxTimer, initialDelay }: {
     jobId: string,
-    startTime:number,
+    startTime:number
     interval: number
     maxTimer?:number
+    initialDelay?:number
 }) {
     const elapsedTime = Date.now() - startTime
     let maxTime
@@ -20,8 +21,15 @@ export async function pollJobStatus({ jobId, startTime, interval, maxTimer }: {
         throw new Error('Server timed out. Please try again later.')
     }
     try {
-        console.log(`[pollJobStatus] Polling for response every ${interval}s... Elapsed time is ${elapsedTime / 1000} seconds`)
-        await delay(interval)
+        
+        if (initialDelay) {
+            console.log(`[pollJobStatus] Polling for response every ${interval}s with initial delay ${initialDelay}s... Elapsed time is ${elapsedTime / 1000} seconds`)
+            await delay(initialDelay)
+        } else {
+            console.log(`[pollJobStatus] Polling for response every ${interval}s... with no initial delay. Elapsed time is ${elapsedTime / 1000} seconds`)
+            await delay(interval)
+        }
+        
         console.log(`Polling...`)
         const response = await fetch(`api/job/getStatus?jobId=${jobId}`, {
             method:'GET',

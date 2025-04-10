@@ -1,30 +1,25 @@
 "use client"
-import { Control, useForm, useWatch } from "react-hook-form";
-import { Textarea } from "../ui/textarea";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
-import { Button } from "../ui/button";
-import { translateGemini, translateGpt, translateClaude, testGemini } from "@/app/action";
-import { useWorkState } from "@/app/_contexts/workStateContext";
-import GlossaryTable from "../tables/glossaryTable";
-import { useEffect, useState } from "react";
-import { GlossaryItem, GlossaryType, ModelsType } from "@/app/_types/glossaryType";
-import ChunkCarousel from "../carousels/chunkCarousel";
-import AiModelSelect from "../select/aiModelSelect";
-import { FaArrowRightArrowLeft } from "react-icons/fa6";
-import ErrorResultAlert from "../dialog/errorResult";
-import Anthropic from "@anthropic-ai/sdk";
-import { claudeCost, openAiCost } from "@/lib/modelPrice";
-import { useOutputContext } from "@/app/_contexts/outputContext";
-import { useSession } from "next-auth/react";
-import redis from "@/lib/redis";
-import { pollJobStatus } from "@/app/_utils/pollJobStatus";
-import { jsonrepair } from 'jsonrepair'
 import { useEditTabContext } from "@/app/_contexts/editContext";
+import { useOutputContext } from "@/app/_contexts/outputContext";
+import { useWorkState } from "@/app/_contexts/workStateContext";
+import { GlossaryItem, ModelsType } from "@/app/_types/glossaryType";
+import { pollJobStatus } from "@/app/_utils/pollJobStatus";
+import { translateClaude, translateGemini, translateGpt } from "@/app/action";
 import useButtonDisabled from "@/hooks/use-disabled";
-import MainTextArea from "../textarea/mainTextarea";
+import { claudeCost, openAiCost } from "@/lib/modelPrice";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { jsonrepair } from 'jsonrepair';
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { Control, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
+import ChunkCarousel from "../carousels/chunkCarousel";
+import ErrorResultAlert from "../dialog/errorResult";
+import AiModelSelect from "../select/aiModelSelect";
 import OutputSelect from "../select/outputSelect";
+import MainTextArea from "../textarea/mainTextarea";
+import { Button } from "../ui/button";
+import { Form, FormControl, FormField, FormItem } from "../ui/form";
 
 
 const tokenLimit = 10000
@@ -62,10 +57,9 @@ export default function MainInputForm() {
     const [selectedChunk, setSelectedChunk] = useState<number | null>(null)
     const isDisabled = useButtonDisabled()
 
-    const [isSplitDone, setIsSplitDone] = useState(false)
     const [aiModel, setAiModel] = useState<ModelsType>('standard')
     const [errorMsg, setErrorMsg] = useState('')
-    const [isFetching, setIsFetching] = useState(false)
+ 
     const { data: session } = useSession()
 
 
