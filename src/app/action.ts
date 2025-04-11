@@ -321,14 +321,14 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             throw new Error('Encountered an authentication error. Please sign in to use this model.')
         }
 
-        const existingUser = await userModel.findById(session.user.id)
+        /* const existingUser = await userModel.findById(session.user.id)
 
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
         }
         if (existingUser.currencyAmt < openAiCost) {
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
-        }
+        } */
 
         let prompt
         if (glossary) {
@@ -358,7 +358,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             userId: session.user.id
         }
         const jobId = await queueJob(params)
-        const UserCurrencyAmt:number = existingUser.currencyAmt
+        /* const UserCurrencyAmt:number = existingUser.currencyAmt
         const updatedUsercur:number = UserCurrencyAmt - openAiCost
         existingUser.currencyAmt = updatedUsercur
         try {
@@ -368,7 +368,7 @@ export async function translateGpt({ text, language, glossary }: translateTxtPro
             throw new Error('Encountered a server error *_*. Please try again later.')
         }
         
-        console.log(`[translateGpt] user currency updated: ${UserCurrencyAmt} - ${openAiCost} = ${updatedUsercur}`)
+        console.log(`[translateGpt] user currency updated: ${UserCurrencyAmt} - ${openAiCost} = ${updatedUsercur}`) */
         return jobId
         
 
@@ -388,14 +388,14 @@ export async function translateClaude({ text, language, glossary }: translateTxt
             throw new Error('Please sign in to use this model.')
         }
 
-        const existingUser = await userModel.findById(session.user.id)
+       /*  const existingUser = await userModel.findById(session.user.id)
 
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
         }
         if (existingUser.currencyAmt < claudeCost) {
             throw new Error('You do not have enough currency to use this model. Purchase more at the currency tab.')
-        }
+        } */
 
         let prompt
         if (glossary) {
@@ -422,13 +422,13 @@ export async function translateClaude({ text, language, glossary }: translateTxt
             userId: session.user.id
         }
         const jobId = await queueJob(params)
-        existingUser.currencyAmt -= claudeCost
+        /* existingUser.currencyAmt -= claudeCost
         try {
             await existingUser.save()
         } catch (err) {
             console.error('[TranslateClaude] Error updating user:', err)
             throw new Error('Encountered a server error *_*, please try again later.')
-        }
+        } */
         
         console.log(`[TranslateClaude] user currency updated`)
         return jobId
@@ -456,21 +456,15 @@ export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
             throw new Error('Please sign in to use this model.')
         }
 
-        const existingUser = await userModel.findById(session.user.id)
+       /*  const existingUser = await userModel.findById(session.user.id)
 
         if (!existingUser) {
             throw new Error('Encountered a server error. Please try relogging.')
         }
         if (existingUser.currencyAmt < editCost) {
             throw new Error('You do not have enough currency to use this function. Purchase more at the currency tab.')
-        }
-        /* const textPrompt = `Please review this text line by line, checking its translation by comparing the lines. Remove any hallucinations and make improvements where you can, and then return a list of lines. \n ###Text \n 
-        그렇다 할지라도!
-        Even if that’s the case!
-
-        좋아하는 게임에 캐릭터가 되어달라는 제안을 어떤 게이머가 거절할 수 있나.
-        What gamer could possibly refuse the offer to become a character in their favorite game?
-        ` */
+        } */
+        
 
         const params: {
             model: ModelsType,
@@ -482,53 +476,18 @@ export async function ClaudeEdit ({prompt}:ClaudeEditProps) {
             userId: session.user.id
         }
         const jobId = await queueJob(params)
-        existingUser.currencyAmt -= editCost
+        /* existingUser.currencyAmt -= editCost
         try {
             await existingUser.save()
         } catch (err) {
             console.error('[ClaudeEdit] Error updating user:', err)
             throw new Error('Encountered a server error *_*, please try again later.')
-        }
+        } */
 
         console.log(`[ClaudeEdit] user currency updated`)
         return jobId
 
 
-        /* const message = await client.messages.create({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 8192,
-            temperature: 0.2,
-            tool_choice: {
-                type: 'tool',
-                name: 'edit_translated_text'
-            },
-            tools: [
-                {
-                    name: "edit_translated_text",
-                    description: "To make improvements and remove any hallucinations from the translated text.",
-                    input_schema: {
-                        type:"object",
-                        properties: {
-                            "result_array": {
-                                type:"array",
-                                translated_line: {
-                                    type:"string",
-                                    description:"The translated line after checking for hallucination and improvements."
-                                }
-
-                            }
-                        }
-                    }
-                }
-            ],
-            messages: [{
-                role: "user",
-                content: prompt
-            }],
-            
-        })
-        console.log('[claudeEdit] message', message)
-        return message.content */
     } catch (err) {
         console.error('[claudeEdit] Error', err)
         throw err
@@ -626,4 +585,91 @@ export async function TermLookup({ term, context, language }: TermLookupProps) {
         console.error('[Termlookup] Error' , err)
         throw err
     }
+}
+
+
+export async function chargeUser({model}:{model: ModelsType}) {
+    try {
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Encountered an authentication error. Please try relogging.')
+        }
+
+        const existingUser = await userModel.findById(session.user.id)
+
+        if (!existingUser) {
+            throw new Error('Encountered a server error. Please try relogging.')
+        }
+
+        switch (model) {
+            case 'b1':
+                if (existingUser.currencyAmt < claudeCost) {
+                    throw new Error('You do not have enough currency. Purchase more at the currency tab.')
+                } else {
+                    existingUser.currencyAmt -= claudeCost
+                    await existingUser.save()
+                    console.log(`[chargeUser b1] user ${existingUser._id} charged ${claudeCost}`)
+                    return true
+                }
+            case 'b2':
+                if (existingUser.currencyAmt < openAiCost) {
+                    throw new Error('You do not have enough currency. Purchase more at the currency tab.')
+                } else {
+                    existingUser.currencyAmt -= openAiCost
+                    await existingUser.save()
+                    console.log(`[chargeUser b2] user ${existingUser._id} charged ${openAiCost}`)
+                    return true
+                }
+            case 'd1':
+                if (existingUser.currencyAmt < editCost) {
+                    throw new Error('You do not have enough currency. Purchase more at the currency tab.')
+                } else {
+                    existingUser.currencyAmt -= editCost
+                    await existingUser.save()
+                    console.log(`[chargeUser d1] user ${existingUser._id} charged ${editCost}`)
+                    return true
+                }
+            default:
+                console.log('[chargeUser] unhandled model', model)
+                return false
+
+        }
+
+
+    } catch (err) {
+        console.error('[chargeUser] error: ', err)
+        return false
+    }
+}
+
+
+export async function checkUserErrors () {
+    try {
+        const session = await auth()
+        if (!session || !session.user.id) {
+            throw new Error('Encountered an authentication error. Please try relogging.')
+        }
+        const key = `errors-${session.user.id}`
+        const timeWindow = 300
+        const errorLimit = 10
+        const exists = await redis.exists(key)
+        if (!exists) {
+            await redis.set(key, 1, {ex: timeWindow})
+        } else {
+            await redis.incr(key)
+        }
+
+        const errorCount = Number(await redis.get(key))
+        if (errorCount > errorLimit) {
+            console.log('[CheckUserErrors] User error limit exceed 10 every 5 min. Count - ', errorCount)
+            return 429
+        } else {
+            console.log('[checkUserErrors] Error count:', errorCount)
+            return 200
+        }
+    } catch (err) {
+        console.error('[CheckUserErrors] error:' , err)
+        throw new Error('Something went wrong. Please try again later.')
+    }
+    
 }
